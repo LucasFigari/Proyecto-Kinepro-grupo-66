@@ -4,3 +4,4 @@ Nicolás Ezequiel Quiñones Uyuni
 Jamir Toledo
 Lucas Manuel Alvarez
 Lucas Figari
+Lucio vaccarini

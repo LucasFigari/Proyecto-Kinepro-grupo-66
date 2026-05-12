@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from "express";
-import UsuarioRoutes from "./routes/UsuarioRoutes.js"
 import AppDataSource from "./config/DbConfig.js";
 import cors from "cors";
 import AreaDeTratamientoRoutes from "./routes/AreaDeTratamientoRoutes.js"
@@ -17,7 +16,6 @@ try {
     process.exit(1); 
 }
 
-app.use("/", UsuarioRoutes);
 app.use("/", AreaDeTratamientoRoutes)
 
 app.listen(3000, () => {

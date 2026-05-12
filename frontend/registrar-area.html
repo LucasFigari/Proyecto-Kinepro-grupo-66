@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Área de Tratamiento</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh; 
+            margin: 0;
+            background-color: var(--bg); 
+            color: var(--text);
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); 
+            width: 100%; 
+            max-width: 400px; 
+        }
+
+        h2 { 
+            margin-top: 0; 
+            font-size: 1.5rem; 
+            text-align: center; 
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group { margin-bottom: 1.2rem; }
+
+        label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            font-size: 0.9rem;
+            font-weight: 600; 
+        }
+
+        input { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 0.75rem; 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer; 
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+        button:active { transform: scale(0.98); }
+        button:disabled { background-color: #94a3b8; cursor: not-allowed; }
+
+        #mensajeError { 
+            margin-top: 1.5rem; 
+            padding: 0.75rem; 
+            border-radius: 6px; 
+            font-size: 0.875rem;
+            display: none; 
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <script src="./src/registrarArea.js" defer></script>
+</head>
+<body>
+
+    <div class="card">
+        <form id="areaForm">
+            <h2>Registro de Área</h2>
+            
+            <div class="input-group">
+                <label for="nombre">Nombre del Área</label>
+                <input type="text" id="nombre" placeholder="Ej: Area Tren Inferior" required>
+            </div>
+
+            <div class="input-group">
+                <label for="descripcion">Descripción Completa</label>
+                <input type="text" id="descripcion" placeholder="Detalles del tratamiento..." required>
+            </div>
+
+            <button type="submit" id="btnGuardar">Guardar Área</button>
+
+            <div id="mensajeError"></div>
+        </form>
+    </div>
+
+</body>
+</html>

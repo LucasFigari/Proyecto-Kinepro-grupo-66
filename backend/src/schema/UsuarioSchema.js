@@ -2,20 +2,30 @@ import { EntitySchema } from "typeorm";
 
 const UserSchema = new EntitySchema({
     name: "Usuario",
-    tableName: "users",
+    tableName: "usuarios",
     columns: {
         id: {
             primary: true,
             type: "int",
             generated: true,
         },
-        username: {
+        dni: {
+            type: "varchar",
+            unique: true
+        },
+        nombre: {
             type: "varchar",
         },
         email: {
             type: "varchar",
             unique: true,
         },
+        password: {
+            type : "varchar"
+        },
+        telefono: {
+            type: "varchar"
+        }
     },
 });
 

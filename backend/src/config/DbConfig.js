@@ -1,4 +1,6 @@
 import { DataSource } from "typeorm";
+import UserSchema from "../schema/UsuarioSchema.js"
+import AreaDeTratamientoSchema from "../schema/AreaDeTratamientoSchema.js";
 
 const AppDataSource = new DataSource({
     type: "postgres", 
@@ -6,10 +8,10 @@ const AppDataSource = new DataSource({
     port: 5432,
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: "js",
-    synchronize: false,
+    database: "db_kinesiologia",
+    synchronize: true,
     logging: false,
-    entities: [],
+    entities: [UserSchema, AreaDeTratamientoSchema],
 });
 
 export default AppDataSource;

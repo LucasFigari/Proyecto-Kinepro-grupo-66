@@ -45,7 +45,7 @@ function validarCampoApellido(ape){
 
         if(ape.length >= 3 && ape.length <= 30){
 
-            if(/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s]+$/.test(nom)){
+            if(/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s]+$/.test(ape)){
                 esValido = true;
             }
 
@@ -178,10 +178,10 @@ function formularioValido(){
             validarCampoNombre(nombre.value.trim()) 
             && validarCampoApellido(apellido.value.trim()) 
             && validarCampoDni(dni.value.trim())              //nota: puse && en lugar de & para hacer cortocircuito (apenas una este mal no sigue evaluando)
-            && validarCampoEmail(email.value.trim()))         //si se quiere cambiar y que se evalue todo, hay que usar &
+            && validarCampoEmail(email.value.trim())         //si se quiere cambiar y que se evalue todo, hay que usar &
             && validarCampoTelefono(telefono.value.trim())
-            && validarCampoContraseña(contraseña.value.trim()
-           )
+            && validarCampoContraseña(contraseña.value.trim())
+        )
 }
 
 
@@ -191,12 +191,35 @@ const formulario = document.getElementById("formRegistroPaciente")
 formulario.addEventListener("submit", e =>{
     e.preventDefault()
     
-    if(formularioValido){
-        //se agrega el usuario a la base de datos y se avisa en pantalla
-        //IMPORTANTE: se tienen que guardar (Excepto en la contraseña) 
-        //            el valor de cada campo con el trim(). 
-        //            Este metodo elimina los espacios en blanco al principio y final del texto
-        //            la contraseña no debería hacerse ya que quizá el usuario quiere usar 
-        //            el caracter de la barra espaciadora como parte de la contraseña
+    if(formularioValido()){
+        
+        const paciente = {
+            nombre: nombre.value.trim(),
+            apellido: apellido.value.trim(),
+            dni: dni.value.trim(),
+            email: email.value.trim(),
+            telefono: telefono.value.trim(),
+            password: contraseña.value
+        }
+
+        fetch("http://localhost:3000/usuarios/registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(paciente)
+        })
+        
+        .then(res => res.json())
+        .then(data => {
+            if(data.ok){
+                alert("Usuario registrado correctamente")
+                formulario.reset() // limpia los campos
+            }
+        })
+        .catch(error => {
+            console.error("Error al registrar:", error)
+            alert("Hubo un error al registrar el usuario")
+        })
+
     }
 })
+    

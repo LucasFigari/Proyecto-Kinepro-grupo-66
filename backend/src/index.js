@@ -4,6 +4,8 @@ import AppDataSource from "./config/DbConfig.js";
 import cors from "cors";
 import AreaDeTratamientoRoutes from "./routes/AreaDeTratamientoRoutes.js"
 import UsuarioRoutes from "./routes/UsuarioRoutes.js"
+import PersonalRoutes from "./routes/PersonalRoutes.js"
+
 
 
 const app = express();
@@ -24,6 +26,7 @@ try {
 
 app.use("/", AreaDeTratamientoRoutes)
 app.use("/usuarios", UsuarioRoutes)
+app.use("/personal", PersonalRoutes)
 
 
 app.listen(3000, () => {

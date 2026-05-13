@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Personal - KinePro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ <style>
+    /* Estilos personalizados para los colores que elegiste */
+    body {
+        /* Un verde claro muy suave para el fondo */
+        background-color: #d1e7dd; 
+    }
+    .card-registro {
+        background-color: #ffffff; /* Contenedor blanco */
+        max-width: 380px;
+        width: 95%;
+    }
+    .btn-celeste-personalizado {
+        /* El azul claro que te gustó */
+        background-color: #a2d2ff; 
+        border: none;
+        color: #004085; /* Texto en un azul oscuro para que se lea bien */
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .btn-celeste-personalizado:hover {
+        background-color: #8ecae6; /* Se oscurece un poquito al pasar el mouse */
+        color: #004085;
+    }
+</style>
+<body class="d-flex justify-content-center align-items-center vh-100">
+
+    <div class="p-4 card-registro shadow-sm rounded-4">
+        
+     <div class="text-center mb-4">
+    
+    <h4 class="fw-bold" style="color: #333;">Registro de Personal</h4>
+</div>
+        <form id="formRegistroPersonal">
+           
+            <div class="row g-2">
+                <div class="col-6 mb-2">
+                    <label class="form-label fw-semibold small">Nombre</label>
+                    <input type="text" class="form-control form-control-sm" id="nombreRegistro" required>
+                </div>
+                <div class="col-6 mb-2">
+                    <label class="form-label fw-semibold small">Apellido</label>
+                    <input type="text" class="form-control form-control-sm" id="apellidoRegistro" required>
+                </div>
+            </div>
+            
+            <div>
+                <div>
+                    <label>Fecha de nacimiento</label>        <!--CAMPO NUEVO AGREGADO-->
+                    <input type="date" id="fechaNacimiento" required>
+                </div>
+            </div>
+            
+            <div class="mb-2">
+                <label class="form-label fw-semibold small">DNI</label>
+                <input type="text" class="form-control form-control-sm" id="dniRegistro" required>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label fw-semibold small">Correo electrónico</label>
+                <input type="email" class="form-control form-control-sm" id="emailRegistro" required>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label fw-semibold small">Teléfono</label>
+                <input type="text" class="form-control form-control-sm" id="telefonoRegistro">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold small">Contraseña</label>
+                <input type="password" class="form-control form-control-sm" id="contraseñaRegistro" required>
+            </div>
+            
+            <div>
+                <label>Puesto de trabajo</label>  <!--CAMPO NUEVO AGREGADO-->
+                <select id="puestoTrabajo" required>
+                    <option value="">--Seleccionar--</option>                
+                    <option value="secretario/a">Secretario/a</option>
+                    <option value="kinesiologo/a">Kinesiólogo/a</option>
+                </select>
+            </div>
+
+            <div class="d-grid">
+                <button id="btnRegistrarPaciente" class="btn btn-celeste-personalizado py-2" type="submit">
+                    Registrar Paciente
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="./src/registrarPersonal.js"></script> <!--CONEXIÓN CON EL SCRIPT DE REGISTRAR PERSONAL-->
+</body>
+</html>

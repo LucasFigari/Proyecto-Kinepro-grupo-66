@@ -191,7 +191,7 @@ const formulario = document.getElementById("formRegistroPaciente")
 formulario.addEventListener("submit", e =>{
     e.preventDefault()
     
-    if(formularioValido()){
+    if(formularioValido()){  //se llama al metodo formularioValido() y si todos los campos están "Ok" se devuelve true
         
         const paciente = {
             nombre: nombre.value.trim(),
@@ -207,12 +207,12 @@ formulario.addEventListener("submit", e =>{
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(paciente)
         })
-        
+
         .then(res => res.json())
         .then(data => {
-            if(data.ok){
+            if(data.ok){     //verifico que se subió
                 alert("Usuario registrado correctamente")
-                formulario.reset() // limpia los campos
+                window.location.href = "../menuPrincipal.html"// redirige al menu principal (si el archivo tiene otro nombre/ruta hay que cambiar esta ruta)
             }
         })
         .catch(error => {

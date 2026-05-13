@@ -3,6 +3,7 @@ import express from "express";
 import AppDataSource from "./config/DbConfig.js";
 import cors from "cors";
 import AreaDeTratamientoRoutes from "./routes/AreaDeTratamientoRoutes.js"
+import UsuarioRoutes from "./routes/UsuarioRoutes.js"
 
 const app = express();
 app.use(cors())
@@ -16,7 +17,8 @@ try {
     process.exit(1); 
 }
 
-app.use("/", AreaDeTratamientoRoutes)
+app.use("/", AreaDeTratamientoRoutes);
+app.use("/", UsuarioRoutes);
 
 app.listen(3000, () => {
     console.log("Servidor corriendo en el puerto 3000");

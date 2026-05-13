@@ -294,4 +294,85 @@ code {
     border-right-color: var(--border);
   }
 }
+/* Acá podés pegar lo que tenés en style.css para ver los colores */
+        body { background-color: #EBF7FF;
+              padding-top: 60px; /* Tiene que ser igual a la altura de la barra */ 
+            
+            }
+        #barra-superior {
+          left: -3px;
+    background-color: #72B9CB !important;
+    border-bottom: 2px solid #7dbbca;
+    /* FIJAMOS LA ALTURA DE LA BARRA AQUÍ */
+    height: 60px; 
+    position: relative; /* Necesario para que el logo sepa dónde ubicarse */
+    display: flex;
+    align-items: center; /* Centra el botón verticalmente */
+    position: fixed;   /* Queda fija en la pantalla */
+    top: 0;            /* Pegada arriba */
+    width: 100%;       /* Que ocupe todo el ancho */
+    z-index: 1000;     /* Para que pase por ENCIMA de las cards */
+}
 
+#logo-kinepro {
+    position: absolute; /* El logo ya no empuja las paredes de la barra */
+    top: none;          /* Ajustalo a gusto */
+    left: 20px;
+    width: 100px;       /* Acá podés poner 100px o lo que quieras, la barra no va a crecer */
+    height: auto;
+    z-index: 10;       /* Para que quede por encima de la barra */
+}
+ #iniciarSesion {
+    /* Quitamos los bordes feos del navegador */
+    border: none;
+    outline: none;
+    
+    /* Colores según tu paleta */
+    background-color: #D1E9F0 !important;
+    color: #107391;
+    
+    /* Espaciado y forma */
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    
+    /* Para que se mueva a la derecha */
+    margin-left: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#iniciarSesion:hover {
+    background-color: #157188 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#iniciarSesion:hover {
+    /* Un celeste más oscuro que el original para que se note el cambio */
+    background-color: #157188 !important; 
+    
+    /* Opcional: que el texto cambie a blanco para que resalte más */
+    color: #ffffff !important; 
+    
+    /* Esto hace que el cambio sea suave y no un salto brusco */
+    transition: 0}
+.linea-separadora {
+    width: 340px;           /* Cortita y elegante */
+    border: none;
+    border-top: 1px solid #000405; /* El celeste de tu marca */
+    opacity: 1;            /* Que se vea sólida */
+    margin: 20px auto;     /* Centrada horizontalmente */
+    border-radius: 10px;   /* Puntas redondeadas */
+}
+#detalles:hover{
+     /* Un celeste más oscuro que el original para que se note el cambio */
+    background-color: #157188 !important; 
+    
+    /* Opcional: que el texto cambie a blanco para que resalte más */
+    color: #ffffff !important; 
+    
+    /* Esto hace que el cambio sea suave y no un salto brusco */
+    transition: 0.3s;
+}

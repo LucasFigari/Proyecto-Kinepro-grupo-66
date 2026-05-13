@@ -1,3 +1,4 @@
+
 import { DataSource } from "typeorm";
 import UserSchema from "../schema/UsuarioSchema.js"
 import AreaDeTratamientoSchema from "../schema/AreaDeTratamientoSchema.js";

@@ -18,6 +18,7 @@ try {
 }
 
 app.use("/", UsuarioRoutes);
+
 app.use("/", AreaDeTratamientoRoutes)
 
 app.listen(3000, () => {

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./src/style2.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu de Usuario</title>
+</head>
+<style>* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#columnaIzquierda {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh; /* 100% del alto de la ventana */
+    display: flex;
+    flex-direction: column;
+    /* Esto evita que se vea blanco si algo falla */
+    background-color: #B5D1E8; 
+}
+
+.franja-color {
+    width: 100%;
+    flex-grow: 1; /* Esto hace que cada bloque se estire para llenar el espacio */
+    border-bottom-right-radius: 80px; 
+    position: relative;
+    padding: 20px;
+}
+
+#bloque1 { 
+    margin-top: -90px;
+    background-color: #72B9CB; z-index: 3; }
+
+#bloque2 { 
+    background-color: #D1E9F0; 
+    z-index: 2; 
+    margin-top: -250px; /* Mantenemos el solapamiento */
+    padding-top: 80px;
+}
+
+#bloque3 { 
+    background-color: #B5D1E8; 
+    z-index: 1; 
+    margin-top: -80px;
+    padding-top: 100px;
+    border-bottom-right-radius: 0; /* El último termina recto abajo */
+}
+#botonPerfil {
+    /* 1. Grosor, estilo y color del borde */
+    border: 2px solid #72B9CB; 
+    
+    /* 2. Redondeado (para que no sea un rectángulo rígido) */
+    border-radius: 10px; 
+    
+    /* 3. Espaciado interno para que el texto no toque los bordes */
+    padding: 10px 20px;
+    
+    /* Colores base */
+    background-color: #D1E9F0; 
+    color: #72B9CB;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+/* Efecto al pasar el mouse */
+#botonPerfil:hover {
+    background-color: #72B9CB;
+    color: #D1E9F0;
+    /* Podés redondearlo más cuando pasás el mouse si querés un efecto moderno */
+   
+}
+.success {background-color: #72B9CB; border: 10px solid #04AA6D;} 
+.success:hover {background-color: #D1E9F0; color: white;}
+.contenedor-del-boton {
+    display: flex;           /* Activa el modo flexible */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;     /* Centra verticalmente (si el div tiene altura) */
+    
+    height: 100px;           /* Opcional: solo si querés darle un alto fijo */
+}
+</style>
+<body>
+    <div id="app">
+        </div>
+
+    <script type="module"> // Agregamos type="module" por Vite
+        const app = document.querySelector('#app');
+        
+        // Inyectamos todo junto
+app.innerHTML = `
+    <div id="columnaIzquierda">
+        <div id="bloque1" class="franja-color">
+            <p>Datos de usuario</p>
+        </div>
+        <div id="bloque2" class="franja-color"></div>
+        <div id="bloque3" class="franja-color">
+        <div class="contenedor-del-boton">
+                <button id="botonPerfil" class="btn success">Ver Perfil</button>
+            </div>
+            
+            </div>
+    </div>
+
+        <div id="contenidoPrincipal" style="margin-left: 250px; padding: 20px;">
+        <h2>Bienvenido a KinePro</h2>
+        <p>Seleccioná una opción del menú.</p>
+        </div>
+`;
+    </script>
+</body>
+</html>

@@ -2,7 +2,8 @@
 import AppDataSource from "../config/DbConfig.js"
 import PersonalSchema from "../schema/PersonalSchema.js"
 
-export const registrarPersonal = async (req, res) => {
+
+export const registrarPersonal = async (req, res) => {  //controlador de alta
 
     const { nombre, apellido, fechaNac, dni, email, telefono, password, rol } = req.body
 
@@ -15,7 +16,7 @@ export const registrarPersonal = async (req, res) => {
 
 }
 
-export const validarDniUnico = async (req, res) => {
+export const validarDniUnico = async (req, res) => {  //controlador de validacion de dni
 
     const { dni } = req.params
 
@@ -31,7 +32,7 @@ export const validarDniUnico = async (req, res) => {
     }
 }
 
-export const validarCorreoUnico = async (req, res) => {
+export const validarCorreoUnico = async (req, res) => {   //controlador de validacion de correo
 
     const { email } = req.params
 
@@ -46,3 +47,27 @@ export const validarCorreoUnico = async (req, res) => {
         res.json({ existe: false })
     }
 }
+
+
+export const obtenerPersonal = async(req, res) => { //controlador para traer todos los registros de la tabla personal
+
+    const repo = AppDataSource.getRepository(PersonalSchema)
+    const personal = repo.find()
+    res.json(personal)
+
+}
+
+
+export const bajaPersonal = async (req, res) => { //controlador de baja de personal
+
+    const { id } = req.params
+
+    const repo = AppDataSource.getRepository(PersonalSchema)
+
+    await repo.delete(id)
+
+    res.json({ ok: true, mensaje: "se eliminó el personal" })
+
+}
+
+

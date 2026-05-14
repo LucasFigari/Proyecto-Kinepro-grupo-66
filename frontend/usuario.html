@@ -89,37 +89,61 @@
     <div id="app">
         </div>
 
-    <script type="module"> // Agregamos type="module" por Vite
-        
-        const app = document.querySelector('#app');
-        
-        // Inyectamos todo junto
-app.innerHTML = `
-    <div id="columnaIzquierda">
-        <div id="bloque1" class="franja-color">
-            <p>Datos de usuario</p>
+   <script type="module"> // Agregamos type="module" por Vite
+    const app = document.querySelector('#app');
+    
+    // 1. Inyectamos el HTML primero
+    app.innerHTML = `
+        <div id="columnaIzquierda">
+            <div id="bloque1" class="franja-color">
+                <p>Datos de usuario</p>
+            </div>
+            <div id="bloque2" class="franja-color"></div>
+            <div id="bloque3" class="franja-color">
+                <div class="contenedor-del-boton">
+                    <button id="botonPerfil" class="btn success">Ver Perfil</button>
+                </div>
+            </div>
         </div>
-        <div id="bloque2" class="franja-color"></div>
-        <div id="bloque3" class="franja-color">
-        <div class="contenedor-del-boton">
-                <button id="botonPerfil" class="btn success">Ver Perfil</button>
-            </div>
-            
-            </div>
-    </div>
 
         <div id="contenidoPrincipal" style="margin-left: 250px; padding: 20px;">
-        <h2>Bienvenido a KinePro</h2>
-        <p>Seleccioná una opción del menú.</p>
+            <h2>Bienvenido a KinePro</h2>
+            <p>Seleccioná una opción del menú.</p>
         </div>
-`;
-const boton = document.getElementById('botonPerfil');
-const contenido = document.getElementById('contenidoPrincipal');
-boton.addEventListener('click', () => {
-    contenido.innerHTML = ''; 
-    console.log("Contenido principal vaciado correctamente.");
-});
+    `;
 
-    </script>
+    // 2. Buscamos los elementos después de inyectar
+    const boton = document.getElementById('botonPerfil');
+    const contenido = document.getElementById('contenidoPrincipal');
+
+   
+    boton.addEventListener('click', async () => {
+        contenido.innerHTML="";
+        try {
+            const respuesta = await fetch('http://localhost:3000/usuarios/perfil/1');
+            
+            if (!respuesta.ok) {
+                throw new Error("No se pudo encontrar el usuario");
+            }
+
+            const usuario = await respuesta.json();
+
+            // Inyectamos los datos reales de la base de datos
+            contenido.innerHTML = `
+                <div class="perfil-contenedor">
+                    <h2>Perfil de Usuario</h2>
+                    <hr>
+                    <p><strong>Nombre:</strong> ${usuario.nombre} ${usuario.apellido}</p>
+                    <p><strong>DNI:</strong> ${usuario.dni}</p>
+                    <p><strong>Email:</strong> ${usuario.email}</p>
+                    <p><strong>Teléfono:</strong> ${usuario.telefono}</p>
+                </div>
+            `;
+        } catch (error) {
+            contenido.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            console.error("Hubo un problema:", error);
+        }
+    });
+</script>
 </body>
 </html>

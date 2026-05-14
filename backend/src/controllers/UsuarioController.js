@@ -12,3 +12,33 @@ export const registrarUsuario = async (req, res) => {
 
     res.json({ ok: true, mensaje: "Usuario registrado correctamente" })
 }
+
+export const verificarDni = async (req, res) => {
+    const { dni } = req.params
+
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    const usuarioExistente = await repo.findOne({ where: { dni: dni } })
+
+    if(usuarioExistente){
+        res.json({ existe: true })
+    } 
+    else {
+        res.json({ existe: false })
+    }
+}
+
+export const verificarEmail = async (req, res) => {
+    const { email } = req.params
+
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    const usuarioExistente = await repo.findOne({where: { email: email } })
+
+    if(usuarioExistente){
+        res.json({ existe: true })
+    }
+    else{
+        res.json({ existe: false })
+    }
+}

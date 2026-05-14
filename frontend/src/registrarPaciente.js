@@ -68,31 +68,38 @@ function validarCampoApellido(ape){
     return esValido
 }
 
-function validarCampoDni(dniParametro){
+async function validarCampoDni(dniParametro){
     let esValido = false;
 
     if(dniParametro != ""){
 
         if(/^\d{7,8}$/.test(dniParametro)){
 
-            //Hacer el If que compruebe la BD. si no existe en la BD se asigna esValido = true (ya que dni es unico). else avisar que dni ya existe
+            const res = await fetch(`http://localhost:3000/usuarios/verificar-dni/${dniParametro}`) //envio el mensaje para verificar el dni enviado como parametro
 
-        }
-        
+            const data = await res.json()  //recibo la respuesta
+
+            if(!(data.existe)){  //si no existe en la bd, se puede crear
+
+                esValido = true
+            }
+            else{
+                //avisar dni ya se encuentra registrado en el sistema
+            }
+        }       
         else{
             //avisar dni invalido
         }
-
     }
-
     else{
         //avisar campo vacio
     }
 
     return esValido
+
 }
 
-function validarCampoEmail(correo){
+async function validarCampoEmail(correo){
 
     let esValido = false;
 
@@ -100,7 +107,17 @@ function validarCampoEmail(correo){
 
         if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)){
 
-            //Hacer el if que compruebe la BD. Si no existe en la BD se asigna esValido = true (correo unico). Else avisar que correo ya existe
+            const res = await fetch(`http://localhost:3000/usuarios/verificar-email/${correo}`)
+            const data = await res.json()
+
+            if(!(data.existe)){
+
+                esValido = true
+
+            }
+            else{
+                //avisar email ya se encuentra registrado en el sistema
+            }
 
         }
         
@@ -172,13 +189,13 @@ function validarCampoContraseña(cont){
 
 
 
-function formularioValido(){  
+async function formularioValido(){  
 
     return (
             validarCampoNombre(nombre.value.trim()) 
             && validarCampoApellido(apellido.value.trim()) 
-            && validarCampoDni(dni.value.trim())              //nota: puse && en lugar de & para hacer cortocircuito (apenas una este mal no sigue evaluando)
-            && validarCampoEmail(email.value.trim())         //si se quiere cambiar y que se evalue todo, hay que usar &
+            && await validarCampoDni(dni.value.trim())              //nota: puse && en lugar de & para hacer cortocircuito (apenas una este mal no sigue evaluando)
+            && await validarCampoEmail(email.value.trim())         //si se quiere cambiar y que se evalue todo, hay que usar &
             && validarCampoTelefono(telefono.value.trim())
             && validarCampoContraseña(contraseña.value.trim())
         )
@@ -188,10 +205,10 @@ function formularioValido(){
 
 const formulario = document.getElementById("formRegistroPaciente")
 
-formulario.addEventListener("submit", e =>{
+formulario.addEventListener("submit", async e =>{
     e.preventDefault()
     
-    if(formularioValido()){  //se llama al metodo formularioValido() y si todos los campos están "Ok" se devuelve true
+    if(await formularioValido()){  //se llama al metodo formularioValido() y si todos los campos están "Ok" se devuelve true
         
         const paciente = {
             nombre: nombre.value.trim(),

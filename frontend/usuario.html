@@ -118,17 +118,13 @@
 
    
     boton.addEventListener('click', async () => {
-        contenido.innerHTML="";
+        contenido.innerHTML = '<p>Buscando datos en la base de datos...</p>';       
         try {
-            const respuesta = await fetch('http://localhost:3000/usuarios/perfil/1');
-            
+            const respuesta = await fetch('http://localhost:3000/usuarios/Perfil/1');    
             if (!respuesta.ok) {
-                throw new Error("No se pudo encontrar el usuario");
+                throw new Error("No se encontró el usuario en la base de datos");
             }
-
             const usuario = await respuesta.json();
-
-            // Inyectamos los datos reales de la base de datos
             contenido.innerHTML = `
                 <div class="perfil-contenedor">
                     <h2>Perfil de Usuario</h2>
@@ -141,7 +137,7 @@
             `;
         } catch (error) {
             contenido.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-            console.error("Hubo un problema:", error);
+            console.error("Detalle:", error);
         }
     });
 </script>

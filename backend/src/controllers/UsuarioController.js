@@ -42,3 +42,22 @@ export const verificarEmail = async (req, res) => {
         res.json({ existe: false })
     }
 }
+
+export const obtenerPerfilCliente = async(req, res) => {
+   const { id } = req.params
+
+   const repo = AppDataSource.getRepository(UserSchema);
+   try{
+       const usuario = await repo.findOne({where: { email: email}})
+
+       if (usuario) {
+              const { password, ...datosPublicos } = usuario;
+              res.json(datosPublicos); 
+       } else {
+               res.status(404).json({ mensaje: "usuario encontrado" });
+       }
+   }catch(error){
+    res.estatus(505).json({ mensaje:"usuario no encontrado"}) 
+   }
+
+}

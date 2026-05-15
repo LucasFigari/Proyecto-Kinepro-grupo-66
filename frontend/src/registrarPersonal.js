@@ -272,7 +272,7 @@ formulario.addEventListener("submit", async e =>{
         .then(data => {
             if(data.ok){     //verifico que se subió
                 alert("Personal registrado correctamente")
-               // window.location.href = "link de la pestaña en la que esté la lista de trabajadores"  IMPORTANTE: MODIFICAR ESTA LINEA 
+                window.location.href = "./pestaña-personal.html" 
             }
         })
         .catch(error => {

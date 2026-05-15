@@ -43,21 +43,20 @@ export const verificarEmail = async (req, res) => {
     }
 }
 
-export const obtenerPerfilCliente = async(req, res) => {
-   const { id } = req.params
-
-   const repo = AppDataSource.getRepository(UserSchema);
-   try{
-       const usuario = await repo.findOne({where: { email: email}})
-
-       if (usuario) {
-              const { password, ...datosPublicos } = usuario;
-              res.json(datosPublicos); 
-       } else {
-               res.status(404).json({ mensaje: "usuario encontrado" });
-       }
-   }catch(error){
-    res.estatus(505).json({ mensaje:"usuario no encontrado"}) 
-   }
-
-}
+export const obtenerPerfilCliente = async (req, res) => {
+    try {
+        const { id } = req.params; 
+        const repo = AppDataSource.getRepository(UserSchema)
+        const usuario = await repo.findOne({where: { id: Number(id) } });
+        if (!usuario) {
+            return res.status(404).json({ message: "El usuario no existe en el sistema" });
+        }       
+        return res.json(usuario);
+    } catch (error) {
+        console.error("Error en obtenerPerfilCliente:", error);
+        return res.status(500).json({ 
+            message: "Error interno del servidor", 
+            error: error.message 
+        });
+    }
+};

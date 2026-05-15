@@ -1,7 +1,7 @@
 // src/routes/UsuarioRoutes.js
 import { Router } from "express"
 import { registrarUsuario, verificarDni, verificarEmail , obtenerPerfilCliente } from "../controllers/UsuarioController.js"
-import { verificarToken } from "../middlewares/authMiddleware.js"
+
 
 const router = Router()
 

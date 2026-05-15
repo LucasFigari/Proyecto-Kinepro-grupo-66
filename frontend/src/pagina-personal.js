@@ -34,7 +34,7 @@ function eliminar(id){
     const confirmacion = confirm("¿Estás seguro que deseas eliminar este personal?")
 
     if(confirmacion){
-        fetch(`http://localhost:3000/personal/eliminar/${id}`, {
+        fetch(`http://localhost:3000/personal/dar-baja-personal/${id}`, {
             method: "DELETE"
         })
         .then(res => res.json())

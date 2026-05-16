@@ -24,7 +24,7 @@ try {
 
 
 
-app.use("/", AreaDeTratamientoRoutes)
+app.use("/area", AreaDeTratamientoRoutes)
 app.use("/usuarios", UsuarioRoutes)
 app.use("/personal", PersonalRoutes)
 app.use("/login", LoginRoutes)

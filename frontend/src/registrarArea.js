@@ -12,7 +12,7 @@ form.addEventListener('submit', async (e) => {
 
         try {
             // Llamada a tu API de Node.js
-            const response = await fetch('http://localhost:3000/registrar-area', {
+            const response = await fetch('http://localhost:3000/area/registrar-area', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -26,7 +26,7 @@ form.addEventListener('submit', async (e) => {
                 mostrarMensaje('¡Área guardada con éxito!', 'green');
                 form.reset();
             } else {
-                mostrarMensaje('Error: ' + (result.detalles || 'No se pudo guardar'), 'red');
+                mostrarMensaje((result.detalles), 'red');
             }
         } catch (error) {
             mostrarMensaje('Error de conexión con el servidor', 'red');

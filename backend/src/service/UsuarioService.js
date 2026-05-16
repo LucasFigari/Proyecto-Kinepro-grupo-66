@@ -8,12 +8,12 @@ export class UsuarioService{
     async saveUsuario(usuario){
         const existeDni = await this.usuarioRepository.findByDni(usuario.dni);
         if (existeDni) {
-            throw new Error("DNI_DUPLICADO");
+            throw new Error("El DNI ingresado ya se encuentra registrado.");
         }
 
         const existeEmail = await this.usuarioRepository.findByEmail(usuario.email);
         if (existeEmail) {
-            throw new Error("EMAIL_DUPLICADO");
+            throw new Error("El EMAIL ingresado ya se encuentra registrado.");
         }
 
         usuario.password =  await this.encriptarPasswordUseCase.execute(usuario.password);

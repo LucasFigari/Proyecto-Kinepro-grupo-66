@@ -1,30 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal de Trabajo - Kinepro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS GLOBALES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- BARRA DE NAVEGACIÓN (Simulada) --- */
+        nav {
+            background-color: #00b4d8; /* Color de identidad Kinepro */
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav::after {
+            content: 'Kinepro - Panel de Administración';
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            width: calc(100% - 40px);
+            max-width: 1400px; /* Evita que se estire al infinito en pantallas gigantes */
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            flex-grow: 1;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-section h1 {
+            color: #0077b6;
+            font-size: 1.8rem;
+        }
+
+        /* --- BOTÓN AGREGAR PERSONAL --- */
+        #btnAgregarPersonal {
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(42, 157, 143, 0.2);
+        }
+
+        #btnAgregarPersonal:hover {
+            background-color: #21867a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(42, 157, 143, 0.3);
+        }
+
+        /* --- REJILLA (GRID) PARA LAS LISTAS --- */
+        .lists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .column-card {
+            background-color: #f8fafb;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .column-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        }
+
+        .column-card h2 {
+            font-size: 1.3rem;
+            color: #495057;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+        }
+
+        /* Colores distintivos por sección */
+        .secretarios-card h2 { border-color: #00b4d8; }
+        .kinesiologos-card h2 { border-color: #90e0ef; }
+
+        /* --- ESTILOS DE LAS LISTAS (UL / LI) --- */
+        ul {
+            list-style: none;
+        }
+
+        /* Estilo para cuando la lista esté vacía (puedes manejarlo desde JS) */
+        ul:empty::before {
+            content: "No hay personal registrado.";
+            display: block;
+            color: #adb5bd;
+            font-style: italic;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        /* Estilo base para los items de la lista que agregues con JS */
+        ul li {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Animación suave para cuando agregues elementos */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- RESPONSIVO PARA MÓVILES --- */
+        @media (max-width: 768px) {
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            #btnAgregarPersonal {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
     
-    <nav></nav> <!--Si hay un nav, reemplazar aca-->
+    <nav></nav> 
     
-    <div>
-        <h2>Secretarios/as</h2>
-        <ul id="listaSecretarios">
-        </ul>
-    </div>
+    <div class="main-container">
+        
+        <div class="header-section">
+            <h1>Gestión de Personal de Trabajo</h1>
+            <button id="btnAgregarPersonal">+ Agregar Personal</button>
+        </div>
 
-    <div>
-        <h2>Kinesiólogos/as</h2>
-        <ul id="listaKinesiologos">
-        </ul>
-    </div>
+        <div class="lists-grid">
+            
+            <div class="column-card secretarios-card">
+                <h2>Secretarios/as</h2>
+                <ul id="listaSecretarios">
+                    </ul>
+            </div>
 
-    <div>
-        <button id="btnAgregarPersonal">Agregar Personal</button>
+            <div class="column-card kinesiologos-card">
+                <h2>Kinesiólogos/as</h2>
+                <ul id="listaKinesiologos">
+                    </ul>
+            </div>
+            
+        </div>
+
     </div>
 
     <script src="./src/pagina-personal.js"></script>

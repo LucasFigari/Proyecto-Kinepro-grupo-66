@@ -31,7 +31,6 @@ export class AreaDeTratamientoController{
 
         } catch (error) {
             console.error("Error al registrar la area de tratamiento:", error);
-
             return res.status(400).json({
                 detalles: error.message
             });
@@ -45,5 +44,21 @@ export class AreaDeTratamientoController{
         } catch (error) {
             return res.status(500).json({ detalles: error.message });
         }    
+    }
+
+    deleteArea = async (req, res) => {
+        try {
+            const { idParaEliminar } = req.params;
+            await this.areaDeTratamientoService.delete(idParaEliminar);
+            return res.status(200).json({ 
+                detalles: "Se elimino el area." 
+            });
+
+        } catch (error) {
+
+            return res.status(500).json({ 
+                detalles: "No se pudo eliminar el area" });
+        }
+
     }
 }

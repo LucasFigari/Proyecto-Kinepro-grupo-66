@@ -50,7 +50,7 @@
     padding-top: 100px;
     border-bottom-right-radius: 0; /* El último termina recto abajo */
 }
-#botonPerfil {
+.btn-lateral {
     /* 1. Grosor, estilo y color del borde */
     border: 2px solid #72B9CB; 
     
@@ -67,6 +67,17 @@
     cursor: pointer;
     transition: all 0.3s;
 }
+.btn-lateral-secundario {
+    width: 130px;
+    height: 35px;
+    font-size: 0.8rem;
+}
+
+#botonPerfil{
+    width: 170px;
+    height: 50px;
+    font-size: 1rem;
+}
 
 /* Efecto al pasar el mouse */
 #botonPerfil:hover {
@@ -75,14 +86,80 @@
     /* Podés redondearlo más cuando pasás el mouse si querés un efecto moderno */
    
 }
+#botonCerrar {
+    width: 90px; 
+    font-size:9px;
+    white-space: nowrap;
+    padding: 3px 6px; /* Espacio arriba/abajo y a los lados */
+}
+
+.contenedor-areas { 
+    margin-left: 250px;
+    display: flex; 
+    flex-wrap:wrap; 
+    gap: 20px; 
+    padding: 20px;
+}
+.tren {
+    background-color: #EAF4F7;
+    border-radius: 15px;
+    padding: 15px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+.imagen-tren{
+    width: 48%;
+    height: 140px;
+    margin-bottom: 10px;
+}
+
+.titulo-tren {
+    background-color: #D89A4D;
+    color: white;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 8px;
+    width: fit-content; /* ocupa su contenido*/
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+.descripcion-tren {
+    color: #3A4A54;
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+.btn-detalles {
+    align-self: flex-end; /* lo mantiene a la derecha */
+    border: none; /*saco borde */
+
+    padding: 8px 7px; /* espacio interno entre letra y borde */
+    border-radius: 8px; /* redondeo */
+    cursor: pointer; /*paso de cursor cmbia*/
+    /*base*/
+    font-weight: bold;
+    background-color: #5C99B3;
+    color: white;
+    transition: background-color 0.3s; 
+    margin-top: auto; /*m,argen */
+}
+
+.btn-detalles:hover {
+    background-color: #4B859E;
+}
+
+
 .success {background-color: #72B9CB; border: 10px solid #04AA6D;} 
 .success:hover {background-color: #D1E9F0; color: white;}
 .contenedor-del-boton {
     display: flex;           /* Activa el modo flexible */
-    justify-content: center; /* Centra horizontalmente */
+    flex-direction: column; /* Apila verticalmente de arriba hacia abajo */
+    /* justify-content: center; */ /* Centra horizontalmente */
     align-items: center;     /* Centra verticalmente (si el div tiene altura) */
-    
-    height: 100px;           /* Opcional: solo si querés darle un alto fijo */
+    gap: 20px;
+    /* height: 100px;  */          /* Opcional: solo si querés darle un alto fijo */
+    margin-top: 40px
 }
 </style>
 <body>
@@ -101,7 +178,10 @@
             <div id="bloque2" class="franja-color"></div>
             <div id="bloque3" class="franja-color">
                 <div class="contenedor-del-boton">
-                    <button id="botonPerfil" class="btn success">Ver Perfil</button>
+                    <button id="botonPerfil" class="btn-lateral">Ver Perfil</button>
+                    <button id="botonTurnos" class="btn-lateral btn-lateral-secundario"> TURNOS </button>
+                    <button id="botonHistorial" class="btn-lateral btn-lateral-secundario"> HISTORIAL </button>
+                    <button id="botonCerrar" class="btn-lateral btn-lateral-secundario"> CERRAR SESIÓN</button>
                 </div>
             </div>
         </div>
@@ -110,12 +190,32 @@
             <h2>Bienvenido a KinePro</h2>
             <p>Seleccioná una opción del menú.</p>
         </div>
+        <div class="contenedor-areas">
+            <div class="tren">
+                <div class="titulo-tren"> TREN SUPERIOR </div>
+                <img class="imagen-tren" src="/src/imagenes/TrenSuperiorUsuario.png">
+                <p class="descripcion-tren"> Rehabilitación de hombro, brazo y mano.</p>
+                <button class="btn-detalles"> Ver detalles </button>
+            </div>
+            <div class="tren">
+                <div class="titulo-tren"> TREN MEDIO </div>
+                <img class="imagen-tren" src="/src/imagenes/TrenMedioUsuario.png">
+                <p class="descripcion-tren"> Estabilidad del núcleo(core). Alivio del dolor lumbar y torácico. Correción postural</p>
+                <button class="btn-detalles"> Ver detalles </button>
+            </div>
+            <div class="tren">
+                <div class="titulo-tren"> TREN INFERIOR </div>
+                <img class="imagen-tren" src="/src/imagenes/TrenInferiorUsuario.png">
+                <p class="descripcion-tren"> Tratamiento de caderas, rodillas y pies. Equilibrio y marcha. Recuperacion de lesiones deportivas </p>
+                <button class="btn-detalles"> Ver detalles </button>
+            </div>
+        </div>  
     `;
 
     // 2. Buscamos los elementos después de inyectar
     const boton = document.getElementById('botonPerfil');
     const contenido = document.getElementById('contenidoPrincipal');
-
+    
    
     boton.addEventListener('click', async () => {
         contenido.innerHTML = '<p>Buscando datos en la base de datos...</p>';       

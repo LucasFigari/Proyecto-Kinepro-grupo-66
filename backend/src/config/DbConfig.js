@@ -2,7 +2,7 @@
 import { DataSource } from "typeorm";
 import UserSchema from "../schema/UsuarioSchema.js"
 import AreaDeTratamientoSchema from "../schema/AreaDeTratamientoSchema.js";
-import PersonalSchema from "../schema/PersonalSchema.js";
+import PasswordResetSchema from "../schema/PasswordResetSchema.js"
 
 const AppDataSource = new DataSource({
     type: "postgres", 
@@ -13,7 +13,7 @@ const AppDataSource = new DataSource({
     database: "db_kinesiologia",
     synchronize: true,
     logging: false,
-    entities: [UserSchema, AreaDeTratamientoSchema, PersonalSchema], //se agregó el schema del Personal
+    entities: [UserSchema, AreaDeTratamientoSchema, PasswordResetSchema],
 });
 
 export default AppDataSource;

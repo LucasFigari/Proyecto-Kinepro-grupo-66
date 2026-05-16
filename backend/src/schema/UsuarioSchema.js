@@ -18,7 +18,10 @@ const UserSchema = new EntitySchema({
         },
         apellido: {
             type: "varchar",
+<<<<<<< HEAD
             nullable: true, 
+=======
+>>>>>>> feature/recuperar-password
         },
         email: {
             type: "varchar",

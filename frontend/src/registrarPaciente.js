@@ -3,8 +3,9 @@ const apellido = /** @type {HTMLInputElement} */ ( document.getElementById("apel
 const dni = /** @type {HTMLInputElement} */ ( document.getElementById("dniRegistro"))
 const email = /** @type {HTMLInputElement} */ ( document.getElementById("emailRegistro"))
 const telefono = /** @type {HTMLInputElement} */ ( document.getElementById("telefonoRegistro"))
-const contraseña = /** @type {HTMLInputElement} */ (document.getElementById("contraseñaRegistro"))
+const password = /** @type {HTMLInputElement} */ (document.getElementById("contraseñaRegistro"))
 
+const contenedorMensaje = document.getElementById('mensaje');
 
 function validarCampoNombre(nom){
     
@@ -75,18 +76,10 @@ async function validarCampoDni(dniParametro){
 
         if(/^\d{7,8}$/.test(dniParametro)){
 
-            const res = await fetch(`http://localhost:3000/usuarios/verificar-dni/${dniParametro}`) //envio el mensaje para verificar el dni enviado como parametro
-
-            const data = await res.json()  //recibo la respuesta
-
-            if(!(data.existe)){  //si no existe en la bd, se puede crear
-
-                esValido = true
-            }
-            else{
-                //avisar dni ya se encuentra registrado en el sistema
-            }
-        }       
+            //Hacer el If que compruebe la BD. si no existe en la BD se asigna esValido = true (ya que dni es unico). else avisar que dni ya existe
+            esValido = true;
+        }
+        
         else{
             //avisar dni invalido
         }
@@ -107,18 +100,8 @@ async function validarCampoEmail(correo){
 
         if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)){
 
-            const res = await fetch(`http://localhost:3000/usuarios/verificar-email/${correo}`)
-            const data = await res.json()
-
-            if(!(data.existe)){
-
-                esValido = true
-
-            }
-            else{
-                //avisar email ya se encuentra registrado en el sistema
-            }
-
+            //Hacer el if que compruebe la BD. Si no existe en la BD se asigna esValido = true (correo unico). Else avisar que correo ya existe
+            esValido = true;
         }
         
         else{
@@ -194,11 +177,10 @@ async function formularioValido(){
     return (
             validarCampoNombre(nombre.value.trim()) 
             && validarCampoApellido(apellido.value.trim()) 
-            && await validarCampoDni(dni.value.trim())              //nota: puse && en lugar de & para hacer cortocircuito (apenas una este mal no sigue evaluando)
-            && await validarCampoEmail(email.value.trim())         //si se quiere cambiar y que se evalue todo, hay que usar &
+            && validarCampoDni(dni.value.trim())              //nota: puse && en lugar de & para hacer cortocircuito (apenas una este mal no sigue evaluando)
+            && validarCampoEmail(email.value.trim())         //si se quiere cambiar y que se evalue todo, hay que usar &
             && validarCampoTelefono(telefono.value.trim())
-            && validarCampoContraseña(contraseña.value.trim())
-        )
+            && validarCampoContraseña(password.value.trim()));
 }
 
 
@@ -208,35 +190,46 @@ const formulario = document.getElementById("formRegistroPaciente")
 formulario.addEventListener("submit", async e =>{
     e.preventDefault()
     
-    if(await formularioValido()){  //se llama al metodo formularioValido() y si todos los campos están "Ok" se devuelve true
+    if(formularioValido()){
+        console.log("-> Formulario OK, iniciando Fetch...");
+        try {
+        const datosParaEnviar = { 
+                dni: dni.value.trim(), 
+                apellido: apellido.value.trim(), 
+                nombre: nombre.value.trim(), 
+                email: email.value.trim(), 
+                password: password.value.trim(), 
+                telefono: telefono.value.trim() 
+            };
+
+        const response = await fetch('http://localhost:3000/registrar-usuario', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(datosParaEnviar)
+        });
+
+
+        const resultado = await response.json();
         
-        const paciente = {
-            nombre: nombre.value.trim(),
-            apellido: apellido.value.trim(),
-            dni: dni.value.trim(),
-            email: email.value.trim(),
-            telefono: telefono.value.trim(),
-            password: contraseña.value
+        if (!response.ok) {
+            throw new Error(resultado.detalles || "Error desconocido");
         }
 
-        fetch("http://localhost:3000/usuarios/registrar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(paciente)
-        })
+        contenedorMensaje.textContent = "✅ ¡Registro exitoso!";
+        contenedorMensaje.style.color = "var(--accent)"; 
+        formulario.reset(); 
 
-        .then(res => res.json())
-        .then(data => {
-            if(data.ok){     //verifico que se subió
-                alert("Usuario registrado correctamente")
-                window.location.href = "../menuPrincipal.html"// redirige al menu principal (si el archivo tiene otro nombre/ruta hay que cambiar esta ruta)
-            }
-        })
-        .catch(error => {
-            console.error("Error al registrar:", error)
-            alert("Hubo un error al registrar el usuario")
-        })
-
+    } catch (error) {
+        if (error.message === "Failed to fetch") {
+            mostrarError("❌ Error: No se pudo conectar con el servidor.");
+        } else {
+            mostrarError("❌ " + error.message);
+        }
+    }
     }
 })
-    
+
+function mostrarError(mensaje) {
+    contenedorMensaje.textContent = mensaje;
+    contenedorMensaje.style.color = "#ff4d4d";
+}

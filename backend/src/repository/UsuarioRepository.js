@@ -1,6 +1,6 @@
 export class UsuarioRepository {
-    constructor(dataSource) {
-        this.repository = dataSource.getRepository("Usuario");
+    constructor(repository) {
+        this.repository = repository;
     }
 
     async findByDni(dni) {

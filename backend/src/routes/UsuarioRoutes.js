@@ -1,16 +1,18 @@
-// src/routes/UsuarioRoutes.js
-import { Router } from "express"
-import { registrarUsuario, verificarDni, verificarEmail , obtenerPerfilCliente } from "../controllers/UsuarioController.js"
+import { Router } from "express";
+import { UsuarioController } from "../controllers/UsuarioController.js";
+import AppDataSource from "../config/DbConfig.js";
+import { UsuarioService } from "../service/UsuarioService.js";
+import { UsuarioRepository} from "../repository/UsuarioRepository.js"
+import { EncriptarPasswordUseCase } from "../password/EncriptarPasswordUseCase.js";
 
+const router = new Router();
 
-const router = Router()
+const repo = AppDataSource.getRepository("Usuario");
+const encriptarPassword = new EncriptarPasswordUseCase();
+const userRepository = new UsuarioRepository(repo);
+const usuarioService = new UsuarioService(userRepository, encriptarPassword);
+const usuarioController = new UsuarioController(usuarioService);
 
-router.post("/registrar", registrarUsuario)
+router.post("/registrar-usuario", usuarioController.saveUsuario);
 
-router.get("/verificar-dni/:dni", verificarDni)
-
-router.get("/verificar-email/:email", verificarEmail)
-
-router.get("/Perfil/:id", obtenerPerfilCliente)
-
-export default router
+export default router;

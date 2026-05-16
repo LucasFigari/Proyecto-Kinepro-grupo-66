@@ -5,7 +5,7 @@ import cors from "cors";
 import AreaDeTratamientoRoutes from "./routes/AreaDeTratamientoRoutes.js"
 import UsuarioRoutes from "./routes/UsuarioRoutes.js"
 import PersonalRoutes from "./routes/PersonalRoutes.js"
-
+import LoginRoutes from "./routes/LoginRoutes.js"
 
 
 const app = express();
@@ -24,9 +24,10 @@ try {
 
 
 
-app.use("/", AreaDeTratamientoRoutes)
+app.use("/area", AreaDeTratamientoRoutes)
 app.use("/usuarios", UsuarioRoutes)
 app.use("/personal", PersonalRoutes)
+app.use("/login", LoginRoutes)
 
 
 app.listen(3000, () => {

@@ -57,7 +57,82 @@ function mostrarHome() {
         `).join('')}
     </div>
 </main>
+        <!-- Modal de login -->
+        <div id="modalLogin" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+            <div style="background:white; padding:2rem; border-radius:12px; width:100%; max-width:400px;">
+                <h4 style="color:#107391; margin-bottom:1.5rem;">Iniciar Sesión</h4>
+                <div style="margin-bottom:1rem;">
+                    <label>DNI</label>
+                    <input id="inputDni" type="text" placeholder="Ingresá tu DNI" 
+                           style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Contraseña</label>
+                    <input id="inputPassword" type="password" placeholder="Ingresá tu contraseña"
+                           style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+                </div>
+                <p id="errorLogin" style="color:red; display:none; font-size:0.9rem;"></p>
+                <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                    <button id="btnConfirmar" style="flex:1; padding:0.6rem; background:#107391; color:white; border:none; border-radius:6px; cursor:pointer;">
+                        Confirmar
+                    </button>
+                    <button id="btnCancelar" style="flex:1; padding:0.6rem; background:#eee; border:none; border-radius:6px; cursor:pointer;">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
     `;
+
+    const modal = document.getElementById('modalLogin');
+
+    //Abro el modal de iniciar sesion
+    document.getElementById('iniciarSesion').addEventListener('click', () => {
+        modal.style.display = 'flex';
+    });
+
+    //Cierro el modal de iniciar sesion
+    document.getElementById('btnCancelar').addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.getElementById('errorLogin').style.display = 'none';
+        document.getElementById('inputDni').value = '';
+        document.getElementById('inputPassword').value = '';
+    });
+
+    //Confirmar el login
+    document.getElementById('btnConfirmar').addEventListener('click', async () => {
+        const dni = document.getElementById('inputDni').value.trim();
+        const password = document.getElementById('inputPassword').value.trim();
+        const errorEl = document.getElementById('errorLogin');
+
+        if(!dni || !password){
+            errorEl.textContent = "Deben rellenarse todos los campos";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dni, password })
+            });
+            const data = await response.json();
+
+            if(data.ok){
+                modal.style.display = 'none';
+                alert(`¡Bienvenido ${data.datos.nombre}!`);
+                // SI HACE FALTA, ACA SE PUEDE REDIRIGIR A OTRA PAGINA SEGUN EL ROL (data.rol)
+            }else {
+                errorEl.textContent = data.mensaje;
+                errorEl.style.display = 'block';
+            }
+
+        } catch (error) {
+            errorEl.textContent = "Error al conectar con el servidor.";
+            errorEl.style.display = 'block';
+        }
+    });
 }
 
 // 3. Ejecución

@@ -17,5 +17,7 @@ const areaDeTratameintoController = new AreaDeTratamientoController(areaDeTratam
 router.post("/registrar-area", areaDeTratameintoController.saveArea);
 router.get("/nombre:nombre", areaDeTratameintoController.getAreaByNombre);
 router.get("/", areaDeTratameintoController.getAll);
+router.delete("/:idParaEliminar", areaDeTratameintoController.deleteArea);
+
 
 export default router;

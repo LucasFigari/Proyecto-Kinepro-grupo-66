@@ -1,82 +1,268 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+
 <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Paciente - KinePro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
- <style>
-    /* Estilos personalizados para los colores que elegiste */
-    body {
-        /* Un verde claro muy suave para el fondo */
-        background-color: #d1e7dd; 
-    }
-    .card-registro {
-        background-color: #ffffff; /* Contenedor blanco */
-        max-width: 380px;
-        width: 95%;
-    }
-    .btn-celeste-personalizado {
-        /* El azul claro que te gustó */
-        background-color: #a2d2ff; 
-        border: none;
-        color: #004085; /* Texto en un azul oscuro para que se lea bien */
-        font-weight: bold;
-        transition: 0.3s;
-    }
-    .btn-celeste-personalizado:hover {
-        background-color: #8ecae6; /* Se oscurece un poquito al pasar el mouse */
-        color: #004085;
-    }
-</style>
-<body class="d-flex justify-content-center align-items-center vh-100">
 
-    <div class="p-4 card-registro shadow-sm rounded-4">
+    <title>Registro De Paciente</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-pantalla: #f4f7f6;
+            --azul-profundo: #005f73;
+            --celeste-primario: #00b4d8;
+            --azul-hover: #0077b6;
+            --texto-etiquetas: #475569;
+            --borde-input: #d8e2dc;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-pantalla);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        div, h1, h4, label, input, button {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         
-     <div class="text-center mb-4">
-    
-    <h4 class="fw-bold" style="color: #333;">Registro de Paciente</h4>
-</div>
-        <form id="formRegistroPaciente">
-            <div class="row g-2">
-                <div class="col-6 mb-2">
-                    <label class="form-label fw-semibold small">Nombre</label>
-                    <input type="text" class="form-control form-control-sm" id="nombreRegistro" required>
+        .bg-info-subtle {
+            background: #ffffff !important; 
+            width: 100%;
+            max-width: 700px; 
+            padding: 40px !important;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 119, 182, 0.06), 0 5px 15px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 180, 216, 0.15) !important;
+        }
+
+        /* Título de la tarjeta */
+        .bg-info-subtle h4 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--azul-profundo) !important;
+            text-align: center;
+            margin-bottom: 30px !important;
+            letter-spacing: -0.5px;
+        }
+
+        .border-success-subtle {
+            border: none !important; 
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 5px 24px; 
+        }
+
+        .border-success-subtle > .mb-4,                    
+        .border-success-subtle > .mb-3:nth-child(4),       
+        .border-success-subtle > .mb-3:nth-child(5),         
+        .border-success-subtle > .mb-3:last-of-type,           
+        .border-success-subtle > #mensaje {                    
+            grid-column: span 2;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.5rem !important;
+        }
+
+        .mb-4:has(.fotoPerfil) {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 14px;
+            margin-bottom: 30px !important;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .fotoPerfil {
+            width: 110px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            box-shadow: 0 4px 14px rgba(0, 180, 216, 0.25);
+        }
+
+        .fotoPerfil + button {
+            background-color: #ffffff;
+            color: var(--celeste-primario);
+            border: 1px solid var(--celeste-primario);
+            padding: 6px 18px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .fotoPerfil + button:hover {
+            background-color: var(--celeste-primario);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 180, 216, 0.2);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--texto-etiquetas);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--celeste-primario);
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .form-control.w-25.p-3 {
+            width: 100% !important; 
+            padding: 11px 16px !important; 
+            font-size: 0.95rem;
+            border: 1px solid var(--borde-input);
+            border-radius: 10px;
+            background-color: #fdfefe;
+            color: #1e293b;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .form-control.w-25.p-3:focus {
+            background-color: #ffffff;
+            border-color: var(--celeste-primario);
+            box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.12);
+        }
+
+        #btnRegistrarPaciente {
+            width: 100%;
+            background: linear-gradient(135deg, var(--celeste-primario) 0%, var(--azul-hover) 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 119, 182, 0.2);
+            margin-top: 10px;
+        }
+
+        #btnRegistrarPaciente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0, 119, 182, 0.35);
+            filter: brightness(1.05);
+        }
+
+        #btnRegistrarPaciente:active {
+            transform: translateY(0);
+        }
+
+        #mensaje {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+                align-items: flex-start; 
+            }
+            .bg-info-subtle {
+                padding: 24px 16px !important;
+                margin: 10px 0;
+            }
+            .border-success-subtle {
+                grid-template-columns: 1fr; 
+            }
+            .border-success-subtle > * {
+                grid-column: span 1 !important; 
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="p-3 mb-2 bg-info-subtle text-dark">
+        <div>
+            <h4 class="fw-bold">Registro de Paciente</h4>
+
+            <form id="formRegistroPaciente">
+                <div class="border border-success-subtle">
+
+                    <div class="mb-4">
+                        <img class="fotoPerfil" src="./src/assets/user-image-default.jpg" alt="Foto de Perfil">
+                        <button type="button">Cambiar Foto</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control w-25 p-3" id="nombreRegistro">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" class="form-control w-25 p-3" id="apellidoRegistro">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Dni</label>
+                        <input type="text" class="form-control w-25 p-3" id="dniRegistro">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control w-25 p-3" id="emailRegistro">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-control w-25 p-3" id="telefonoRegistro">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control w-25 p-3" id="contraseñaRegistro">
+                    </div>
+
+                    <div class="mb-3">
+                        <button id="btnRegistrarPaciente" type="submit">Registrar</button>
+                    </div>
+
+                    <div id="mensaje" class="mt-2"></div>
                 </div>
-                <div class="col-6 mb-2">
-                    <label class="form-label fw-semibold small">Apellido</label>
-                    <input type="text" class="form-control form-control-sm" id="apellidoRegistro" required>
-                </div>
-            </div>
-
-            <div class="mb-2">
-                <label class="form-label fw-semibold small">DNI</label>
-                <input type="text" class="form-control form-control-sm" id="dniRegistro" required>
-            </div>
-
-            <div class="mb-2">
-                <label class="form-label fw-semibold small">Correo electrónico</label>
-                <input type="email" class="form-control form-control-sm" id="emailRegistro" required>
-            </div>
-
-            <div class="mb-2">
-                <label class="form-label fw-semibold small">Teléfono</label>
-                <input type="text" class="form-control form-control-sm" id="telefonoRegistro">
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label fw-semibold small">Contraseña</label>
-                <input type="password" class="form-control form-control-sm" id="contraseñaRegistro" required>
-            </div>
-
-            <div class="d-grid">
-                <button id="btnRegistrarPaciente" class="btn btn-celeste-personalizado py-2" type="submit">
-                    Registrar Paciente
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
     <script src="./src/registrarPaciente.js"></script>
 </body>
+
 </html>

@@ -13,7 +13,13 @@ export class AreaDeTratamientoRepository{
     }
 
     async save(areaDeTratamiento){
-        return await this.repository.save(areaDeTratamiento);
+        try {
+            return await this.repository.save(areaDeTratamiento);
+
+        } catch (error) {
+            throw new Error("El area ingresada ya existe");
+
+        }
     }
 
     async delete(areaId){
@@ -30,5 +36,9 @@ export class AreaDeTratamientoRepository{
 
     async findAll(){
         return await this.repository.find();
+    }
+
+    async deleteByNombre(nombreArea){
+        await this.repository.softDelete( {nombre: nombreArea});
     }
 }

@@ -124,6 +124,15 @@ function mostrarHome() {
                 modal.style.display = 'none';
                 alert(`¡Bienvenido ${data.datos.nombre}!`);
                 // SI HACE FALTA, ACA SE PUEDE REDIRIGIR A OTRA PAGINA SEGUN EL ROL (data.rol)
+                if(data.rol === 'Secretaria'){
+                    window.location.href = 'index-secretaria.html';
+                }else if(data.rol === 'Kinesiologo'){
+                    window.location.href = 'index-kinesiologo.html';
+                }else if(data.rol === 'Admin'){
+                    window.location.href = 'index-admin.html';
+                }else {
+                    window.location.href = 'usuario.html';
+                }
             }else {
                 errorEl.textContent = data.mensaje;
                 errorEl.style.display = 'block';

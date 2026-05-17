@@ -84,6 +84,7 @@ function mostrarHome() {
         </div>
     `;
 
+
     const modal = document.getElementById('modalLogin');
 
     //Abro el modal de iniciar sesion
@@ -135,5 +136,7 @@ function mostrarHome() {
     });
 }
 
-// 3. Ejecución
+    
+
+
 document.addEventListener('DOMContentLoaded', mostrarHome);

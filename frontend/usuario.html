@@ -189,8 +189,7 @@
         <div id="contenidoPrincipal" style="margin-left: 250px; padding: 20px;">
             <h2>Bienvenido a KinePro</h2>
             <p>Seleccioná una opción del menú.</p>
-        </div>
-        <div class="contenedor-areas">
+            <div class="contenedor-areas">
             <div class="tren">
                 <div class="titulo-tren"> TREN SUPERIOR </div>
                 <img class="imagen-tren" src="/src/imagenes/TrenSuperiorUsuario.png">
@@ -210,15 +209,17 @@
                 <button class="btn-detalles"> Ver detalles </button>
             </div>
         </div>  
+        </div>
+        
     `;
 
     // 2. Buscamos los elementos después de inyectar
     const boton = document.getElementById('botonPerfil');
     const contenido = document.getElementById('contenidoPrincipal');
-    
    
     boton.addEventListener('click', async () => {
-        contenido.innerHTML = '<p>Buscando datos en la base de datos...</p>';       
+        contenido.innerHTML = '<p>Buscando datos en la base de datos...</p>';     
+          
         try {
             const respuesta = await fetch('http://localhost:3000/usuarios/Perfil/1');    
             if (!respuesta.ok) {
@@ -233,6 +234,7 @@
                     <p><strong>DNI:</strong> ${usuario.dni}</p>
                     <p><strong>Email:</strong> ${usuario.email}</p>
                     <p><strong>Teléfono:</strong> ${usuario.telefono}</p>
+                    
                 </div>
             `;
         } catch (error) {

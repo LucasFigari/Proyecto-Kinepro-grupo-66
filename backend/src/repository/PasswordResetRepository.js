@@ -1,6 +1,6 @@
 import { MoreThan } from "typeorm";
 
-export class UsuarioRepository {
+export class PasswordResetRepository {
     constructor(passwordResetRepository) {
         this.repository = passwordResetRepository;
     }
@@ -22,10 +22,10 @@ export class UsuarioRepository {
     }
 
     async findByToken(token){
-        return await this.repository.findOneBy({
+        return await this.repository.findOne({
             where: {
                 token: token,
-                expires_at: MoreThan(Date.now())
+                expires_at: MoreThan(new Date())
             }
         });
     }

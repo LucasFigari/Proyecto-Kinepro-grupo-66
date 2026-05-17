@@ -9,7 +9,7 @@ export class RestablecerPasswordUseCase{
 
     execute = async(req, res) => {
         try {
-            const { token } = req.body;
+            const { token } = req.params;
             const { newPassword } = req.body;
 
             const resetRequest = await this.passwordResetRepository.findByToken(token);
@@ -20,7 +20,9 @@ export class RestablecerPasswordUseCase{
             
             const userAlmacenado = await this.usuarioRepository.findById(resetRequest.user_id);
 
-            userAlmacenado.password = await this.encriptarPasswordUseCase.execute(newPassword);
+            //userAlmacenado.password = await this.encriptarPasswordUseCase.execute(newPassword);
+
+            userAlmacenado.password = newPassword;  //usar esto solo para pruebas
 
             await this.passwordResetRepository.delete(resetRequest.user_id);
 

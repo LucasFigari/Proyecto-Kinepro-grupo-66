@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - KinePro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0; width: 220px;
+            background: #00b4d8;
+            display: flex; flex-direction: column;
+            padding: 2rem 1rem;
+            gap: 12px;
+        }
+        .sidebar-title {
+            color: #fff; font-size: 18px; font-weight: 500;
+            margin-bottom: 1rem; padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .sidebar-btn {
+            background: #2a9d8f; color: #fff;
+            border: none; border-radius: 10px;
+            padding: 0.7rem 1rem; font-size: 14px;
+            cursor: pointer; text-align: left;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none;
+        }
+        .sidebar-btn:hover { background: #21867a; color: #fff; }
+        .sidebar-logout {
+            margin-top: auto;
+            background: rgba(255,255,255,0.15); color: #fff;
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 10px;
+            padding: 0.7rem 1rem; font-size: 14px;
+            cursor: pointer; text-align: left;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-logout:hover { background: rgba(255,255,255,0.25); }
+
+        .main-content {
+            margin-left: 220px; padding: 2.5rem;
+        }
+        .welcome {
+            font-size: 22px; font-weight: 500; margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            font-size: 14px; color: #666; margin-bottom: 2rem;
+        }
+        .cards-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 16px; max-width: 700px;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none; color: inherit;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: inherit; }
+        .card-icon {
+            font-size: 32px; color: #00b4d8; margin-bottom: 0.75rem;
+        }
+        .card-title {
+            font-size: 15px; font-weight: 500; margin-bottom: 0.4rem;
+        }
+        .card-desc {
+            font-size: 13px; color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-title">KinePro · Admin</div>
+        <a href="/pagina-personal.html" class="sidebar-btn">
+            <i class="ti ti-users"></i> Personal
+        </a>
+        <a href="#" class="sidebar-btn">
+            <i class="ti ti-activity"></i> Tratamientos
+        </a>
+        <button class="sidebar-logout" id="btnCerrarSesion">
+            <i class="ti ti-logout"></i> Cerrar sesión
+        </button>
+    </div>
+
+    <div class="main-content">
+        <p class="welcome">Bienvenido, <span id="nombreAdmin">Admin</span></p>
+        <p class="subtitle">Seleccioná una opción del menú para comenzar.</p>
+        <div class="cards-grid">
+            <a href="/pagina-personal.html" class="card">
+                <div class="card-icon"><i class="ti ti-users"></i></div>
+                <p class="card-title">Gestión de personal</p>
+                <p class="card-desc">Crear, modificar y eliminar cuentas de secretarias y kinesiólogos.</p>
+            </a>
+            <a href="#" class="card">
+                <div class="card-icon"><i class="ti ti-activity"></i></div>
+                <p class="card-title">Tratamientos</p>
+                <p class="card-desc">Crear y eliminar los tratamientos disponibles en la empresa.</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+    </script>
+
+</body>
+</html>

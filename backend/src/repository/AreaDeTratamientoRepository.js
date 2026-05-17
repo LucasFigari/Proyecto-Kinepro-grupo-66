@@ -41,4 +41,13 @@ export class AreaDeTratamientoRepository{
     async deleteByNombre(nombreArea){
         await this.repository.softDelete( {nombre: nombreArea});
     }
+async findTurnosByAreaId(areaId) {
+        
+        const areaConTurnos = await this.repository.findOne({
+            where: { id: areaId },
+            relations: ["turnos"] 
+        });
+
+        return areaConTurnos ? areaConTurnos.turnos : [];
+    }
 }

@@ -27,4 +27,8 @@ export class AreaDeTratamientoService{
             throw new Error("No se puedo eliminar el area.")
         }
     }
+    async getTurnosDeUnArea(areaId) {
+    return await this.areaDeTratamientoRepository.findTurnosByAreaId(areaId);
+}
+ 
 }

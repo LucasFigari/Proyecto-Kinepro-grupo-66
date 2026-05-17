@@ -21,6 +21,13 @@ const AreaDeTratamientoSchema = new EntitySchema({
         deleteDate: true, 
         nullable: true
     }
+    },
+    relations: {
+        turnos: {
+            target: "Turno",
+            type: "one-to-many",
+            inverseSide: "area"
+        }
     }
 });
 

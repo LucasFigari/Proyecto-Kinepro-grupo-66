@@ -20,4 +20,7 @@ router.get("/", areaDeTratameintoController.getAll);
 router.delete("/:idParaEliminar", areaDeTratameintoController.deleteArea);
 
 
+
+router.get("/:id/turnos", (req, res) => areaDeTratameintoController.getTurnosByArea(req, res));
+
 export default router;

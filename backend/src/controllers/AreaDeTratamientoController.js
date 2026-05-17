@@ -61,4 +61,16 @@ export class AreaDeTratamientoController{
         }
 
     }
+   
+
+getTurnosByArea = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const turnos = await this.areaDeTratamientoService.getTurnosDeUnArea(parseInt(id));       
+        return res.status(200).json(turnos);
+    } catch (error) {
+        console.error("Error en el controlador al traer turnos:", error);
+        return res.status(500).json({ error: "Error interno al recuperar los turnos." });
+    }
+}
 }

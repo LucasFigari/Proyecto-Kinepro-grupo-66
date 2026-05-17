@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-export class SolicitarRecuperacionPassword{
+export class SolicitarPasswordUseCase{
 
     constructor(userRepository, passwordResetRepository, sendMailUseCase){
         this.userRepository= userRepository;
@@ -28,7 +28,7 @@ export class SolicitarRecuperacionPassword{
 
             await this.passwordResetRepository.save(userPasswordReset);
 
-            const text = `Haz clic aquí para restablecer tu clave: http://localhost:3000/reset/${token}`;
+            const text = `Haz clic aquí para restablecer tu clave: http://localhost:3000/forgot-password/reset/${token}`;
             await this.sendMailUseCase.execute(user.email, "Recuperacion de contraseña.", text);
             
             return res.status(200).json({ 

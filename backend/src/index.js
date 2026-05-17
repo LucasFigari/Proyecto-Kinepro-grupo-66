@@ -6,7 +6,7 @@ import AreaDeTratamientoRoutes from "./routes/AreaDeTratamientoRoutes.js"
 import UsuarioRoutes from "./routes/UsuarioRoutes.js"
 import PersonalRoutes from "./routes/PersonalRoutes.js"
 import LoginRoutes from "./routes/LoginRoutes.js"
-
+import PasswordRoutes from "./routes/PasswordRoutes.js"
 
 const app = express();
 app.use(cors())
@@ -28,7 +28,8 @@ app.use("/area", AreaDeTratamientoRoutes)
 app.use("/usuarios", UsuarioRoutes)
 app.use("/personal", PersonalRoutes)
 app.use("/login", LoginRoutes)
-
+app.use("/forgot-password", PasswordRoutes);
+app.use(express.static('public'));
 
 app.listen(3000, () => {
     console.log("Servidor corriendo en el puerto 3000");

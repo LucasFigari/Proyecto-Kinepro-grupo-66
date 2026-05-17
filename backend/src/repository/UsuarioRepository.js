@@ -3,6 +3,10 @@ export class UsuarioRepository {
         this.repository = repository;
     }
 
+    async findById(id) {
+        return await this.repository.findOneBy({ id: id });
+    }
+
     async findByDni(dni) {
         return await this.repository.findOneBy({ dni: dni });
     }

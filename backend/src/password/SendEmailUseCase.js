@@ -1,6 +1,6 @@
-import Transporter from "./Transporter.js";
+import Transporter from "../config/Transporter.js";
 
-export class SendMailUseCase{
+export class SendEmailUseCase{
 
     constructor(){
         this.Transporter = Transporter;

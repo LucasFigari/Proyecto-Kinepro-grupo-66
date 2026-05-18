@@ -14,7 +14,7 @@ export class SolicitarPasswordUseCase{
             const user = await this.userRepository.findByEmail(email);
 
             if(!user){
-                return res.status(404).json({ status: 'error', message: 'El correo no está registrado.' });
+                return res.status(404).json({ status: 'error', message: 'El correo ingresado no pertenece a un usuario registrado.' });
             }
 
             const token = crypto.randomBytes(20).toString("hex");

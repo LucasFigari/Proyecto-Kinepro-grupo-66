@@ -5,7 +5,7 @@ import { UsuarioService } from "../service/UsuarioService.js";
 import { UsuarioRepository } from "../repository/UsuarioRepository.js";
 import { EncriptarPasswordUseCase } from "../password/EncriptarPasswordUseCase.js";
 
-import { registrarUsuario, verificarDni, verificarEmail,buscarPaciente } from "../controllers/UsuarioController.js";
+import { registrarUsuario, verificarDni, verificarEmail,buscarPaciente, obtenerPerfil } from "../controllers/UsuarioController.js";
 
 const router = Router();
 
@@ -21,4 +21,5 @@ router.get("/verificar-dni/:dni", verificarDni);
 router.get("/verificar-email/:email", verificarEmail);
 router.get("/buscar/:busqueda", buscarPaciente);
 
+router.get("/:id", obtenerPerfil);
 export default router;

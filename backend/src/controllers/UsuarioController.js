@@ -56,5 +56,24 @@ export const buscarPaciente = async (req, res) => {
 
     res.json(pacientes)
 }
+//
+export const obtenerPerfil = async (req, res) => {
+    try {
+        const { id } = req.params; 
+        
+        const repo = AppDataSource.getRepository(UserSchema); 
 
+        const usuario = await repo.findOne({ where: { id: parseInt(id) } });
+
+        if (!usuario) {
+            return res.status(404).json({ mensaje: "Usuario no encontrado" });
+        }
+
+        res.json(usuario);
+        
+    } catch (error) {
+        console.error("Error al obtener el perfil:", error);
+        res.status(500).json({ mensaje: "Error interno del servidor" });
+    }
+};
     

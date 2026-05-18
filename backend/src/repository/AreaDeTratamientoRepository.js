@@ -45,7 +45,7 @@ async findTurnosByAreaId(areaId) {
         
         const areaConTurnos = await this.repository.findOne({
             where: { id: areaId },
-            relations: ["turnos"] 
+            relations: ["turnos", "turnos.usuario"] 
         });
 
         return areaConTurnos ? areaConTurnos.turnos : [];

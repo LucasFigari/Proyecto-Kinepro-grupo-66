@@ -57,17 +57,3 @@ export const buscarPaciente = async (req, res) => {
     res.json(pacientes)
 }
 
-    export const buscarPaciente = async (req, res) => {
-    const { busqueda } = req.params
-
-    const repo = AppDataSource.getRepository(UserSchema)
-
-    const pacientes = await repo
-        .createQueryBuilder("usuario")
-        .where("usuario.nombre ILIKE :busqueda OR usuario.apellido ILIKE :busqueda OR usuario.dni ILIKE :busqueda", 
-            { busqueda: `%${busqueda}%` })
-        .getMany()
-
-    res.json(pacientes)
-}
-

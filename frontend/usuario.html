@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="./src/style2.css"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Menu de Usuario</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>* {
     margin: 0;
@@ -246,10 +247,11 @@
 
 
 
-/* conecto al back y pido cupo */
+
+
 async function pedirCupoAlBackend(nombreDelArea) {
     try {
-        // Le avisam al backend qué área quiere tocar
+        
         const respuesta = await fetch('http://localhost:3000/area/reservar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -258,17 +260,35 @@ async function pedirCupoAlBackend(nombreDelArea) {
 
         const resultado = await respuesta.json();
 
-        //alertas de oprueba
         if (!respuesta.ok) {
-            //  No hay cupo o no existe el área
-            alert(` Error: ${resultado.detalles}`);
-        } else {
-            // alerta de prueba, sumó el cupo con éxito
-            alert(` Reserva Exitosa Cupos: ${resultado.area.cupoOcupados}/${resultado.area.cupoMaximo}`);
+            Swal.fire({
+                icon: "error",
+                title: "No se pudo reservar",
+                text: `${resultado.detalles}`,
+                confirmButtonColor: "#72B9CB" 
+            });
+            return;
         }
 
+        Swal.fire({
+            icon: "success",
+            title: "¡Cupo Disponible!",
+            text: "Te asignamos un lugar en " + nombreDelArea + " Cupos actuales: " + resultado.area.cupoOcupados+ "/" + resultado.area.cupoMaximo,
+            confirmButtonColor: "#72B9CB"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/seleccion-de-turnos.html?area=${encodeURIComponent(nombreDelArea)}`;
+            }
+        });
+
     } catch (error) {
-        alert("No se pudo conectar con el servidor. ¿Está encendido el backend?");
+        console.error(error);
+        Swal.fire({
+            icon: "question",
+            title: "Error de conexión",
+            text: "No se pudo conectar con el servidor.",
+            confirmButtonColor: "#72B9CB"
+        });
     }
 }
 

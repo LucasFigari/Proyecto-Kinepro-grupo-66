@@ -30,21 +30,31 @@ export class AreaDeTratamientoService{
     async getTurnosDeUnArea(areaId) {
     return await this.areaDeTratamientoRepository.findTurnosByAreaId(areaId);
 }
-    //logica de cupos del area
-    async reservarCupo(nombreArea){
-        const area = await this.areaDeTratamientoRepository.findByNombre(nombreArea);
+    /*logica de cupos del area */
+async reservarCupo(nombreArea) {
+    const area = await this.areaDeTratamientoRepository.findByNombre( nombreArea);
+    
+    if (!area) throw new Error("El área especificada no existe.");
 
-        if (!area){
-            throw new Error("el area de tratamiento no existe");
-        }
-
-        if (area.cupoOcupados >= area.cupoMaximo){
-            throw new Error("no hay cupo disponible en " + nombreArea + ".");
-        }
-
-        area.cupoOcupados += 1;
-
-        return await this.areaDeTratamientoRepository.save(area); 
+    /* verifica si esta lleno */
+    if (area.cupoOcupados >= area.cupoMaximo) {
+        throw new Error("No hay cupos disponibles para esta área.");
     }
+
+    return area;
+}
+
+/*aumenta +1 la catnidad de cupos ocupados*/
+async aumentarContadorCupo(nombreArea) {
+    const area = await this.areaDeTratamientoRepository.findByNombre(nombreArea);
+    
+    if (!area) throw new Error("No se pudo actualizar el cupo: Área no encontrada.");
+
+    
+    area.cupoOcupados = area.cupoOcupados + 1; 
+    
+    /* guardo en la bd*/
+    return await this.areaDeTratamientoRepository.save(area); 
+}
 
 }

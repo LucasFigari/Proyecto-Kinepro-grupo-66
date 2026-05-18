@@ -23,4 +23,6 @@ router.delete("/:idParaEliminar", areaDeTratameintoController.deleteArea);
 
 router.get("/:id/turnos", (req, res) => areaDeTratameintoController.getTurnosByArea(req, res));
 
+router.post("/reservar", areaDeTratameintoController.reservarCupoDeArea);
+
 export default router;

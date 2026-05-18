@@ -30,5 +30,21 @@ export class AreaDeTratamientoService{
     async getTurnosDeUnArea(areaId) {
     return await this.areaDeTratamientoRepository.findTurnosByAreaId(areaId);
 }
- 
+    //logica de cupos del area
+    async reservarCupo(nombreArea){
+        const area = await this.areaDeTratamientoRepository.findByNombre(nombreArea);
+
+        if (!area){
+            throw new Error("el area de tratamiento no existe");
+        }
+
+        if (area.cupoOcupados >= area.cupoMaximo){
+            throw new Error("no hay cupo disponible en " + nombreArea + ".");
+        }
+
+        area.cupoOcupados += 1;
+
+        return await this.areaDeTratamientoRepository.save(area); 
+    }
+
 }

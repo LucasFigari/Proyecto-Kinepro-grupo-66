@@ -73,4 +73,24 @@ getTurnosByArea = async (req, res) => {
         return res.status(500).json({ error: "Error interno al recuperar los turnos." });
     }
 }
+
+    reservarCupoDeArea = async ( req, res) =>{
+        try{
+        
+        const {nombreArea} = req.body
+
+        if (!nombreArea){
+            return res.status(400).json({ detalles: "falta especificar nombre area"});
+        }
+        const areaAct = await this.areaDeTratamientoService.reservarCupo(nombreArea);
+        return res.status(200).json({
+            mensaje: "Cupo reservado con éxito",
+            area: areaAct
+        });
+        } catch (error) {
+            return res.status(400).json({
+                detalles: error.message
+            })
+        }
+    }
 }

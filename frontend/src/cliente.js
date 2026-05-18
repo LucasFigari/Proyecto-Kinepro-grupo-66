@@ -27,8 +27,7 @@ areas.forEach(area => {
             // 🎨 NUEVO DISEÑO: Tarjeta moderna con texto sobre la imagen
             const tarjetaHTML = `
                 <div class="card border-0 position-relative text-white overflow-hidden shadow-sm" 
-                     style="cursor: pointer; height: 220px; border-radius: 14px;" 
-                     onclick="cargarTurnosPorArea(${area.id}, '${area.nombre}')">
+                     style="cursor: pointer; height: 220px; border-radius: 14px;">
                     
                     <img src="${rutaImagen}" 
                          onerror="this.onerror=null; this.src='./src/imagenes/default.png';" 
@@ -37,15 +36,24 @@ areas.forEach(area => {
                          alt="${area.nombre}">
                     
                     <div class="d-flex flex-column justify-content-end p-3 w-100 h-100 position-relative" 
-                         style="z-index: 2; );">
+                         style="z-index: 2; ">
                         
                         <div class="d-flex align-items-center gap-2">
                             
-                            <p class="card-title mb-0 fw-bold" );">${area.nombre}</p>
+                            <p class="card-title mb-0 fw-bold">${area.nombre}</p>
                         </div>
                         
+
+                        <div class="mt-3">
+                        <button 
+                        type="button"
+                        class="btn btn-sm btn-success fw-bold"
+                        onclick="cargarTurnosPorArea(${area.id}, '${area.nombre}')">
+                        Agendar Turno
+                        </button>
                         </div>
                 </div>
+            </div>
             `;
             gridDinamica.insertAdjacentHTML('beforeend', tarjetaHTML);
         });
@@ -158,3 +166,55 @@ btonPerfil.addEventListener("click", async (e) => {
         `;
     }
 });
+
+async function cargarTurnosPorArea(idArea, nombreArea) {
+    try {
+
+        const respuesta = await fetch('http://localhost:3000/area/reservar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombreArea: nombreArea
+            })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            Swal.fire({
+                icon: "error",
+                title: "Cupos agotados",
+                text: resultado.detalles,
+                confirmButtonColor: "#72B9CB"
+            });
+
+            return;
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "¡Cupos disponibles!",
+            text: `Área: ${nombreArea}`,
+            confirmButtonColor: "#72B9CB"
+        }).then(() => {
+
+            window.location.href =
+            `/seleccion-de-turnos.html?id=${idArea}&area=${encodeURIComponent(nombreArea)}`;
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "No se pudo verificar el cupo."
+        });
+    }
+}
+
+window.cargarTurnosPorArea = cargarTurnosPorArea;

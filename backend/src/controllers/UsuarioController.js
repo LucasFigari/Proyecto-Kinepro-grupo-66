@@ -57,3 +57,7 @@ export const buscarPaciente = async (req, res) => {
     res.json(pacientes)
 }
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 24379ffb82f4df194cabfbe088950d41f4292421

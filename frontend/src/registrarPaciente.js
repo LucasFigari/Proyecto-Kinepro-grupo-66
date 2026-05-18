@@ -20,17 +20,17 @@ function validarCampoNombre(nom){
             }
 
             else{
-                //avisar en pantalla formato invalido
+                mostrarError("❌ Error: Formato invalido en campo 'Nombre'.")
             }
         }
 
         else{
-            //avisar en pantalla limite de caracteres
+            mostrarError("❌ Error: El campo 'Nombre' debe poseer entre 3 y 30 caracteres.")
         }
     }
 
     else{
-        //avisar en pantalla campo vacio
+        mostrarError("❌ Error: Debe completar todos los campos.")
     }
         
     
@@ -51,17 +51,17 @@ function validarCampoApellido(ape){
             }
 
             else{
-                //avisar en pantalla formato invalido
+                mostrarError("❌ Error: Formato invalido en campo 'Apellido'.")
             }
         }
 
         else{
-            //avisar en pantalla limite de caracteres
+            mostrarError("❌ Error: El campo 'Apellido' debe poseer entre 3 y 30 caracteres.")
         }
     }
 
     else{
-        //avisar en pantalla campo vacio
+        mostrarError("❌ Error: Debe completar todos los campos.")
     }
         
     
@@ -76,16 +76,22 @@ async function validarCampoDni(dniParametro){
 
         if(/^\d{7,8}$/.test(dniParametro)){
 
-            //Hacer el If que compruebe la BD. si no existe en la BD se asigna esValido = true (ya que dni es unico). else avisar que dni ya existe
-            esValido = true;
+            const res = await fetch(`http://localhost:3000/usuarios/verificar-dni/${dniParametro}`)
+            const data = await res.json()
+
+            if(!data.existe){
+                esValido = true
+            } else {
+                mostrarError("❌ Error: El DNI ingresado ya existe en el sistema.")
+            }
         }
         
         else{
-            //avisar dni invalido
+            mostrarError("❌ Error: El DNI debe poseer entre 7 y 8 caracteres numéricos.")
         }
     }
     else{
-        //avisar campo vacio
+        mostrarError("❌ Error: Debe completar todos los campos.")
     }
 
     return esValido
@@ -100,18 +106,20 @@ async function validarCampoEmail(correo){
 
         if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)){
 
-            //Hacer el if que compruebe la BD. Si no existe en la BD se asigna esValido = true (correo unico). Else avisar que correo ya existe
-            esValido = true;
-        }
-        
-        else{
-            //avisar correo invalido
-        }
+            const res = await fetch(`http://localhost:3000/usuarios/verificar-email/${correo}`)
+            const data = await res.json()
 
+            if(!data.existe){
+                esValido = true
+            } 
+            else {
+                mostrarError("❌ Error: El correo ingresado ya existe en el sistema.")
+            }
+        }
     }
 
     else{
-        //avisar campo vacio
+        mostrarError("❌ Error: Debe completar todos los campos.")
     }
 
     return esValido
@@ -130,13 +138,13 @@ function validarCampoTelefono(tel){
         }
 
         else{
-            //avisar que telefono debe ser entre 8 y 15 digitos numericos
+            mostrarError("❌ Error: El número de teléfono debe poseer Únicamente entre 8 y 15 digitos numéricos.")
         }
 
     }
 
     else{
-        //avisar campo vacio
+        mostrarError("❌ Error: Debe completar todos los campos.")
     }
 
     return esValido
@@ -157,13 +165,13 @@ function validarCampoContraseña(cont){
         }
 
         else{
-            //avisar que contraseña debe tener entre 8 y 12 caracteres
+            mostrarError("❌ Error: La contraseña debe tener entre 8 y 12 caracteres.")
         }
 
     }
 
     else{
-        //informar campo vacio
+        mostrarError("❌ Error: Debe completar todos los campos.")
     }
 
     return esValido
@@ -177,8 +185,8 @@ async function formularioValido(){
     return (
             validarCampoNombre(nombre.value.trim()) 
             && validarCampoApellido(apellido.value.trim()) 
-            && validarCampoDni(dni.value.trim())              //nota: puse && en lugar de & para hacer cortocircuito (apenas una este mal no sigue evaluando)
-            && validarCampoEmail(email.value.trim())         //si se quiere cambiar y que se evalue todo, hay que usar &
+            && await validarCampoDni(dni.value.trim())              //nota: puse && en lugar de & para hacer cortocircuito (apenas una este mal no sigue evaluando)
+            && await validarCampoEmail(email.value.trim())         //si se quiere cambiar y que se evalue todo, hay que usar &
             && validarCampoTelefono(telefono.value.trim())
             && validarCampoContraseña(password.value.trim()));
 }
@@ -190,7 +198,7 @@ const formulario = document.getElementById("formRegistroPaciente")
 formulario.addEventListener("submit", async e =>{
     e.preventDefault()
     
-    if(formularioValido()){
+    if(await formularioValido()){
         console.log("-> Formulario OK, iniciando Fetch...");
         try {
         const datosParaEnviar = { 
@@ -217,6 +225,7 @@ formulario.addEventListener("submit", async e =>{
 
         contenedorMensaje.textContent = "✅ ¡Registro exitoso!";
         contenedorMensaje.style.color = "var(--accent)"; 
+        contenedorMensaje.style.display = "block"
         formulario.reset(); 
 
     } catch (error) {
@@ -230,6 +239,7 @@ formulario.addEventListener("submit", async e =>{
 })
 
 function mostrarError(mensaje) {
+    contenedorMensaje.style.display = "block"
     contenedorMensaje.textContent = mensaje;
     contenedorMensaje.style.color = "#ff4d4d";
 }

@@ -63,6 +63,7 @@ export const obtenerPerfil = async (req, res) => {
         
         const repo = AppDataSource.getRepository(UserSchema); 
 
+
         const usuario = await repo.findOne({ where: { id: parseInt(id) } });
 
         if (!usuario) {
@@ -77,3 +78,4 @@ export const obtenerPerfil = async (req, res) => {
     }
 };
     
+

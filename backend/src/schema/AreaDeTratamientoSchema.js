@@ -16,6 +16,14 @@ const AreaDeTratamientoSchema = new EntitySchema({
         descripcion:{
             type: "varchar",
         },
+        cupoMaximo:{
+            type: "int",
+            default: 10 //valor de prueba
+        },
+        cupoOcupados:{
+            type: "int",
+            default: 0 //cant de cupos ocupados
+        },
         deletedAt: {
         type: "timestamp",
         deleteDate: true, 

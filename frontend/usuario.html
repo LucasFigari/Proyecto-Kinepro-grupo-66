@@ -194,19 +194,19 @@
                 <div class="titulo-tren"> TREN SUPERIOR </div>
                 <img class="imagen-tren" src="/src/imagenes/TrenSuperiorUsuario.png">
                 <p class="descripcion-tren"> Rehabilitación de hombro, brazo y mano.</p>
-                <button class="btn-detalles"> Ver detalles </button>
+                <button id="btnDetallesSuperior" class="btn-detalles"> Ver detalles </button>
             </div>
             <div class="tren">
                 <div class="titulo-tren"> TREN MEDIO </div>
                 <img class="imagen-tren" src="/src/imagenes/TrenMedioUsuario.png">
                 <p class="descripcion-tren"> Estabilidad del núcleo(core). Alivio del dolor lumbar y torácico. Correción postural</p>
-                <button class="btn-detalles"> Ver detalles </button>
+                <button id="btnDetallesMedio"class="btn-detalles"> Ver detalles </button>
             </div>
             <div class="tren">
                 <div class="titulo-tren"> TREN INFERIOR </div>
                 <img class="imagen-tren" src="/src/imagenes/TrenInferiorUsuario.png">
                 <p class="descripcion-tren"> Tratamiento de caderas, rodillas y pies. Equilibrio y marcha. Recuperacion de lesiones deportivas </p>
-                <button class="btn-detalles"> Ver detalles </button>
+                <button id="btnDetallesInferior" class="btn-detalles"> Ver detalles </button>
             </div>
         </div>  
         </div>
@@ -242,6 +242,49 @@
             console.error("Detalle:", error);
         }
     });
+
+
+
+
+/* conecto al back y pido cupo */
+async function pedirCupoAlBackend(nombreDelArea) {
+    try {
+        // Le avisam al backend qué área quiere tocar
+        const respuesta = await fetch('http://localhost:3000/area/reservar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombreArea: nombreDelArea })
+        });
+
+        const resultado = await respuesta.json();
+
+        //alertas de oprueba
+        if (!respuesta.ok) {
+            //  No hay cupo o no existe el área
+            alert(` Error: ${resultado.detalles}`);
+        } else {
+            // alerta de prueba, sumó el cupo con éxito
+            alert(` Reserva Exitosa Cupos: ${resultado.area.cupoOcupados}/${resultado.area.cupoMaximo}`);
+        }
+
+    } catch (error) {
+        alert("No se pudo conectar con el servidor. ¿Está encendido el backend?");
+    }
+}
+
+document.getElementById('btnDetallesSuperior').addEventListener('click', () => {
+    pedirCupoAlBackend('TREN SUPERIOR'); // Llama a la función mandando este texto exacto
+});
+
+document.getElementById('btnDetallesMedio').addEventListener('click', () => {
+    pedirCupoAlBackend('TREN MEDIO');
+});
+
+document.getElementById('btnDetallesInferior').addEventListener('click', () => {
+    pedirCupoAlBackend('TREN INFERIOR');
+});
+
+
 </script>
 </body>
 </html>

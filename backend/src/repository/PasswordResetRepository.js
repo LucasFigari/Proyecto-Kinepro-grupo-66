@@ -1,6 +1,8 @@
 import { MoreThan } from "typeorm";
 
+
 export class PasswordResetRepository {
+
     constructor(passwordResetRepository) {
         this.repository = passwordResetRepository;
     }

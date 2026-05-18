@@ -4,6 +4,7 @@ import AppDataSource from "../config/DbConfig.js";
 import { UsuarioService } from "../service/UsuarioService.js";
 import { UsuarioRepository} from "../repository/UsuarioRepository.js"
 import { EncriptarPasswordUseCase } from "../password/EncriptarPasswordUseCase.js";
+import { registrarUsuario, verificarDni, verificarEmail, buscarPaciente } from "../controllers/UsuarioController.js"
 
 const router = new Router();
 
@@ -16,3 +17,13 @@ const usuarioController = new UsuarioController(usuarioService);
 router.post("/registrar-usuario", usuarioController.saveUsuario);
 
 export default router;
+// src/routes/UsuarioRoutes.js
+
+const router = Router()
+
+router.post("/registrar", registrarUsuario)
+router.get("/verificar-dni/:dni", verificarDni)
+router.get("/verificar-email/:email", verificarEmail)
+router.get("/buscar/:busqueda", buscarPaciente)
+
+export default router

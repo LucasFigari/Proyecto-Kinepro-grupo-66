@@ -84,6 +84,7 @@ function mostrarHome() {
         </div>
     `;
 
+
     const modal = document.getElementById('modalLogin');
 
     //Abro el modal de iniciar sesion
@@ -121,6 +122,8 @@ function mostrarHome() {
 
             if(data.ok){
                 modal.style.display = 'none';
+                sessionStorage.setItem("rol", data.rol)
+                sessionStorage.setItem("nombre", data.datos.nombre)
                 alert(`¡Bienvenido ${data.datos.nombre}!`);
                 // SI HACE FALTA, ACA SE PUEDE REDIRIGIR A OTRA PAGINA SEGUN EL ROL (data.rol)
                 if(data.rol === 'Secretaria'){
@@ -144,5 +147,7 @@ function mostrarHome() {
     });
 }
 
-// 3. Ejecución
+    
+
+
 document.addEventListener('DOMContentLoaded', mostrarHome);

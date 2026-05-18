@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="./src/style2.css"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Menu de Usuario</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>* {
     margin: 0;
@@ -189,36 +190,37 @@
         <div id="contenidoPrincipal" style="margin-left: 250px; padding: 20px;">
             <h2>Bienvenido a KinePro</h2>
             <p>Seleccioná una opción del menú.</p>
-        </div>
-        <div class="contenedor-areas">
+            <div class="contenedor-areas">
             <div class="tren">
                 <div class="titulo-tren"> TREN SUPERIOR </div>
                 <img class="imagen-tren" src="/src/imagenes/TrenSuperiorUsuario.png">
                 <p class="descripcion-tren"> Rehabilitación de hombro, brazo y mano.</p>
-                <button class="btn-detalles"> Ver detalles </button>
+                <button id="btnDetallesSuperior" class="btn-detalles"> Ver detalles </button>
             </div>
             <div class="tren">
                 <div class="titulo-tren"> TREN MEDIO </div>
                 <img class="imagen-tren" src="/src/imagenes/TrenMedioUsuario.png">
                 <p class="descripcion-tren"> Estabilidad del núcleo(core). Alivio del dolor lumbar y torácico. Correción postural</p>
-                <button class="btn-detalles"> Ver detalles </button>
+                <button id="btnDetallesMedio"class="btn-detalles"> Ver detalles </button>
             </div>
             <div class="tren">
                 <div class="titulo-tren"> TREN INFERIOR </div>
                 <img class="imagen-tren" src="/src/imagenes/TrenInferiorUsuario.png">
                 <p class="descripcion-tren"> Tratamiento de caderas, rodillas y pies. Equilibrio y marcha. Recuperacion de lesiones deportivas </p>
-                <button class="btn-detalles"> Ver detalles </button>
+                <button id="btnDetallesInferior" class="btn-detalles"> Ver detalles </button>
             </div>
         </div>  
+        </div>
+        
     `;
 
     // 2. Buscamos los elementos después de inyectar
     const boton = document.getElementById('botonPerfil');
     const contenido = document.getElementById('contenidoPrincipal');
-    
    
     boton.addEventListener('click', async () => {
-        contenido.innerHTML = '<p>Buscando datos en la base de datos...</p>';       
+        contenido.innerHTML = '<p>Buscando datos en la base de datos...</p>';     
+          
         try {
             const respuesta = await fetch('http://localhost:3000/usuarios/Perfil/1');    
             if (!respuesta.ok) {
@@ -233,6 +235,7 @@
                     <p><strong>DNI:</strong> ${usuario.dni}</p>
                     <p><strong>Email:</strong> ${usuario.email}</p>
                     <p><strong>Teléfono:</strong> ${usuario.telefono}</p>
+                    
                 </div>
             `;
         } catch (error) {
@@ -240,6 +243,68 @@
             console.error("Detalle:", error);
         }
     });
+
+
+
+
+
+
+async function pedirCupoAlBackend(nombreDelArea) {
+    try {
+        
+        const respuesta = await fetch('http://localhost:3000/area/reservar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombreArea: nombreDelArea })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            Swal.fire({
+                icon: "error",
+                title: "No se pudo reservar",
+                text: `${resultado.detalles}`,
+                confirmButtonColor: "#72B9CB" 
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "¡Cupo Disponible!",
+            text: "Te asignamos un lugar en " + nombreDelArea + " Cupos actuales: " + resultado.area.cupoOcupados+ "/" + resultado.area.cupoMaximo,
+            confirmButtonColor: "#72B9CB"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/seleccion-de-turnos.html?area=${encodeURIComponent(nombreDelArea)}`;
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: "question",
+            title: "Error de conexión",
+            text: "No se pudo conectar con el servidor.",
+            confirmButtonColor: "#72B9CB"
+        });
+    }
+}
+
+document.getElementById('btnDetallesSuperior').addEventListener('click', () => {
+    pedirCupoAlBackend('TREN SUPERIOR'); // Llama a la función mandando este texto exacto
+});
+
+document.getElementById('btnDetallesMedio').addEventListener('click', () => {
+    pedirCupoAlBackend('TREN MEDIO');
+});
+
+document.getElementById('btnDetallesInferior').addEventListener('click', () => {
+    pedirCupoAlBackend('TREN INFERIOR');
+});
+
+
 </script>
 </body>
 </html>

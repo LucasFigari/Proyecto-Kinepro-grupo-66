@@ -27,4 +27,34 @@ export class AreaDeTratamientoService{
             throw new Error("No se puedo eliminar el area.")
         }
     }
+    async getTurnosDeUnArea(areaId) {
+    return await this.areaDeTratamientoRepository.findTurnosByAreaId(areaId);
+}
+    /*logica de cupos del area */
+async reservarCupo(nombreArea) {
+    const area = await this.areaDeTratamientoRepository.findByNombre( nombreArea);
+    
+    if (!area) throw new Error("El área especificada no existe.");
+
+    /* verifica si esta lleno */
+    if (area.cupoOcupados >= area.cupoMaximo) {
+        throw new Error("No hay cupos disponibles para esta área.");
+    }
+
+    return area;
+}
+
+/*aumenta +1 la catnidad de cupos ocupados*/
+async aumentarContadorCupo(nombreArea) {
+    const area = await this.areaDeTratamientoRepository.findByNombre(nombreArea);
+    
+    if (!area) throw new Error("No se pudo actualizar el cupo: Área no encontrada.");
+
+    
+    area.cupoOcupados = area.cupoOcupados + 1; 
+    
+    /* guardo en la bd*/
+    return await this.areaDeTratamientoRepository.save(area); 
+}
+
 }

@@ -65,15 +65,18 @@
 
     <div class="sidebar">
         <div class="sidebar-title">KinePro · Kinesiólogo</div>
-        <a href="#" class="sidebar-btn">
-            <i class="ti ti-clipboard-list"></i> Historial médico
+        <a href="#" class="sidebar-btn" id = "historialClinico">
+            <i class="ti ti-clipboard-list" ></i> Historial médico
+        </a>
+         <a href="#" class="sidebar-btn" id="botonDeTurnos">
+            <i class="ti ti-clipboard-list"></i> ver turnos de Areas
         </a>
         <button class="sidebar-logout" id="btnCerrarSesion">
             <i class="ti ti-logout"></i> Cerrar sesión
         </button>
     </div>
 
-    <div class="main-content">
+    <div id="divContenedor" class="main-content">
         <p class="welcome">Bienvenido, <span id="nombreKinesiologo">Kinesiólogo</span></p>
         <p class="subtitle">Seleccioná una opción del menú para comenzar.</p>
         <div class="cards-grid">
@@ -85,11 +88,7 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById('btnCerrarSesion').addEventListener('click', () => {
-            window.location.href = '/';
-        });
-    </script>
+    <script src="./src/Kinesologo.js"></script>
 
 </body>
 </html>

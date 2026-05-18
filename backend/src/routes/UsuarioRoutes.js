@@ -1,5 +1,4 @@
 import { Router } from "express";
-//import { UsuarioController } from "../controllers/UsuarioController.js";
 import AppDataSource from "../config/DbConfig.js";
 import { UsuarioService } from "../service/UsuarioService.js";
 import { UsuarioRepository } from "../repository/UsuarioRepository.js";
@@ -13,7 +12,6 @@ const repo = AppDataSource.getRepository("Usuario");
 const encriptarPassword = new EncriptarPasswordUseCase();
 const userRepository = new UsuarioRepository(repo);
 const usuarioService = new UsuarioService(userRepository, encriptarPassword);
-//const usuarioController = new UsuarioController(usuarioService);
 
 
 router.post("/registrar", registrarUsuario);

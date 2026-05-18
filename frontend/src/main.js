@@ -61,17 +61,30 @@ function mostrarHome() {
         <div id="modalLogin" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
             <div style="background:white; padding:2rem; border-radius:12px; width:100%; max-width:400px;">
                 <h4 style="color:#107391; margin-bottom:1.5rem;">Iniciar Sesión</h4>
+                
                 <div style="margin-bottom:1rem;">
                     <label>DNI</label>
                     <input id="inputDni" type="text" placeholder="Ingresá tu DNI" 
-                           style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+                        style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
                 </div>
-                <div style="margin-bottom:1rem;">
+                
+                <div style="margin-bottom:0.5rem;">
                     <label>Contraseña</label>
                     <input id="inputPassword" type="password" placeholder="Ingresá tu contraseña"
-                           style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+                        style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
                 </div>
+
+                <div style="text-align: right; margin-bottom: 1.5rem;">
+                    <a href="http://localhost:5173/forgot-password.html" 
+                    style="color: #107391; font-size: 0.85rem; text-decoration: none; font-family: sans-serif; transition: color 0.2s;"
+                    onmouseover="this.style.color='#0a4d63'; this.style.textDecoration='underline';" 
+                    onmouseout="this.style.color='#107391'; this.style.textDecoration='none';">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+                
                 <p id="errorLogin" style="color:red; display:none; font-size:0.9rem;"></p>
+                
                 <div style="display:flex; gap:1rem; margin-top:1.5rem;">
                     <button id="btnConfirmar" style="flex:1; padding:0.6rem; background:#107391; color:white; border:none; border-radius:6px; cursor:pointer;">
                         Confirmar

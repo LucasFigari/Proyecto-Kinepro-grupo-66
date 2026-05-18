@@ -202,7 +202,7 @@ formulario.addEventListener("submit", async e =>{
                 telefono: telefono.value.trim() 
             };
 
-        const response = await fetch('http://localhost:3000/usuarios/registrar-usuario', { 
+        const response = await fetch('http://localhost:3000/usuarios/registrar', { 
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify(datosParaEnviar)

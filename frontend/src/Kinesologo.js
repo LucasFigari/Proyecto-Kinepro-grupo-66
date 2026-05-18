@@ -14,14 +14,11 @@ const cargarTurnosPorArea = async (areaId, areaNombre) => {
             </div>
         `;
 
-        // Hacemos el fetch al endpoint de turnos filtrado por el ID del área
-        // Nota: Asegurate de que tu backend responda a esta ruta o adaptala a la de tu grupo
         const respuesta = await fetch(`http://localhost:3000/area/${areaId}/turnos`);
         if (!respuesta.ok) throw new Error('Error al obtener los turnos');
         
         const turnos = await respuesta.json();
 
-        // Estructura base de la pantalla de turnos con un botón para regresar
         contenido.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
@@ -35,12 +32,9 @@ const cargarTurnosPorArea = async (areaId, areaNombre) => {
             <div id="tabla-turnos-contenedor"></div>
         `;
 
-        // Asignamos el evento al botón volver
         document.getElementById("btnVolverAreas").addEventListener("click", cargarAreas);
-
         const tablaContenedor = document.getElementById("tabla-turnos-contenedor");
 
-        // Si no hay turnos cargados para esa área (por ejemplo, para Tren Inferior)
         if (turnos.length === 0) {
             tablaContenedor.innerHTML = `
                 <div class="alert alert-info" role="alert">
@@ -50,31 +44,35 @@ const cargarTurnosPorArea = async (areaId, areaNombre) => {
             return;
         }
 
-        // Dibujamos una tabla limpia aprovechando Bootstrap o tus estilos
+        // 🆕 Agregamos la columna "Paciente" en la cabecera de la tabla
         let tablaHTML = `
             <table class="table table-striped table-hover mt-3 align-middle">
                 <thead class="table-dark">
                     <tr>
                         <th>Fecha</th>
                         <th>Horario</th>
-                        <th>Estado</th>
+                        <th>Paciente</th> <th>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
-        // Recorremos los turnos que trajo Postgres
+        // Recorremos los turnos que trajo Postgres con la relación cargada
         turnos.forEach(turno => {
-            // Un formateo simple por si el estado viene en boolean
             const estadoBadge = turno.isDisponible 
                 ? '<span class="badge bg-success">Disponible</span>' 
                 : '<span class="badge bg-danger">Ocupado</span>';
+
+            // 🧠 LÓGICA DE CONTROL: Si el turno tiene usuario asignado, mostramos sus datos reales
+            const pacienteInfo = turno.usuario 
+                ? `<strong>${turno.usuario.nombre} ${turno.usuario.apellido}</strong> <br><small class="text-muted">DNI: ${turno.usuario.dni}</small>`
+                : '<span class="text-success-emphasis fw-medium">-- Cupo Disponible --</span>';
 
             tablaHTML += `
                 <tr>
                     <td><strong>${turno.fecha}</strong></td>
                     <td>${turno.horario} hs</td>
-                    <td>${estadoBadge}</td>
+                    <td>${pacienteInfo}</td> <td>${estadoBadge}</td>
                 </tr>
             `;
         });

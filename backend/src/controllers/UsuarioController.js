@@ -1,32 +1,73 @@
-export class UsuarioController{
+// src/controllers/UsuarioController.js
+import AppDataSource from "../config/DbConfig.js"
+import UserSchema from "../schema/UsuarioSchema.js"
 
-    constructor(UsuarioService){
-        this.usuarioService = UsuarioService;
-    }
+export const registrarUsuario = async (req, res) => {
+    const { nombre, apellido, dni, email, telefono, password } = req.body
 
-    saveUsuario = async (req, res) => {
-        try {
-            const usuario = {
-                dni: req.body.dni,
-                nombre: req.body.nombre,
-                apellido: req.body.apellido,
-                email: req.body.email,
-                password: req.body.password,
-                telefono: req.body.telefono
-            }
+    const repo = AppDataSource.getRepository(UserSchema)
 
-            const nuevoUsuario = await this.usuarioService.saveUsuario(usuario);
-            return res.status(201).json(nuevoUsuario);
-        } catch (error) {
-            console.error("Error al registrar al Usuario:", error.message);
+    const nuevoUsuario = repo.create({ nombre, apellido, dni, email, telefono, password })
+    await repo.save(nuevoUsuario)
 
-            if (error.message === "DNI_DUPLICADO" || error.message === "EMAIL_DUPLICADO") {
-                return res.status(409).json({ detalles: error.message });
-            }
+    res.json({ ok: true, mensaje: "Usuario registrado correctamente" })
+}
 
-            return res.status(400).json({
-                detalles: error.message || "Error inesperado en el registro"
-            });
-        }
+export const verificarDni = async (req, res) => {
+    const { dni } = req.params
+
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    const usuarioExistente = await repo.findOne({ where: { dni: dni } })
+
+    if(usuarioExistente){
+        res.json({ existe: true })
+    } 
+    else {
+        res.json({ existe: false })
     }
 }
+
+export const verificarEmail = async (req, res) => {
+    const { email } = req.params
+
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    const usuarioExistente = await repo.findOne({ where: { email: email } })
+
+    if(usuarioExistente){
+        res.json({ existe: true })
+    }
+    else{
+        res.json({ existe: false })
+    }
+}
+
+export const buscarPaciente = async (req, res) => {
+    const { busqueda } = req.params
+
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    const pacientes = await repo
+        .createQueryBuilder("usuario")
+        .where("usuario.nombre ILIKE :busqueda OR usuario.apellido ILIKE :busqueda OR usuario.dni ILIKE :busqueda", 
+            { busqueda: `%${busqueda}%` })
+        .getMany()
+
+    res.json(pacientes)
+}
+
+    export const buscarPaciente = async (req, res) => {
+    const { busqueda } = req.params
+
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    const pacientes = await repo
+        .createQueryBuilder("usuario")
+        .where("usuario.nombre ILIKE :busqueda OR usuario.apellido ILIKE :busqueda OR usuario.dni ILIKE :busqueda", 
+            { busqueda: `%${busqueda}%` })
+        .getMany()
+
+    res.json(pacientes)
+}
+

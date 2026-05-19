@@ -166,13 +166,13 @@ function validarCampoTelefono(tel){
 
     if(tel != ""){ //verifico que no sea vacio el campo
 
-        if(/^\d{8,15}$/.test(tel)){ //testeo que el numero de telefono no tenga caracteres, cantidad digitos etc.
+        if(/^\d{7,15}$/.test(tel)){ //testeo que el numero de telefono no tenga caracteres, cantidad digitos etc.
             
             esValido = true
         }
 
         else{
-            mostrarError("❌ Error: el telefono debe poseer entre 8 y 15 caracteres numéricos.")
+            mostrarError("❌ Error: el telefono debe poseer entre 7 y 15 caracteres numéricos.")
         }
 
     }
@@ -273,7 +273,7 @@ formulario.addEventListener("submit", async e =>{
             .then(data => {
                 if(data.ok){     //verifico que se subió
                     alert("Personal registrado correctamente")
-                    window.location.href = "./pestaña-personal.html" 
+                    window.location.href = "./pagina-personal.html" 
                 }
             })
         }

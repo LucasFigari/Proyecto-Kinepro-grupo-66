@@ -132,13 +132,13 @@ function validarCampoTelefono(tel){
 
     if(tel != ""){
 
-        if(/^\d{8,15}$/.test(tel)){
+        if(/^\d{7,15}$/.test(tel)){
             
             esValido = true
         }
 
         else{
-            mostrarError("❌ Error: El número de teléfono debe poseer Únicamente entre 8 y 15 digitos numéricos.")
+            mostrarError("❌ Error: El número de teléfono debe poseer entre 7 y 15 caracteres numéricos.")
         }
 
     }

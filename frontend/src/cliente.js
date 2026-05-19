@@ -1,6 +1,7 @@
 const API_URL = 'http://localhost:3000/area';
-const btonPerfil = document.getElementById("Perfil"); // ✅ Vinculado al ID exacto del HTML
+const btonPerfil = document.getElementById("Perfil"); 
 const contenido = document.getElementById("divContenedor");
+const turnos = document.getElementById("botonDeTurnos");
 
 const cargarAreas = async () => {
     try {
@@ -20,11 +21,10 @@ const cargarAreas = async () => {
             return;
         }
 
-areas.forEach(area => {
+        areas.forEach(area => {
             const nombreNormalizado = area.nombre.replace(/\s+/g, '');
             const rutaImagen = `./src/imagenes/${nombreNormalizado}.png`;
 
-            // 🎨 NUEVO DISEÑO: Tarjeta moderna con texto sobre la imagen
             const tarjetaHTML = `
                 <div class="card border-0 position-relative text-white overflow-hidden shadow-sm" 
                      style="cursor: pointer; height: 220px; border-radius: 14px;" 
@@ -37,14 +37,11 @@ areas.forEach(area => {
                          alt="${area.nombre}">
                     
                     <div class="d-flex flex-column justify-content-end p-3 w-100 h-100 position-relative" 
-                         style="z-index: 2; );">
-                        
+                         style="z-index: 2;">
                         <div class="d-flex align-items-center gap-2">
-                            
-                            <p class="card-title mb-0 fw-bold" );">${area.nombre}</p>
+                            <p class="card-title mb-0 fw-bold">${area.nombre}</p>
                         </div>
-                        
-                        </div>
+                    </div>
                 </div>
             `;
             gridDinamica.insertAdjacentHTML('beforeend', tarjetaHTML);
@@ -55,7 +52,6 @@ areas.forEach(area => {
 };
 
 cargarAreas();
-
 
 btonPerfil.addEventListener("click", async (e) => {
     e.preventDefault(); 
@@ -83,19 +79,15 @@ btonPerfil.addEventListener("click", async (e) => {
     
     try {
         console.log("✈️ Enviando petición fetch a la URL:", `http://localhost:3000/usuarios/${idUsuarioLogueado}`);
-
         const respuesta = await fetch(`http://localhost:3000/usuarios/${idUsuarioLogueado}`); 
         
-        if (!respuesta.ok) {
-            throw new Error("No se pudo obtener la información del perfil.");
-        }
+        if (!respuesta.ok) throw new Error("No se pudo obtener la información del perfil.");
         
         const usuario = await respuesta.json();
         localStorage.setItem("idUsuario", usuario.id);
         
         contenido.innerHTML = `
             <div class="container mt-2" style="max-width: 600px;">
-                
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <p class="welcome mb-0">Mi Perfil</p>
@@ -116,45 +108,127 @@ btonPerfil.addEventListener("click", async (e) => {
                             <span class="badge bg-primary">Usuario KinePro</span>
                         </div>
                     </div>
-                    
                     <hr class="text-muted">
-                    
                     <div class="row g-3">
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Nombre</label>
-                            <strong>${usuario.nombre}</strong>
-                        </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Apellido</label>
-                            <strong>${usuario.apellido || 'No registrado'}</strong>
-                        </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Documento (DNI)</label>
-                            <strong>${usuario.dni || 'No registrado'}</strong>
-                        </div>
-                        <div class="col-6">
-                            <label class="text-muted small d-block">Teléfono</label>
-                            <strong>${usuario.telefono || 'No registrado'}</strong>
-                        </div>
-                        <div class="col-12">
-                            <label class="text-muted small d-block">Correo Electrónico</label>
-                            <strong>${usuario.email || usuario.correo || 'No registrado'}</strong> 
-                        </div>
+                        <div class="col-6"><label class="text-muted small d-block">Nombre</label><strong>${usuario.nombre}</strong></div>
+                        <div class="col-6"><label class="text-muted small d-block">Apellido</label><strong>${usuario.apellido || 'No registrado'}</strong></div>
+                        <div class="col-6"><label class="text-muted small d-block">Documento (DNI)</label><strong>${usuario.dni || 'No registrado'}</strong></div>
+                        <div class="col-6"><label class="text-muted small d-block">Teléfono</label><strong>${usuario.telefono || 'No registrado'}</strong></div>
+                        <div class="col-12"><label class="text-muted small d-block">Correo Electrónico</label><strong>${usuario.email || usuario.correo || 'No registrado'}</strong></div>
                     </div>
                 </div>
-
             </div>
         `; 
 
-        // ⚡ Mantenemos el evento para que limpie la pantalla y recargue las áreas
-        document.getElementById("btnVolverAlInicio").addEventListener("click", () => {
-            cargarAreas(); 
-        });
-
+        document.getElementById("btnVolverAlInicio").addEventListener("click", cargarAreas);
     } catch (error) {
         console.error("Error al cargar el perfil:", error);
-        contenido.innerHTML = `
-            <div class="alert alert-danger">Error al cargar los datos del perfil.</div>
-        `;
+        contenido.innerHTML = `<div class="alert alert-danger">Error al cargar los datos del perfil.</div>`;
     }
 });
+
+/**
+ * Evento para el botón de "Mis Turnos"
+ */
+turnos.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const idUsuarioLogueado = localStorage.getItem('idUsuario');
+
+    if (!idUsuarioLogueado) {
+        contenido.innerHTML = `
+            <div class="alert alert-warning" role="alert">
+                <h5>Sesión requerida</h5>
+                <p>Debes iniciar sesión para ver tus turnos.</p>
+                <a href="/login.html" class="btn btn-warning btn-sm">Ir al Login</a>
+            </div>
+        `;
+        return;
+    }
+
+    contenido.innerHTML = `
+        <div class="container mt-2" style="max-width: 600px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <p class="welcome mb-0">Mis Turnos</p>
+                    <p class="subtitle mb-0">Visualizá tus próximas citas programadas.</p>
+                </div>
+                <button id="btnVolverAlInicio" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                    <i class="ti ti-arrow-back-up"></i> Volver
+                </button>
+            </div>
+            <div id="contenedor-turnos-usuario" class="mt-3">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <p class="mt-2 text-muted">Cargando tu agenda...</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    await cargarTurnosDelUsuario(idUsuarioLogueado);
+
+    document.getElementById("btnVolverAlInicio").addEventListener("click", () => {
+        cargarAreas();
+    });
+});
+
+/**
+ * Busca los turnos del usuario y los filtra por fecha >= hoy
+ */
+const cargarTurnosDelUsuario = async (idUsuario) => {
+    const contenedor = document.getElementById("contenedor-turnos-usuario");
+
+    try {
+       // Reemplazá la línea del fetch en cargarTurnosDelUsuario por esto:
+const idLimpio = String(idUsuario).replace(/[^0-9]/g, ''); // Deja SOLO los números
+const respuesta = await fetch(`http://localhost:3000/turnos/paciente/${idLimpio}`);
+        
+        if (!respuesta.ok) {
+            contenedor.innerHTML = '<p class="text-muted small">No se pudieron cargar los turnos en este momento.</p>';
+            return;
+        }
+
+        const turnos = await respuesta.json();
+        const hoy = new Date().toLocaleDateString('en-CA'); 
+
+        // 🧼 FILTRADO: Limpiamos las fechas eliminando la parte de la hora 'T00:00:00...' si viniera de Postgres
+        const turnosProximos = turnos.filter(t => {
+            const fechaLimpia = t.fecha.includes('T') ? t.fecha.split('T')[0] : t.fecha;
+            return fechaLimpia >= hoy;
+        });
+
+        if (turnosProximos.length === 0) {
+            contenedor.innerHTML = '<p class="text-muted small">No tienes turnos programados próximamente.</p>';
+            return;
+        }
+
+        // ⏱️ ORDENADO: Ajustado para usar la propiedad real "horario" de tu base de datos
+        turnosProximos.sort((a, b) => {
+            const fechaA = a.fecha.includes('T') ? a.fecha.split('T')[0] : a.fecha;
+            const fechaB = b.fecha.includes('T') ? b.fecha.split('T')[0] : b.fecha;
+            return (fechaA + a.horario).localeCompare(fechaB + b.horario);
+        });
+
+        // 📐 RENDERIZADO: Cambiamos t.hora por t.horario e incluimos un recorte simple por si Postgres devuelve los segundos (:00)
+        contenedor.innerHTML = turnosProximos.map(turno => {
+            const fechaFormateada = turno.fecha.includes('T') ? turno.fecha.split('T')[0] : turno.fecha;
+            const horarioCorto = turno.horario.substring(0, 5); // Transforma '16:00:00' en '16:00'
+
+            return `
+                <div class="card mb-2 border-0 shadow-sm bg-light" style="border-left: 4px solid #0dcaf0 !important;">
+                    <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 text-dark">${turno.area?.nombre || 'Consulta de Kinesiología'}</h6>
+                            <small class="text-muted"><i class="ti ti-calendar"></i> ${fechaFormateada} | <i class="ti ti-clock"></i> ${horarioCorto} hs</small>
+                        </div>
+                        <span class="badge bg-white text-info border border-info">Confirmado</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error("Error al obtener turnos:", error);
+        contenedor.innerHTML = '<p class="text-danger small">Error de conexión al obtener turnos.</p>';
+    }
+};

@@ -35,44 +35,65 @@ const cargarTurnosPorArea = async (areaId, areaNombre) => {
         document.getElementById("btnVolverAreas").addEventListener("click", cargarAreas);
         const tablaContenedor = document.getElementById("tabla-turnos-contenedor");
 
-        if (turnos.length === 0) {
+        // 📅 1. Obtenemos la fecha de HOY en formato local 'YYYY-MM-DD'
+        const hoy = new Date().toLocaleDateString('es-AR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).split('/').reverse().join('-'); 
+
+        // 🧼 2. FILTRADO: Nos quedamos ESTRICTAMENTE con los turnos que coincidan con hoy
+        const turnosDeHoy = turnos.filter(turno => {
+            // Aseguramos que si la fecha viene completa con hora de la base de datos, solo comparemos el YYYY-MM-DD
+            const fechaLimpia = turno.fecha.includes('T') ? turno.fecha.split('T')[0] : turno.fecha;
+            return fechaLimpia === hoy;
+        });
+
+        // ⏱️ 3. ORDENADO: Ordenamos por horario para que la jornada se lea de corrido
+        turnosDeHoy.sort((a, b) => a.horario.localeCompare(b.horario));
+
+        // 🚨 4. NUEVA VALIDACIÓN: Si después de limpiar no hay nada para hoy, mostramos el aviso
+        if (turnosDeHoy.length === 0) {
             tablaContenedor.innerHTML = `
                 <div class="alert alert-info" role="alert">
-                    No hay turnos registrados para el área de ${areaNombre} actualmente.
+                    No hay turnos registrados para el día de hoy en el área de ${areaNombre}.
                 </div>
             `;
             return;
         }
 
-        // 🆕 Agregamos la columna "Paciente" en la cabecera de la tabla
         let tablaHTML = `
             <table class="table table-striped table-hover mt-3 align-middle">
                 <thead class="table-dark">
                     <tr>
                         <th>Fecha</th>
                         <th>Horario</th>
-                        <th>Paciente</th> <th>Estado</th>
+                        <th>Paciente</th> 
+                        <th>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
-        // Recorremos los turnos que trajo Postgres con la relación cargada
-        turnos.forEach(turno => {
+        // 📐 5. Recorremos únicamente el array filtrado 'turnosDeHoy'
+        turnosDeHoy.forEach(turno => {
             const estadoBadge = turno.isDisponible 
                 ? '<span class="badge bg-success">Disponible</span>' 
                 : '<span class="badge bg-danger">Ocupado</span>';
 
-            // 🧠 LÓGICA DE CONTROL: Si el turno tiene usuario asignado, mostramos sus datos reales
             const pacienteInfo = turno.usuario 
                 ? `<strong>${turno.usuario.nombre} ${turno.usuario.apellido}</strong> <br><small class="text-muted">DNI: ${turno.usuario.dni}</small>`
                 : '<span class="text-success-emphasis fw-medium">-- Cupo Disponible --</span>';
 
+            // Usamos una variable limpia para mostrar la fecha de forma más amigable si querés
+            const fechaAMostrar = turno.fecha.includes('T') ? turno.fecha.split('T')[0] : turno.fecha;
+
             tablaHTML += `
                 <tr>
-                    <td><strong>${turno.fecha}</strong></td>
+                    <td><strong>${fechaAMostrar}</strong></td>
                     <td>${turno.horario} hs</td>
-                    <td>${pacienteInfo}</td> <td>${estadoBadge}</td>
+                    <td>${pacienteInfo}</td> 
+                    <td>${estadoBadge}</td>
                 </tr>
             `;
         });

@@ -273,7 +273,7 @@ async function pedirCupoAlBackend(nombreDelArea) {
         Swal.fire({
             icon: "success",
             title: "¡Cupo Disponible!",
-            text: "Te asignamos un lugar en " + nombreDelArea + " Cupos actuales: " + resultado.area.cupoOcupados+ "/" + resultado.area.cupoMaximo,
+            text: "Te asignamos un lugar en " + nombreDelArea + " Cupos actuales: " + resultado.area.cupoOcupados+ "/" + ñresultado.area.cupoMaximo,
             confirmButtonColor: "#72B9CB"
         }).then((result) => {
             if (result.isConfirmed) {

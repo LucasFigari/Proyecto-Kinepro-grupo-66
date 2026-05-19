@@ -4,7 +4,7 @@ import { UsuarioService } from "../service/UsuarioService.js";
 import { UsuarioRepository } from "../repository/UsuarioRepository.js";
 import { EncriptarPasswordUseCase } from "../password/EncriptarPasswordUseCase.js";
 
-import { registrarUsuario, verificarDni, verificarEmail,buscarPaciente, obtenerPerfil } from "../controllers/UsuarioController.js";
+import { registrarUsuario, verificarDni, verificarEmail,buscarPaciente, obtenerPerfil, eliminarPerfil, obtenerTodosUsuarios } from "../controllers/UsuarioController.js";
 
 const router = Router();
 
@@ -22,4 +22,6 @@ router.get("/buscar/:busqueda", buscarPaciente);
 router.get("/:id", obtenerPerfil);
 
 
+router.delete("/:id" , eliminarPerfil)
+router.get("/", obtenerTodosUsuarios);
 export default router;

@@ -18,4 +18,8 @@ export class UsuarioRepository {
     async save(usuario) {
         return await this.repository.save(usuario);
     }
+
+    async delete(id){
+        return await this.repository.delete(id);
+    }
 }

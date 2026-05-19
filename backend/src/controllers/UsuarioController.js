@@ -77,5 +77,35 @@ export const obtenerPerfil = async (req, res) => {
         res.status(500).json({ mensaje: "Error interno del servidor" });
     }
 };
+
+export const eliminarPerfil = async (req,res) =>{
+    try {const { id } = req.params;
+
+    const repo = AppDataSource.getRepository(UserSchema);
+
+    const usuario = await repo.findOneBy({ id: parseInt(id) });
+
+    if (!usuario){
+        return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+    await repo.delete(id);
+    res.json({ ok: true, mensaje : "se elimino el cliente"})
+    
+    }catch (error) {
+       res.status(500).json({ mensaje: "error en el servidor"})
+    }
+}
+
+export const obtenerTodosUsuarios = async (req, res) => {
+    try{
+    const repo = AppDataSource.getRepository(UserSchema);
+    const usuarios = await repo.find();
+    res.json(usuarios);
+    }
+    catch (error){
+        console.error(error);
+        res.status(500).json({ mensaje: "error al traer los usuarios"});
+    }
+}
     
 

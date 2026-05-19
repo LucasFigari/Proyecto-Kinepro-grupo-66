@@ -21,4 +21,15 @@ export class UsuarioService{
         return await this.usuarioRepository.save(usuario);
     }
 
+    async eliminarUsuarioPorId(id){
+        const idNUm = paraseInt(id);
+
+        const usuario = await this.usuarioRepository.findById(idNUm);
+
+        if (!usuario){
+            throw new Error("usuario no existente! ");
+        }
+        return await this.usuarioRepository.delete(idNUm);
+    }
+
 }

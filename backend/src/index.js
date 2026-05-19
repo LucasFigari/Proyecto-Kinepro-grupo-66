@@ -7,6 +7,7 @@ import UsuarioRoutes from "./routes/UsuarioRoutes.js"
 import PersonalRoutes from "./routes/PersonalRoutes.js"
 import LoginRoutes from "./routes/LoginRoutes.js"
 import PasswordRoutes from "./routes/PasswordRoutes.js"
+import turnoRutas from "./routes/TurnosRoutes.js"
 
 const app = express();
 app.use(cors())
@@ -29,6 +30,7 @@ app.use("/usuarios", UsuarioRoutes)
 app.use("/personal", PersonalRoutes)
 app.use("/login", LoginRoutes)
 app.use("/forgot-password", PasswordRoutes);
+app.use("/turnos", turnoRutas)
 app.use(express.static('public'));
 
 app.listen(3000, () => {

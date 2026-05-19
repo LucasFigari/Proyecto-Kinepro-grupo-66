@@ -84,6 +84,11 @@
         <a href="#" class="sidebar-btn">
             <i class="ti ti-activity"></i> Tratamientos
         </a>
+
+        <button class="sidebar-btn" id="btnSidebarGestion">
+        <i class="ti ti-users"></i> Gestión usuarios
+        </button>
+
         <button class="sidebar-logout" id="btnCerrarSesion">
             <i class="ti ti-logout"></i> Cerrar sesión
         </button>
@@ -98,6 +103,13 @@
                 <p class="card-title">Gestión de personal</p>
                 <p class="card-desc">Crear, modificar y eliminar cuentas de secretarias y kinesiólogos.</p>
             </a>
+
+            <div class="card" id="tarjetaGestion" style="cursor: pointer;">
+            <div class="card-icon"><i class="ti ti-users"></i></div>
+            <p class="card-title">Gestión de Usuarios</p>
+            <p class="card-desc">Dar de baja pacientes de KinePro.</p>
+            </div>
+
             <a href="#" class="card">
                 <div class="card-icon"><i class="ti ti-activity"></i></div>
                 <p class="card-title">Tratamientos</p>
@@ -111,6 +123,7 @@
             window.location.href = '/';
         });
     </script>
+    <script src="./src/gestion-usuarios.js"></script>
 
 </body>
 </html>

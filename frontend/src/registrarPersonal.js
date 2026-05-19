@@ -7,6 +7,8 @@ const telefono = /** @type {HTMLInputElement} */ ( document.getElementById("tele
 const contraseña = /** @type {HTMLInputElement} */ (document.getElementById("contraseñaRegistro"))
 const puestoTrabajo = /** @type {HTMLSelectElement} */ (document.getElementById("puestoTrabajo"))
 
+const contenedorMensaje = document.getElementById('mensaje');
+
 
 function validarCampoNombre(nom){
     
@@ -21,17 +23,17 @@ function validarCampoNombre(nom){
             }
 
             else{
-                //avisar en pantalla formato invalido
+                mostrarError("❌ Error: Formato de nombre invalido.")
             }
         }
 
         else{
-            //avisar en pantalla limite de caracteres
+            mostrarError("❌ Error: El campo 'Nombre' debe poseer entre 3 y 30 caracteres.")
         }
     }
 
     else{
-        //avisar en pantalla campo vacio
+        mostrarError("❌ Error: Debe completar el campo 'Nombre'.")
     }
         
     
@@ -52,17 +54,17 @@ function validarCampoApellido(ape){
             }
 
             else{
-                //avisar en pantalla formato invalido
+                mostrarError("❌ Error: Formato de apellido invalido.")
             }
         }
 
         else{
-            //avisar en pantalla limite de caracteres
+            mostrarError("❌ Error: El campo 'Apellido' debe poseer entre 3 y 30 caracteres.")
         }
     }
 
     else{
-        //avisar en pantalla campo vacio
+        mostrarError("❌ Error: Debe completar el campo 'Apellido'.")
     }
         
     
@@ -81,11 +83,11 @@ function validarCampoFechaNacimiento(fechaNac){
             esValido = true
         }
         else{
-            //avisar que la fecha debe ser menor a la de hoy
+            mostrarError("❌ Error: La fecha de nacimiento debe ser anterior a la fecha actual.")
         }
     }
     else{
-        //avisar que falta completar la fecha
+        mostrarError("❌ Error: Debe completar la fecha de nacimiento.")
     }
 
     return esValido
@@ -108,19 +110,19 @@ async function validarCampoDni(dniParametro){
 
             }
             else{
-                //avisar que dni ya existe en la bd del personal
+                mostrarError("❌ Error: Ya existe una Cuenta Profesional con el DNI elegido.")
             }
 
         }
         
         else{
-            //avisar dni invalido
+            mostrarError("❌ Error: El campo 'DNI' debe poseer entre 7 y 8 caracteres numéricos.")
         }
 
     }
 
     else{
-        //avisar campo vacio
+        mostrarError("❌ Error: Debe completar el campo 'DNI'.")
     }
 
     return esValido
@@ -141,19 +143,17 @@ async function validarCampoEmail(correo){
                 esValido = true
             }
             else{
-                //avisar que ya existe el email en la bd del personal
+                mostrarError("❌ Error: Ya existe una cuenta Profesional con el email elegido.")
             }
 
         }
-        
         else{
-            //avisar correo invalido
+            mostrarError("❌ Error: Formato de email invalido.")
         }
 
     }
-
     else{
-        //avisar campo vacio
+        mostrarError("❌ Error: Debe completar el campo 'Email'.")
     }
 
     return esValido
@@ -172,13 +172,13 @@ function validarCampoTelefono(tel){
         }
 
         else{
-            //avisar que telefono debe ser entre 8 y 15 digitos numericos
+            mostrarError("❌ Error: el telefono debe poseer entre 8 y 15 caracteres numéricos.")
         }
 
     }
 
     else{
-        //avisar campo vacio
+        mostrarError("❌ Error: Debe completar el campo 'telefono'.")
     }
 
     return esValido
@@ -199,13 +199,13 @@ function validarCampoContraseña(cont){
         }
 
         else{
-            //avisar que contraseña debe tener entre 8 y 12 caracteres
+            mostrarError("❌ Error: La Contraseña debe poseer entre 8 y 12 caracteres.")
         }
 
     }
 
     else{
-        //informar campo vacio
+        mostrarError("❌ Error: Debe completar el campo 'Contraseña'.")
     }
 
     return esValido
@@ -220,7 +220,7 @@ function validarCampoPuestoTrabajo(pt){
         esValido=true
     }
     else{
-        //avisar que se seleccione una opcion
+        mostrarError("❌ Error: Seleccione un Rol")
     }
 
     return esValido
@@ -251,35 +251,43 @@ formulario.addEventListener("submit", async e =>{
     
     if(await formularioValido()){  //se llama al metodo formularioValido() y si todos los campos están "Ok" se devuelve true
         
-        const personalTrabajo = {
-            nombre: nombre.value.trim(),
-            apellido: apellido.value.trim(),
-            fechaNac: fechaNacimiento.value,
-            dni: dni.value.trim(),
-            email: email.value.trim(),                            //Creo el objeto que contiene los datos del personal
-            telefono: telefono.value.trim(),
-            password: contraseña.value,
-            rol: puestoTrabajo.value
-        }
-
-        fetch("http://localhost:3000/personal/registrar", {   
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(personalTrabajo)                  //convierto el objeto a archivo json
-        })
-
-        .then(res => res.json())
-        .then(data => {
-            if(data.ok){     //verifico que se subió
-                alert("Personal registrado correctamente")
-                window.location.href = "./pestaña-personal.html" 
+        try{
+            const personalTrabajo = {
+                nombre: nombre.value.trim(),
+                apellido: apellido.value.trim(),
+                fechaNac: fechaNacimiento.value,
+                dni: dni.value.trim(),
+                email: email.value.trim(),                            //Creo el objeto que contiene los datos del personal
+                telefono: telefono.value.trim(),
+                password: contraseña.value,
+                rol: puestoTrabajo.value
             }
-        })
-        .catch(error => {
+
+            fetch("http://localhost:3000/personal/registrar", {   
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(personalTrabajo)                  //convierto el objeto a archivo json
+            })
+
+            .then(res => res.json())
+            .then(data => {
+                if(data.ok){     //verifico que se subió
+                    alert("Personal registrado correctamente")
+                    window.location.href = "./pestaña-personal.html" 
+                }
+            })
+        }
+        catch(error) {
             console.error("Error al registrar:", error)  //caso de error
             alert("Hubo un error al registrar el Personal")
-        })
+        }
 
     }
 })
+
+function mostrarError(mensaje) {
+    contenedorMensaje.style.display = "block"
+    contenedorMensaje.textContent = mensaje;
+    contenedorMensaje.style.color = "#ff4d4d";
+}
     

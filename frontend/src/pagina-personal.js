@@ -7,7 +7,7 @@ fetch("http://localhost:3000/personal/lista-completa")
 
     data.forEach(persona => {
 
-        const div = document.createElement("li")  // creo un div por cada persona
+        const li = document.createElement("li")  // creo un div por cada persona
 
         li.innerHTML = `
             <p>${persona.nombre} ${persona.apellido} - DNI: ${persona.dni}</p>

@@ -201,40 +201,42 @@ formulario.addEventListener("submit", async e =>{
     if(await formularioValido()){
         console.log("-> Formulario OK, iniciando Fetch...");
         try {
-        const datosParaEnviar = { 
+            const datosParaEnviar = { 
                 dni: dni.value.trim(), 
                 apellido: apellido.value.trim(), 
                 nombre: nombre.value.trim(), 
                 email: email.value.trim(), 
-                password: password.value.trim(), 
+                password: password.value, 
                 telefono: telefono.value.trim() 
             };
 
-        const response = await fetch('http://localhost:3000/usuarios/registrar', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(datosParaEnviar)
-        });
+            const response = await fetch('http://localhost:3000/usuarios/registrar', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(datosParaEnviar)
+            });
 
 
-        const resultado = await response.json();
+            const resultado = await response.json();
         
-        if (!response.ok) {
-            throw new Error(resultado.detalles || "Error desconocido");
-        }
+            if (!response.ok) {
+                throw new Error(resultado.detalles || "Error desconocido");
+            }
 
-        contenedorMensaje.textContent = "✅ ¡Registro exitoso!";
-        contenedorMensaje.style.color = "var(--accent)"; 
-        contenedorMensaje.style.display = "block"
-        formulario.reset(); 
+            contenedorMensaje.textContent = "✅ ¡Registro exitoso!";
+            contenedorMensaje.style.color = "var(--accent)"; 
+            contenedorMensaje.style.display = "block"
+            formulario.reset(); 
 
-    } catch (error) {
-        if (error.message === "Failed to fetch") {
-            mostrarError("❌ Error: No se pudo conectar con el servidor.");
-        } else {
-            mostrarError("❌ " + error.message);
+        } 
+        catch (error) {
+            if (error.message === "Failed to fetch") {
+               mostrarError("❌ Error: No se pudo conectar con el servidor.");
+            } 
+            else {
+                mostrarError("❌ " + error.message);
+            }
         }
-    }
     }
 })
 

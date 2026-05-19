@@ -52,7 +52,7 @@ export const validarCorreoUnico = async (req, res) => {   //controlador de valid
 export const obtenerPersonal = async(req, res) => { //controlador para traer todos los registros de la tabla personal
 
     const repo = AppDataSource.getRepository(PersonalSchema)
-    const personal = repo.find()
+    const personal = await repo.find()
     res.json(personal)
 
 }

@@ -20,4 +20,6 @@ router.get("/verificar-email/:email", verificarEmail);
 router.get("/buscar/:busqueda", buscarPaciente);
 
 router.get("/:id", obtenerPerfil);
+
+
 export default router;

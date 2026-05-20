@@ -194,6 +194,49 @@
 
     </div>
 
+    <!-- Modal editar personal -->
+    <div id="modalEditar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:2rem; border-radius:12px; width:100%; max-width:450px;">
+            <h4 style="margin-bottom:1.5rem;">Editar Perfil</h4>
+            <input type="hidden" id="editId">
+            <div style="margin-bottom:1rem;">
+                <label>Nombre</label>
+                <input id="editNombre" type="text" style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label>Apellido</label>
+                <input id="editApellido" type="text" style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label>DNI</label>
+                <input id="editDni" type="text" style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label>Email</label>
+                <input id="editEmail" type="email" style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label>Teléfono</label>
+                <input id="editTelefono" type="text" style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label>Rol</label>
+                <select id="editRol" style="width:100%; padding:0.5rem; margin-top:0.3rem; border:1px solid #ccc; border-radius:6px;">
+                    <option value="Secretaria">Secretaria</option>
+                    <option value="Kinesiologo">Kinesiólogo</option>
+                </select>
+            </div>
+            <p id="mensajeEditar" style="display:none; font-size:0.9rem; margin-bottom:1rem;"></p>
+            <div style="display:flex; gap:1rem;">
+                <button id="btnGuardarCambios" style="flex:1; padding:0.6rem; background:#107391; color:white; border:none; border-radius:6px; cursor:pointer;">
+                    Guardar Cambios
+                </button>
+                <button id="btnCancelarEditar" style="flex:1; padding:0.6rem; background:#eee; border:none; border-radius:6px; cursor:pointer;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
     <script src="./src/pagina-personal.js"></script>
 </body>
 

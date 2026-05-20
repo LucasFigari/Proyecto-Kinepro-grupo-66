@@ -70,4 +70,22 @@ export const bajaPersonal = async (req, res) => { //controlador de baja de perso
 
 }
 
+// EDICION DE DATOS DEL PERSONAL
+export const editarPersonal = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, apellido, dni, email, telefono, rol} = req.body;
+    const repo = AppDataSource.getRepository(PersonalSchema);
 
+    //Valido campos vacíos
+    if(!nombre || !apellido || !dni || !email || !telefono || !rol){
+        return res.json({ ok: false, mensaje: "Debe completar todos los campos"})
+    }
+    //Valido DNI único
+    const dniExistente = await repo.findOne({ where: {dni}})
+    if( dniExistente && dniExistente.id !== parseInt(id)) {
+        return res.json({ ok:false, mensaje: "El DNI ya se encuentra registrado en la lista de trabajadores actuales"})
+    }
+
+    await repo.update(id, { nombre, apellido, dni, email, telefono, rol })
+    res.json({ ok:true, mensaje: "Se han aplicado los cambios"})
+}

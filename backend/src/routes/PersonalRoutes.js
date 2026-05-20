@@ -1,6 +1,6 @@
 // src/routes/PersonalRoutes.js
 import { Router } from "express"
-import { registrarPersonal, validarDniUnico, validarCorreoUnico, bajaPersonal, obtenerPersonal } from "../controllers/PersonalController.js"
+import { registrarPersonal, validarDniUnico, validarCorreoUnico, bajaPersonal, obtenerPersonal, editarPersonal } from "../controllers/PersonalController.js"
 
 
 const router = Router()
@@ -14,5 +14,7 @@ router.get("/verificar-email/:email", validarCorreoUnico)
 router.get("/lista-completa", obtenerPersonal)
 
 router.delete("/dar-baja-personal/:id", bajaPersonal)
+
+router.put("/editar-personal/:id", editarPersonal)
 
 export default router

@@ -226,7 +226,18 @@ formulario.addEventListener("submit", async e =>{
             contenedorMensaje.textContent = "✅ ¡Registro exitoso!";
             contenedorMensaje.style.color = "var(--accent)"; 
             contenedorMensaje.style.display = "block"
-            formulario.reset(); 
+            formulario.reset();
+
+            setTimeout(() => {
+                const rol = sessionStorage.getItem("rol")
+
+                if(rol === "Secretaria"){
+                   window.location.href = "./index-secretaria.html"  
+                } else {
+                window.location.href = "./index.html"
+                }
+            }, 1500)
+
 
         } 
         catch (error) {

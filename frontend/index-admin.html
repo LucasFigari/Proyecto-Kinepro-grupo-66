@@ -17,6 +17,11 @@
             padding: 2rem 1rem;
             gap: 12px;
         }
+        .sidebar-logo {
+            width: 80px;
+            margin: 0rem auto 1rem auto; 
+            display: block;
+        }
         .sidebar-title {
             color: #fff; font-size: 18px; font-weight: 500;
             margin-bottom: 1rem; padding-bottom: 1rem;
@@ -77,10 +82,17 @@
 <body>
 
     <div class="sidebar">
+
+    <a href="./index-admin.html">
+        <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
+    </a>
+
         <div class="sidebar-title">KinePro · Admin</div>
+
         <a href="./pagina-personal.html" class="sidebar-btn">
             <i class="ti ti-users"></i> Personal
         </a>
+
         <a href="#" class="sidebar-btn">
             <i class="ti ti-activity"></i> Tratamientos
         </a>

@@ -8,67 +8,91 @@
     <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; }
 
-        .sidebar {
-            position: fixed; top: 0; left: 0; bottom: 0; width: 220px;
-            background: #2d6a4f;
-            display: flex; flex-direction: column;
-            align-items: center;
-            padding: 2rem 1rem;
-        }
+    .sidebar {
+        position: fixed; top: 0; left: 0; bottom: 0; width: 220px;
+        background: #2d6a4f;
+        display: flex; flex-direction: column;
+        padding: 2rem 1rem;
+        gap: 12px;
+    }
+    .sidebar-logo {
+        width: 80px;
+        margin: 0rem auto 1rem auto; 
+        display: block;
+    }
+    .sidebar-title {
+        color: #fff; font-size: 18px; font-weight: 500;
+        margin-bottom: 1rem; padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    .sidebar-btn {
+        background: #52b788; color: #fff;
+        border: none; border-radius: 10px;
+        padding: 0.7rem 1rem; font-size: 14px;
+        cursor: pointer; text-align: left;
+        display: flex; align-items: center; gap: 10px;
+        text-decoration: none;
+    }
+    .sidebar-btn:hover { background: #3d9a6e; color: #fff; }
+    .sidebar-logout {
+        margin-top: auto;
+        background: rgba(255,255,255,0.15); color: #fff;
+        border: 1px solid rgba(255,255,255,0.3); border-radius: 10px;
+        padding: 0.7rem 1rem; font-size: 14px;
+        cursor: pointer; text-align: left;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logout:hover { background: rgba(255,255,255,0.25); }
 
-        .sidebar-logo {
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-        }
+    .main-content {
+        margin-left: 220px;
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 8rem;
+        min-height: 100vh;
+    }
 
-        .main-content {
-            margin-left: 220px;
-            padding: 2.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding-top: 8rem;
-            min-height: 100vh;
-        }
+    .buscador-wrapper {
+        width: 100%;
+        max-width: 500px;
+    }
 
-        .buscador-wrapper {
-            width: 100%;
-            max-width: 500px;
-        }
+    .buscador {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 16px;
+        outline: none;
+    }
 
-        .buscador {
-            width: 100%;
-            padding: 0.8rem 1.2rem;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            font-size: 16px;
-            outline: none;
-        }
+    .buscador:focus {
+        border-color: #2d6a4f;
+        box-shadow: 0 0 0 3px rgba(45,106,79,0.15);
+    }
 
-        .buscador:focus {
-            border-color: #2d6a4f;
-            box-shadow: 0 0 0 3px rgba(45,106,79,0.15);
-        }
+    .resultados {
+        margin-top: 1.5rem;
+        width: 100%;
+        list-style: none;
+        padding: 0;
+    }
 
-        .resultados {
-            margin-top: 1.5rem;
-            width: 100%;
-        }
-
-        .resultado-item {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .resultado-item {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
     </style>
 </head>
 <body>

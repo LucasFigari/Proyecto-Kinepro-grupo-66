@@ -4,25 +4,43 @@ const sidebar = document.getElementById("sidebar")
 
 if(rol === "Secretaria"){
     sidebar.innerHTML = `
-        <div class="sidebar-title">KinePro · Secretaria</div>
-        <a href="registrar-paciente.html" class="sidebar-btn">
-            <i class="ti ti-user-plus"></i> Registrar paciente
-        </a>
-        <a href="buscar-paciente.html" class="sidebar-btn">
-            <i class="ti ti-search"></i> Buscar paciente
-        </a>
-        <button class="sidebar-logout" id="btnCerrarSesion">
-            <i class="ti ti-logout"></i> Cerrar sesión
-        </button>
+            <a href="./index-secretaria.html">
+                <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
+            </a>
+
+            <div class="sidebar-title">KinePro · Secretaria</div>
+            <a href="./registrar-paciente.html" class="sidebar-btn">
+                <i class="ti ti-user-plus"></i> Registrar usuario
+            </a>
+            <a href="./buscar-paciente.html" class="sidebar-btn">
+                <i class="ti ti-search"></i> Buscar Paciente
+            </a>
+            <a href="./index-usuario.html" class="sidebar-btn">
+                <i class="ti ti-menu"></i> Tratamientos         
+            </a>
+            
+            <button class="sidebar-btn" id="btnSidebarGestion">
+                <i class="ti ti-users"></i> Gestionar usuarios
+            </button>
+            <button class="sidebar-logout" id="btnCerrarSesion">
+                <i class="ti ti-logout"></i> Cerrar sesión
+            </button>
+        </div>
     `
 } else if(rol === "Admin"){
     sidebar.innerHTML = `
-        <div class="sidebar-title">KinePro · Admin</div>
-        <a href="registrar-personal.html" class="sidebar-btn">
-            <i class="ti ti-user-plus"></i> Registrar personal
+        <a href="./index-admin.html">
+            <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
         </a>
-        <a href="lista-personal.html" class="sidebar-btn">
-            <i class="ti ti-users"></i> Lista personal
+        <div class="sidebar-title">KinePro · Admin</div>
+        <a href="./pagina-personal.html" class="sidebar-btn">
+            <i class="ti ti-users"></i> Personal
+        </a>
+        <a href="./buscar-paciente.html" class="sidebar-btn">
+            <i class="ti ti-search"></i> Buscar paciente
+        </a>
+        <a href="#" class="sidebar-btn">
+            <i class="ti ti-activity"></i> Tratamientos
         </a>
         <button class="sidebar-logout" id="btnCerrarSesion">
             <i class="ti ti-logout"></i> Cerrar sesión

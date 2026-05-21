@@ -9,7 +9,7 @@ let htmlInicioOriginal = contenedor.innerHTML;
 // Función principal que arma la pantalla y maneja los datos
 const cargarListaUsuarios = async () => {
     
-    // Armamos la estructura de la tabla en el contenedor (sin importar el back)
+    // estructura de la tabla en el contenedor (sin importar el back)
     contenedor.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
@@ -43,7 +43,7 @@ const cargarListaUsuarios = async () => {
         </div>
     `;
 
-    // Vinculamos inmediatamente el botón Volver para que no se rompa la navegación
+    // Vinculo inmediatamente el botón Volver para que no se rompa la navegación
     document.getElementById('btnVolverAlInicio').addEventListener('click', () => {
         contenedor.innerHTML = htmlInicioOriginal;
         reconectarEventos();
@@ -85,7 +85,7 @@ const cargarListaUsuarios = async () => {
             tablaCuerpo.insertAdjacentHTML('beforeend', filaHTML);
         });
 
-        // 🟢 CORRECCIÓN: Los listeners se asignan acá, justo después de renderizar las filas con éxito
+        
         document.querySelectorAll('.btn-eliminar-dinamico').forEach(boton => {
             boton.addEventListener('click', () => {
                 const idUsuario = boton.getAttribute('data-id');

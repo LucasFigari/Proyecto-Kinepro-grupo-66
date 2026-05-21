@@ -69,6 +69,7 @@
     transition: all 0.3s;
 }
 .btn-lateral-secundario {
+    display:flex;
     width: 130px;
     height: 35px;
     font-size: 0.8rem;
@@ -164,10 +165,31 @@
 }
 </style>
 <body>
+
+    <!-- Modal cerrar sesión -->
+    <div id="modalCerrarSesion" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:2rem; border-radius:12px; width:100%; max-width:380px; text-align:center;">
+            <h4 style="margin-bottom:1rem;">¿Cerrar sesión?</h4>
+            <p style="color:#666; margin-bottom:1.5rem;">¿Estás seguro que querés cerrar tu sesión?</p>
+            <div style="display:flex; gap:1rem;">
+                <button id="btnConfirmarCerrar" style="flex:1; padding:0.6rem; background:#107391; color:white; border:none; border-radius:6px; cursor:pointer;">
+                    Confirmar
+                </button>
+                <button id="btnCancelarCerrar" style="flex:1; padding:0.6rem; background:#eee; border:none; border-radius:6px; cursor:pointer;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="app">
         </div>
 
    <script type="module"> // Agregamos type="module" por Vite
+
+    const rol = sessionStorage.getItem('rol');
+    if (!rol || rol !== 'usuario') window.location.href = '/';
+
     const app = document.querySelector('#app');
     
     // 1. Inyectamos el HTML primero
@@ -182,7 +204,7 @@
                     <button id="botonPerfil" class="btn-lateral">Ver Perfil</button>
                     <button id="botonTurnos" class="btn-lateral btn-lateral-secundario"> TURNOS </button>
                     <button id="botonHistorial" class="btn-lateral btn-lateral-secundario"> HISTORIAL </button>
-                    <button id="botonCerrar" class="btn-lateral btn-lateral-secundario"> CERRAR SESIÓN</button>
+                    <button id="btnCerrarSesion" class="btn-lateral btn-lateral-secundario"> CERRAR SESIÓN </button>
                 </div>
             </div>
         </div>
@@ -304,6 +326,20 @@ document.getElementById('btnDetallesInferior').addEventListener('click', () => {
     pedirCupoAlBackend('TREN INFERIOR');
 });
 
+const modalCerrar = document.getElementById('modalCerrarSesion');
+
+document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+    modalCerrar.style.display = 'flex';
+});
+
+document.getElementById('btnConfirmarCerrar').addEventListener('click', () => {
+    sessionStorage.clear();
+    window.location.href = '/';
+});
+
+document.getElementById('btnCancelarCerrar').addEventListener('click', () => {
+    modalCerrar.style.display = 'none';
+});
 
 </script>
 </body>

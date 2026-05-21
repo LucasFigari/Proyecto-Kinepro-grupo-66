@@ -3,6 +3,9 @@ const btonPerfil = document.getElementById("Perfil"); // ✅ Vinculado al ID exa
 const contenido = document.getElementById("divContenedor");
 const turnos = document.getElementById("botonDeTurnos"); // 👈 1. INTEGRADO: Captura el botón de turnos del HTML
 
+const rol = sessionStorage.getItem('rol');
+if (!rol || rol !== 'usuario') window.location.href = '/';
+
 const cargarAreas = async () => {
     try {
         const respuesta = await fetch(API_URL);
@@ -316,3 +319,18 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
 };
 
 window.cargarTurnosPorArea = cargarTurnosPorArea;
+// Modal de cierre de sesión
+const modalCerrar = document.getElementById('modalCerrarSesion');
+
+document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+    modalCerrar.style.display = 'flex';
+});
+
+document.getElementById('btnConfirmarCerrar').addEventListener('click', () => {
+    sessionStorage.clear();
+    window.location.href = '/';
+});
+
+document.getElementById('btnCancelarCerrar').addEventListener('click', () => {
+    modalCerrar.style.display = 'none';
+});

@@ -2,6 +2,9 @@
 const rol = sessionStorage.getItem("rol")
 const sidebar = document.getElementById("sidebar")
 
+const rolesPermitidos = ['Admin', 'Secretaria', 'Kinesiologo'];
+if (!rol || !rolesPermitidos.includes(rol)) window.location.href = '/';
+
 if(rol === "Secretaria"){
     sidebar.innerHTML = `
             <a href="./index-secretaria.html">

@@ -3,6 +3,9 @@ const contenido = document.getElementById("divContenedor");
 const botonTurnos = document.getElementById("botonDeTurnos");
 const botonHistorialClinico = document.getElementById("historialClinico");
 
+const rol = sessionStorage.getItem('rol');
+if (!rol || rol !== 'Kinesiologo') window.location.href = '/';
+
 // === 1. NUEVA FUNCIÓN: Cargar y mostrar los turnos del área seleccionada ===
 const cargarTurnosPorArea = async (areaId, areaNombre) => {
     try {
@@ -190,6 +193,17 @@ botonTurnos.addEventListener("click", (e) => {
     }
 });
 
+const modalCerrar = document.getElementById('modalCerrarSesion');
+
 document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+    modalCerrar.style.display = 'flex';
+});
+
+document.getElementById('btnConfirmarCerrar').addEventListener('click', () => {
+    sessionStorage.clear();
     window.location.href = '/';
+});
+
+document.getElementById('btnCancelarCerrar').addEventListener('click', () => {
+    modalCerrar.style.display = 'none';
 });

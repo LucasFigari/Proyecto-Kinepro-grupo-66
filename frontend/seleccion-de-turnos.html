@@ -28,6 +28,10 @@
     </div>
 
     <script>
+
+        const rol = sessionStorage.getItem('rol');
+        if (!rol || rol !== 'usuario') window.location.href = '/';
+
         document.addEventListener('DOMContentLoaded', () => {
             // 1. Capturamos el texto que viene después del '?' en la barra de direcciones
             const valoresUrl = window.location.search;

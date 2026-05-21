@@ -1,5 +1,8 @@
 const API_URL = 'http://localhost:3000/area';
 
+const rol = sessionStorage.getItem('rol');
+if (!rol || rol !== 'Admin') window.location.href = '/';
+
 async function cargarAreas() {
     try {
         const respuesta = await fetch(API_URL);

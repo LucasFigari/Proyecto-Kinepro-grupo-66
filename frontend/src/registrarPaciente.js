@@ -5,6 +5,9 @@ const email = /** @type {HTMLInputElement} */ ( document.getElementById("emailRe
 const telefono = /** @type {HTMLInputElement} */ ( document.getElementById("telefonoRegistro"))
 const password = /** @type {HTMLInputElement} */ (document.getElementById("contraseñaRegistro"))
 
+const rol = sessionStorage.getItem('rol');
+if (!rol || rol !== 'Secretaria') window.location.href = '/';
+
 const contenedorMensaje = document.getElementById('mensaje');
 
 function validarCampoNombre(nom){

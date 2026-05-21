@@ -1,3 +1,6 @@
+const rol = sessionStorage.getItem('rol');
+if (!rol || rol !== 'Admin') window.location.href = '/';
+
 fetch("http://localhost:3000/personal/lista-completa")
 .then(res => res.json())
 .then(data => {

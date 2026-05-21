@@ -9,6 +9,8 @@ const puestoTrabajo = /** @type {HTMLSelectElement} */ (document.getElementById(
 
 const contenedorMensaje = document.getElementById('mensaje');
 
+const rol = sessionStorage.getItem('rol');
+if (!rol || rol !== 'Admin') window.location.href = '/';
 
 function validarCampoNombre(nom){
     

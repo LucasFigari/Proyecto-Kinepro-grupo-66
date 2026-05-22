@@ -1,8 +1,8 @@
 const form = document.getElementById('areaForm');
 const contenedorMensaje = document.getElementById('mensajeError');
 
-const rol = sessionStorage.getItem('rol');
-if (!rol || rol !== 'Admin') window.location.href = '/';
+//const rol = sessionStorage.getItem('rol');
+//if (!rol || rol !== 'Admin') window.location.href = '/';
 
 form.addEventListener('submit', async (e) => {
         e.preventDefault();

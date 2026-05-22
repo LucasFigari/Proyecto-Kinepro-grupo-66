@@ -146,7 +146,7 @@ function mostrarHome() {
                 }else if(data.rol === 'Admin'){
                     window.location.href = 'index-admin.html';
                 }else {
-                    window.location.href = 'usuario.html';
+                    window.location.href = 'index-usuario.html';
                 }
             }else {
                 errorEl.textContent = data.mensaje;

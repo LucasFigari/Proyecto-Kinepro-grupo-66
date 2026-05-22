@@ -358,6 +358,45 @@ code {
     
     /* Esto hace que el cambio sea suave y no un salto brusco */
     transition: 0}
+
+#registrarPaciente {
+    /* Quitamos los bordes feos del navegador */
+    border: none;
+    outline: none;
+    
+    /* Colores según tu paleta */
+    background-color: #D1E9F0 !important;
+    color: #107391;
+    
+    /* Espaciado y forma */
+
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    
+    /* Para que se mueva a la derecha */
+    margin-left: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#registrarPaciente:hover {
+    background-color: #157188 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#registrarPaciente:hover {
+  /* Un celeste más oscuro que el original para que se note el cambio */
+    background-color: #157188 !important; 
+    
+    /* Opcional: que el texto cambie a blanco para que resalte más */
+    color: #ffffff !important; 
+    
+    /* Esto hace que el cambio sea suave y no un salto brusco */
+    transition: 0}
+
 .linea-separadora {
     width: 340px;           /* Cortita y elegante */
     border: none;

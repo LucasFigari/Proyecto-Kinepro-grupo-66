@@ -1,7 +1,7 @@
 const API_URL = 'http://localhost:3000/area';
-const btonPerfil = document.getElementById("Perfil"); // ✅ Vinculado al ID exacto del HTML
+const btonPerfil = document.getElementById("Perfil"); 
 const contenido = document.getElementById("divContenedor");
-const turnos = document.getElementById("botonDeTurnos"); // 👈 1. INTEGRADO: Captura el botón de turnos del HTML
+const turnos = document.getElementById("botonDeTurnos"); 
 
 const rol = sessionStorage.getItem('rol');
 if (!rol || rol !== 'usuario') window.location.href = '/';
@@ -28,7 +28,6 @@ const cargarAreas = async () => {
             const nombreNormalizado = area.nombre.replace(/\s+/g, '');
             const rutaImagen = `./src/imagenes/${nombreNormalizado}.png`;
 
-            // 🎨 NUEVO DISEÑO: Tarjeta moderna con texto sobre la imagen
             const tarjetaHTML = `
                 <div class="card border-0 position-relative text-white overflow-hidden shadow-sm" 
                      style="cursor: pointer; height: 220px; border-radius: 14px;">
@@ -69,7 +68,7 @@ cargarAreas();
 btonPerfil.addEventListener("click", async (e) => {
     e.preventDefault(); 
 
-    const idUsuarioLogueado = localStorage.getItem('idUsuario'); 
+    const idUsuarioLogueado = sessionStorage.getItem('idUsuario'); 
     console.log('El usuario logueado tiene el item: ' + idUsuarioLogueado);
 
     if (!idUsuarioLogueado) {
@@ -100,11 +99,10 @@ btonPerfil.addEventListener("click", async (e) => {
         }
         
         const usuario = await respuesta.json();
-        localStorage.setItem("idUsuario", usuario.id);
+        sessionStorage.setItem("idUsuario", usuario.id); // ✅ Mantener consistencia en sessionStorage
         
         contenido.innerHTML = `
             <div class="container mt-2" style="max-width: 600px;">
-                
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <p class="welcome mb-0">Mi Perfil</p>
@@ -151,7 +149,6 @@ btonPerfil.addEventListener("click", async (e) => {
                         </div>
                     </div>
                 </div>
-
             </div>
         `; 
 
@@ -167,13 +164,10 @@ btonPerfil.addEventListener("click", async (e) => {
     }
 });
 
-/**
- * ⚡ 2. INTEGRADO: Evento para el botón de "Mis Turnos"
- */
 if (turnos) {
     turnos.addEventListener("click", async (e) => {
         e.preventDefault();
-        const idUsuarioLogueado = localStorage.getItem('idUsuario');
+        const idUsuarioLogueado = sessionStorage.getItem('idUsuario');
 
         if (!idUsuarioLogueado) {
             contenido.innerHTML = `
@@ -218,12 +212,8 @@ async function cargarTurnosPorArea(idArea, nombreArea) {
     try {
         const respuesta = await fetch('http://localhost:3000/area/reservar', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nombreArea: nombreArea
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombreArea: nombreArea })
         });
 
         const resultado = await respuesta.json();
@@ -244,8 +234,7 @@ async function cargarTurnosPorArea(idArea, nombreArea) {
             text: `Área: ${nombreArea}`,
             confirmButtonColor: "#72B9CB"
         }).then(() => {
-            window.location.href =
-            `/seleccion-de-turnos.html?id=${idArea}&area=${encodeURIComponent(nombreArea)}`;
+            window.location.href = `/seleccion-de-turnos.html?id=${idArea}&area=${encodeURIComponent(nombreArea)}`;
         });
 
     } catch (error) {
@@ -258,15 +247,11 @@ async function cargarTurnosPorArea(idArea, nombreArea) {
     }
 }
 
-/**
- * ⚡ 3. INTEGRADO: Función que busca los turnos del usuario y los dibuja en pantalla
- */
 const cargarTurnosDelUsuario = async (idUsuario) => {
     const contenedor = document.getElementById("contenedor-turnos-usuario");
 
     try {
-        const idLimpio = String(idUsuario).replace(/[^0-9]/g, ''); 
-        const respuesta = await fetch(`http://localhost:3000/turnos/paciente/${idLimpio}`);
+        const respuesta = await fetch(`http://localhost:3000/turnos/paciente/${idUsuario}`);
         
         if (!respuesta.ok) {
             contenedor.innerHTML = '<p class="text-muted small">No se pudieron cargar los turnos en este momento.</p>';
@@ -276,7 +261,6 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
         const turnosData = await respuesta.json();
         const hoy = new Date().toLocaleDateString('en-CA'); 
 
-        // 🧼 FILTRADO: Nos quedamos con los turnos vigentes
         const turnosProximos = turnosData.filter(t => {
             const fechaLimpia = t.fecha.includes('T') ? t.fecha.split('T')[0] : t.fecha;
             return fechaLimpia >= hoy;
@@ -287,14 +271,12 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
             return;
         }
 
-        // ⏱️ ORDENADO: Cronológico por fecha y horario
         turnosProximos.sort((a, b) => {
             const fechaA = a.fecha.includes('T') ? a.fecha.split('T')[0] : a.fecha;
             const fechaB = b.fecha.includes('T') ? b.fecha.split('T')[0] : b.fecha;
             return (fechaA + a.horario).localeCompare(fechaB + b.horario);
         });
 
-        // 📐 RENDERIZADO: Generamos el HTML dinámico
         contenedor.innerHTML = turnosProximos.map(turno => {
             const fechaFormateada = turno.fecha.includes('T') ? turno.fecha.split('T')[0] : turno.fecha;
             const horarioCorto = turno.horario.substring(0, 5); 
@@ -319,18 +301,24 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
 };
 
 window.cargarTurnosPorArea = cargarTurnosPorArea;
-// Modal de cierre de sesión
+
 const modalCerrar = document.getElementById('modalCerrarSesion');
 
-document.getElementById('btnCerrarSesion').addEventListener('click', () => {
-    modalCerrar.style.display = 'flex';
-});
+if (document.getElementById('btnCerrarSesion')) {
+    document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+        modalCerrar.style.display = 'flex';
+    });
+}
 
-document.getElementById('btnConfirmarCerrar').addEventListener('click', () => {
-    sessionStorage.clear();
-    window.location.href = '/';
-});
+if (document.getElementById('btnConfirmarCerrar')) {
+    document.getElementById('btnConfirmarCerrar').addEventListener('click', () => {
+        sessionStorage.clear();
+        window.location.href = '/';
+    });
+}
 
-document.getElementById('btnCancelarCerrar').addEventListener('click', () => {
-    modalCerrar.style.display = 'none';
-});
+if (document.getElementById('btnCancelarCerrar')) {
+    document.getElementById('btnCancelarCerrar').addEventListener('click', () => {
+        modalCerrar.style.display = 'none';
+    });
+}

@@ -1,6 +1,5 @@
 import './style.css';
 
-// 1. Tus datos simulados (mientras esperás al grupo)
 const areasSimuladas = [
     {
         id: 1,
@@ -22,7 +21,6 @@ const areasSimuladas = [
     }
 ];
 
-// 2. Función principal
 function mostrarHome() {
     const app = document.querySelector('#app');
     
@@ -100,12 +98,10 @@ function mostrarHome() {
 
     const modal = document.getElementById('modalLogin');
 
-    //Abro el modal de iniciar sesion
     document.getElementById('iniciarSesion').addEventListener('click', () => {
         modal.style.display = 'flex';
     });
 
-    //Cierro el modal de iniciar sesion
     document.getElementById('btnCancelar').addEventListener('click', () => {
         modal.style.display = 'none';
         document.getElementById('errorLogin').style.display = 'none';
@@ -133,22 +129,25 @@ function mostrarHome() {
             });
             const data = await response.json();
 
-            if(data.ok){
-                modal.style.display = 'none';
-                sessionStorage.setItem("rol", data.rol)
-                sessionStorage.setItem("nombre", data.datos.nombre)
-                alert(`¡Bienvenido ${data.datos.nombre}!`);
-                // SI HACE FALTA, ACA SE PUEDE REDIRIGIR A OTRA PAGINA SEGUN EL ROL (data.rol)
-                if(data.rol === 'Secretaria'){
-                    window.location.href = 'index-secretaria.html';
-                }else if(data.rol === 'Kinesiologo'){
-                    window.location.href = 'index-kinesiologo.html';
-                }else if(data.rol === 'Admin'){
-                    window.location.href = 'index-admin.html';
-                }else {
-                    window.location.href = 'index-usuario.html';
-                }
-            }else {
+        if(data.ok){
+            modal.style.display = 'none';
+            
+            sessionStorage.setItem("idUsuario", data.datos.id); // 
+            sessionStorage.setItem("rol", data.rol);
+            sessionStorage.setItem("nombre", data.datos.nombre);
+            
+            alert(`¡Bienvenido ${data.datos.nombre}!`);
+            
+            if(data.rol === 'Secretaria'){
+                window.location.href = 'index-secretaria.html';
+            } else if(data.rol === 'Kinesiologo'){
+                window.location.href = 'index-kinesiologo.html';
+            } else if(data.rol === 'Admin'){
+                window.location.href = 'index-admin.html';
+            } else {
+                window.location.href = 'index-usuario.html';
+            }
+        }else {
                 errorEl.textContent = data.mensaje;
                 errorEl.style.display = 'block';
             }

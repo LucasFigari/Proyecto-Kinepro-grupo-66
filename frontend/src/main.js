@@ -26,7 +26,7 @@ function mostrarHome() {
     
     app.innerHTML = `
         <header id="barra-superior" class="shadow-sm">
-            <div class="container d-flex align-items-center">
+            <div class="container d-flex align-items-center gap-3">
                 <img id="logo-kinepro" src="./src/imagenes/logo.png.png" alt="Logo KinePro">
                 <button id="iniciarSesion">Iniciar Sesion</button>
                 <a href="./registrar-paciente.html"><button id="registrarPaciente">Registrarse</button></a>

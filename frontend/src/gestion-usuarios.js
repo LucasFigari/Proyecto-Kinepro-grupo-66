@@ -57,3 +57,36 @@ function confirmarBaja(idUsuario, nombreUsuario) {
         });
     }
 }
+
+
+const btnVolver = document.getElementById('btnVolver');
+
+if (btnVolver) {
+    const paginaAnterior = document.referrer; 
+    
+    
+    let colorHover = '#6c757d'; 
+
+    
+    if (paginaAnterior.includes('index-admin.html')) {
+        colorHover = '#00b4d8'; 
+    } else if (paginaAnterior.includes('index-secretaria.html')) {
+        colorHover = '#2d6a4f'; 
+    }
+
+    btnVolver.addEventListener('click', () => {
+        window.history.back();
+    });
+
+    btnVolver.addEventListener('mouseover', () => {
+        btnVolver.style.backgroundColor = colorHover;
+        btnVolver.style.borderColor = colorHover;
+        btnVolver.style.color = '#ffffff'; // Texto siempre blanco en hover
+    });
+
+    btnVolver.addEventListener('mouseout', () => {
+        btnVolver.style.backgroundColor = 'transparent';
+        btnVolver.style.borderColor = '#6c757d'; // Vuelve al gris original
+        btnVolver.style.color = '#6c757d';
+    });
+}

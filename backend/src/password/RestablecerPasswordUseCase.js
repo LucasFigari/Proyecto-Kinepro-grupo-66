@@ -20,9 +20,7 @@ export class RestablecerPasswordUseCase{
             
             const userAlmacenado = await this.usuarioRepository.findById(resetRequest.user_id);
 
-            userAlmacenado.password = await this.encriptarPasswordUseCase.execute(newPassword);
-
-            // userAlmacenado.password = newPassword;  //usar esto solo para pruebas
+            userAlmacenado.password = newPassword; 
 
             await this.passwordResetRepository.delete(resetRequest.user_id);
 

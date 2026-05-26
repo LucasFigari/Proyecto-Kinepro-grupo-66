@@ -36,21 +36,31 @@ if(rol === "Secretaria"){
 } else if(rol === "Admin"){
     sidebar.innerHTML = `
         <a href="./index-admin.html">
-            <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
-        </a>
+        <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
+    </a>
+
         <div class="sidebar-title">KinePro · Admin</div>
+
         <a href="./pagina-personal.html" class="sidebar-btn">
             <i class="ti ti-users"></i> Personal
         </a>
         <a href="./buscar-paciente.html" class="sidebar-btn">
-            <i class="ti ti-search"></i> Buscar paciente
+            <i class="ti ti-search"></i> Buscar Paciente
         </a>
-        <a href="#" class="sidebar-btn">
+
+
+        <a href="listar-areas.html" class="sidebar-btn">
             <i class="ti ti-activity"></i> Tratamientos
         </a>
+
+        <a href="./eliminar-usuarios.html" class="sidebar-btn" id="btnSidebarGestion">
+            <i class="ti ti-users"></i> Eliminar pacientes
+        </a>
+
         <button class="sidebar-logout" id="btnCerrarSesion">
             <i class="ti ti-logout"></i> Cerrar sesión
         </button>
+    </div>
     `
 }
 

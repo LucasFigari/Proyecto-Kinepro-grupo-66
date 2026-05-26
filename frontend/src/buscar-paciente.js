@@ -7,28 +7,31 @@ if (!rol || !rolesPermitidos.includes(rol)) window.location.href = '/';
 
 if(rol === "Secretaria"){
     sidebar.innerHTML = `
-            <a href="./index-secretaria.html">
-                <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
-            </a>
+             <div class="sidebar">
 
-            <div class="sidebar-title">KinePro · Secretaria</div>
-            <a href="./registrar-paciente.html" class="sidebar-btn">
-                <i class="ti ti-user-plus"></i> Registrar usuario
-            </a>
-            <a href="./buscar-paciente.html" class="sidebar-btn">
-                <i class="ti ti-search"></i> Buscar Paciente
-            </a>
-            <a href="./index-usuario.html" class="sidebar-btn">
-                <i class="ti ti-menu"></i> Tratamientos         
-            </a>
-            
-            <button class="sidebar-btn" id="btnSidebarGestion">
-                <i class="ti ti-users"></i> Gestionar usuarios
-            </button>
-            <button class="sidebar-logout" id="btnCerrarSesion">
-                <i class="ti ti-logout"></i> Cerrar sesión
-            </button>
-        </div>
+        <a href="./index-secretaria.html">
+            <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
+        </a>
+
+        <div class="sidebar-title">KinePro · Secretaria</div>
+        <a href="./registrar-paciente.html" class="sidebar-btn">
+            <i class="ti ti-user-plus"></i> Registrar usuario
+        </a>
+        <a href="./buscar-paciente.html" class="sidebar-btn">
+            <i class="ti ti-search"></i> Buscar Paciente
+        </a>
+        <a href="./listar-areas.html" class="sidebar-btn">
+            <i class="ti ti-menu"></i> Tratamientos         <!--aca agregué el boton-->
+        </a>
+        
+        <a href="./eliminar-usuarios.html" class="sidebar-btn" id="btnSidebarGestion">
+            <i class="ti ti-users"></i> Eliminar pacientes
+        </a>
+
+        <button class="sidebar-logout" id="btnCerrarSesion">
+            <i class="ti ti-logout"></i> Cerrar sesión
+        </button>
+    </div>
     `
 } else if(rol === "Admin"){
     sidebar.innerHTML = `

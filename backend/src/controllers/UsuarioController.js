@@ -1,6 +1,7 @@
 // src/controllers/UsuarioController.js
 import AppDataSource from "../config/DbConfig.js"
 import UserSchema from "../schema/UsuarioSchema.js"
+import TurnoSchema from "../schema/TurnosSchema.js"
 
 export const registrarUsuario = async (req, res) => {
     const { nombre, apellido, dni, email, telefono, password } = req.body
@@ -79,18 +80,34 @@ export const obtenerPerfil = async (req, res) => {
 };
 
 export const eliminarPerfil = async (req,res) =>{
-    try {const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    const repo = AppDataSource.getRepository(UserSchema);
+        const repo = AppDataSource.getRepository(UserSchema);
 
-    const usuario = await repo.findOneBy({ id: parseInt(id) });
+        const usuario = await repo.findOneBy({ id: parseInt(id) });
 
-    if (!usuario){
-        return res.status(404).json({ mensaje: "Usuario no encontrado" });
-    }
-    await repo.delete(id);
-    res.json({ ok: true, mensaje : "se elimino el cliente"})
-    
+        if (!usuario){
+            return res.status(404).json({ mensaje: "Usuario no encontrado" });
+        }
+
+        const repoTurnos = AppDataSource.getRepository(TurnoSchema);
+        const tieneTurnos = await repoTurnos.findOne({ 
+            where: { 
+                usuario: { id: parseInt(id) }
+            }
+        });
+
+        if (tieneTurnos) {
+            return res.status(400).json({ 
+                ok: false, 
+                mensaje: "No se puede eliminar el usuario porque tiene turnos asignados. Cancelalos primero." 
+            });
+        }
+        
+        await repo.delete(id);
+        res.json({ ok: true, mensaje : "se elimino el cliente"})
+        
     }catch (error) {
        res.status(500).json({ mensaje: "error en el servidor"})
     }

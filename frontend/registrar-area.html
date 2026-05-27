@@ -155,6 +155,12 @@
                 <input type="text" id="descripcion" placeholder="Detalles del tratamiento..." required>
             </div>
 
+            <div class="input-group">   
+                <label for="imagen">Imagen del Área</label>     <!--TODO ESTE BLOQUE DIV DE LA IMAGEN SI NO LLEGA A FUNCIONAR SE PUEDE BORRAR-->
+                <input type="file" id="imagen" accept="image/*">
+                <img id="preview" src="./src/imagenes/default-area.png" style="width: 100%; margin-top: 0.5rem; border-radius: 8px;">
+            </div>
+
             <button type="submit" id="btnGuardar">Guardar Área</button>
 
             <div id="mensajeError"></div>

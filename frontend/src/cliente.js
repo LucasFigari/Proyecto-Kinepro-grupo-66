@@ -2,6 +2,7 @@ const API_URL = 'http://localhost:3000/area';
 const btonPerfil = document.getElementById("Perfil"); 
 const contenido = document.getElementById("divContenedor");
 const turnos = document.getElementById("botonDeTurnos"); 
+const btonHistorial = document.getElementById("botonHistorial");
 
 const rol = sessionStorage.getItem('rol');
 if (!rol || rol !== 'usuario') window.location.href = '/';
@@ -325,6 +326,35 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
         contenedor.innerHTML = '<p class="text-danger small">Error de conexión al obtener turnos.</p>';
     }
 };
+
+//historial
+btonHistorial.addEventListener("click", async (e) => {
+    e.preventDefault(); 
+
+    const idUsuarioLogueado = sessionStorage.getItem('idUsuario'); 
+    console.log('El usuario logueado tiene el item: ' + idUsuarioLogueado);
+
+    if (!idUsuarioLogueado) {
+        contenido.innerHTML = `
+            <div class="alert alert-warning" role="alert">
+                <h5>Sesión no válida</h5>
+                <p>No se encontraron datos de inicio de sesión. Por favor, vuelva a ingresar al sistema.</p>
+                <a href="/login.html" class="btn btn-warning btn-sm">Ir al Login</a>
+            </div>
+        `;
+        return;
+    }
+
+    contenido.innerHTML = `
+        <div class="text-center mt-5">
+            <div class="spinner-border text-info" role="status"></div>
+            <p class="mt-2 text-muted">Buscando tu historial...</p>
+        </div>
+    `; 
+    
+    
+});
+
 
 window.cargarTurnosPorArea = cargarTurnosPorArea;
 

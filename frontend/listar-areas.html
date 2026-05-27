@@ -10,13 +10,24 @@
             --bg-principal: #f4f7f6; --blanco: #ffffff; --texto-principal: #2c3e50;
             --texto-secundario: #7f8c8d; --celeste-clinico: #00a896; --rojo-eliminar: #e63946;
             --borde: #e2e8f0; --sombra: 0 4px 6px -1px rgba(0, 0, 0, 0.1); --radio-esquina: 12px;
+            --verde-hover: #008f80;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-principal); color: var(--texto-principal); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .container { background: var(--blanco); width: 100%; max-width: 650px; padding: 30px; border-radius: var(--radio-esquina); box-shadow: var(--sombra); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--bg-principal); padding-bottom: 15px; }
+        
+        /* Cabecera Modificada */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--bg-principal); padding-bottom: 15px; gap: 15px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
         .header h1 { font-size: 24px; }
         .header .badge { background-color: #e0f2f1; color: var(--celeste-clinico); padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; }
+        
+        /* Estilos del Nuevo Botón Agregar */
+        .btn-add { background-color: var(--celeste-clinico); color: var(--blanco); border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease; text-decoration: none; }
+        .btn-add:hover { background-color: var(--verde-hover); }
+        .btn-add:active { transform: scale(0.98); }
+        .btn-add .material-icons-round { font-size: 18px; }
+
         .areas-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
         .area-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background-color: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio-esquina); transition: all 0.25s ease; }
         .area-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border-color: #b2dfdb; }
@@ -35,8 +46,14 @@
 
     <div class="container">
         <div class="header">
-            <h1>Áreas de Tratamiento</h1>
-            <span class="badge" id="area-count">Cargando...</span>
+            <div class="header-left">
+                <h1>Áreas</h1>
+                <span class="badge" id="area-count">Cargando...</span>
+            </div>
+            <a href="registrar-area.html" class="btn-add" id="btn-agregar-area">
+                <span class="material-icons-round">add</span>
+                Agregar Área
+            </a>
         </div>
 
         <ul class="areas-list" id="areas-container"></ul>

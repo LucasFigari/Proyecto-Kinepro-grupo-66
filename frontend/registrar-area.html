@@ -6,16 +6,23 @@
     <title>Registro de Área de Tratamiento</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --border: #e2e8f0;
-            --success-bg: #dcfce7;
-            --success-text: #166534;
-            --error-bg: #fee2e2;
-            --error-text: #991b1b;
+            /* Paleta de Colores Corporativa Kinepro */
+            --bg-principal: #f4f7f6; 
+            --blanco: #ffffff; 
+            --texto-principal: #2c3e50;
+            --texto-secundario: #7f8c8d; 
+            --celeste-clinico: #00a896; 
+            --verde-hover: #008f80;
+            --rojo-eliminar: #e63946;
+            --borde: #e2e8f0; 
+            --sombra: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --radio-esquina: 12px;
+
+            /* Alertas unificadas */
+            --success-bg: #e0f2f1;
+            --success-text: #00a896;
+            --error-bg: #ffebee;
+            --error-text: #e63946;
         }
 
         body { 
@@ -25,78 +32,104 @@
             align-items: center;
             min-height: 100vh; 
             margin: 0;
-            background-color: var(--bg); 
-            color: var(--text);
+            background-color: var(--bg-principal); 
+            color: var(--texto-principal);
         }
 
         .card { 
-            background: var(--card-bg); 
-            padding: 2rem; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); 
+            background: var(--blanco); 
+            padding: 2.5rem 2rem; 
+            border-radius: var(--radio-esquina); 
+            box-shadow: var(--sombra); 
             width: 100%; 
-            max-width: 400px; 
+            max-width: 420px; 
+            border: 1px solid rgba(0, 168, 150, 0.1); /* Toque sutil clínico en el borde del panel */
         }
 
         h2 { 
             margin-top: 0; 
             font-size: 1.5rem; 
             text-align: center; 
-            color: var(--primary);
-            margin-bottom: 1.5rem;
+            color: var(--texto-principal);
+            margin-bottom: 1.8rem;
+            font-weight: 600;
         }
 
-        .input-group { margin-bottom: 1.2rem; }
+        .input-group { margin-bottom: 1.4rem; }
 
         label { 
             display: block; 
             margin-bottom: 0.5rem; 
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             font-weight: 600; 
+            color: var(--texto-principal);
         }
 
         input { 
             width: 100%; 
-            padding: 0.75rem; 
-            border: 1px solid var(--border); 
-            border-radius: 6px; 
+            padding: 0.75rem 1rem; 
+            border: 1px solid var(--borde); 
+            border-radius: 8px; 
             box-sizing: border-box; 
-            transition: border-color 0.2s, box-shadow 0.2s;
-            font-size: 1rem;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            font-size: 0.95rem;
+            color: var(--texto-principal);
+            background-color: #fafbfa;
+        }
+
+        input::placeholder {
+            color: #b2bec3;
         }
 
         input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: var(--celeste-clinico);
+            box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.15);
+            background-color: var(--blanco);
         }
 
         button { 
             width: 100%; 
-            padding: 0.75rem; 
-            background-color: var(--primary); 
-            color: white; 
+            padding: 0.8rem; 
+            background-color: var(--celeste-clinico); 
+            color: var(--blanco); 
             border: none; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer; 
-            transition: background-color 0.2s, transform 0.1s;
-            margin-top: 0.5rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 0.8rem;
         }
 
-        button:hover { background-color: var(--primary-hover); }
+        button:hover { background-color: var(--verde-hover); }
         button:active { transform: scale(0.98); }
-        button:disabled { background-color: #94a3b8; cursor: not-allowed; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
 
         #mensajeError { 
             margin-top: 1.5rem; 
-            padding: 0.75rem; 
-            border-radius: 6px; 
+            padding: 0.8rem; 
+            border-radius: 8px; 
             font-size: 0.875rem;
             display: none; 
             text-align: center;
+            font-weight: 500;
             animation: fadeIn 0.3s ease;
+        }
+
+        /* Clases auxiliares dinámicas para usar desde tu registrarArea.js */
+        #mensajeError.exito {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid #b2dfdb;
+            display: block;
+        }
+
+        #mensajeError.error {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid #ffcdd2;
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -114,7 +147,7 @@
             
             <div class="input-group">
                 <label for="nombre">Nombre del Área</label>
-                <input type="text" id="nombre" placeholder="Ej: Area Tren Inferior" required>
+                <input type="text" id="nombre" placeholder="Ej: Kinesiología Deportiva" required>
             </div>
 
             <div class="input-group">

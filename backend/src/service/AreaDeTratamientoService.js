@@ -27,9 +27,11 @@ export class AreaDeTratamientoService{
             throw new Error("No se puedo eliminar el area.")
         }
     }
+
     async getTurnosDeUnArea(areaId) {
-    return await this.areaDeTratamientoRepository.findTurnosByAreaId(areaId);
-}
+        return await this.areaDeTratamientoRepository.findTurnosByAreaId(areaId);
+    }
+
     /*logica de cupos del area */
 async reservarCupo(nombreArea) {
     const area = await this.areaDeTratamientoRepository.findByNombre( nombreArea);

@@ -13,9 +13,10 @@ form.addEventListener('submit', async (e) => {
         formData.append('descripcion', document.getElementById('descripcion').value);
         
         const inputImagen = document.getElementById('imagen'); // Asegúrate de tener este ID en tu HTML
-        if (inputImagen.files[0]) {
-            formData.append('imagen', inputImagen.files[0]);
+        if (!inputImagen.files[0]) {
+            return mostrarMensaje('Debe seleccionar una imagen obligatoriamente', 'red');
         }
+        formData.append('imagen', inputImagen.files[0]);
 
         try {
             const response = await fetch('http://localhost:3000/area/registrar-area', {

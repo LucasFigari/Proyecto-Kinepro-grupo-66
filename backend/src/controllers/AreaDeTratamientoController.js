@@ -22,8 +22,8 @@ export class AreaDeTratamientoController{
     saveArea = async (req, res) =>{
         try {
             const area = {
-            nombre: req.body.nombre,
-            descripcion: req.body.descripcion
+                nombre: req.body.nombre,
+                descripcion: req.body.descripcion
             }
 
             const nuevaArea = await this.areaDeTratamientoService.save(area);

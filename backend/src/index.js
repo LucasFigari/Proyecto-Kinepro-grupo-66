@@ -9,6 +9,14 @@ import LoginRoutes from "./routes/LoginRoutes.js"
 import PasswordRoutes from "./routes/PasswordRoutes.js"
 import turnoRutas from "./routes/TurnosRoutes.js"
 
+
+import path from "path";
+import { fileURLToPath } from "url";
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 app.use(cors())
 app.use(express.json());
@@ -23,6 +31,8 @@ try {
 
 
 
+// Forzamos la ruta absoluta a la carpeta de imágenes dentro de src
+app.use('/imagenes', express.static(path.resolve(__dirname, 'imagenes')));
 
 
 app.use("/area", AreaDeTratamientoRoutes)

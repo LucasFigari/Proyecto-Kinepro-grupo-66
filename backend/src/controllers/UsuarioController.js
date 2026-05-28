@@ -125,4 +125,41 @@ export const obtenerTodosUsuarios = async (req, res) => {
     }
 }
     
+export const editarUsuario = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, apellido, telefono, password } = req.body;
 
+    console.log("Datos recibidos: ", {nombre, apellido, telefono, password})
+
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    //Valido campos vacios
+    if( !nombre || !apellido || !telefono){
+        return res.json({ ok: false, mensaje: "Debe completar todos los campos"})
+    }
+
+    //Valido que nombre y apellido (3-30 caracteres)
+    if( nombre.length < 3 || nombre.length > 30){
+        return res.json({ ok: false, mensaje: "El nombre debe tener entre 3 y 30 caracteres"})
+    }
+    if(apellido.length < 3 || apellido.length > 30){
+        return res.json({ ok: false, mensaje: "El apellido debe tener entre 3 y 30 caracteres"})
+    }
+
+    // Validar teléfono (solo números, 7-8 dígitos)
+    const telefonoRegex = /^\d{7,8}$/
+    if (!telefonoRegex.test(telefono)) {
+        return res.json({ ok: false, mensaje: "El teléfono debe tener entre 7 y 8 dígitos numéricos" })
+    }
+
+    //Valido contraseña si se ingreso nueva
+    if( password && password.length < 6 || password.length > 12){
+        return res.json({ ok: false, mensaje: "La contraseña debe tener entre 6 y 12 caracteres"})
+    }
+
+    const datosActualizar = { nombre, apellido, telefono }
+    if(password) datosActualizar.password = password
+
+    await repo.update(id, datosActualizar)
+    res.json({ ok: true, mensaje: "Datos actualizados" })
+}

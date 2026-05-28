@@ -137,6 +137,9 @@ btonPerfil.addEventListener("click", async (e) => {
                     <button id="btnVolverAlInicio" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
                         <i class="ti ti-arrow-back-up"></i> Volver
                     </button>
+                    <button id="btnEditarPerfil" class="btn btn-info btn-sm text-white d-flex align-items-center gap-2">
+                        <i class="ti ti-pencil"></i> Editar Perfil
+                    </button>
                 </div>
                 
                 <div class="card p-4 shadow-sm" style="height: auto; overflow: visible;">
@@ -180,6 +183,96 @@ btonPerfil.addEventListener("click", async (e) => {
 
         document.getElementById("btnVolverAlInicio").addEventListener("click", () => {
             cargarAreas(); 
+        });
+
+        //Manejo de la edicion de perfil
+        document.getElementById("btnEditarPerfil").addEventListener("click", () => {
+            contenido.innerHTML = `
+                <div class="container mt-2" style="max-width: 600px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="welcome mb-0">Editar Perfil</p>
+                            <p class="subtitle mb-0">Actualizá tus datos personales.</p>
+                        </div>
+                        <button id="btnCancelarEdicion" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                            <i class="ti ti-arrow-back-up"></i> Cancelar
+                        </button>
+                    </div>
+
+                    <div class="card p-4 shadow-sm">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="text-muted small d-block">Nombre</label>
+                                <input id="editNombre" type="text" class="form-control" value="${usuario.nombre}">
+                            </div>
+                            <div class="col-6">
+                                <label class="text-muted small d-block">Apellido</label>
+                                <input id="editApellido" type="text" class="form-control" value="${usuario.apellido || ''}">
+                            </div>
+                            <div class="col-6">
+                                <label class="text-muted small d-block">DNI</label>
+                                <strong>${usuario.dni || 'No registrado'}</strong>
+                            </div>
+                            <div class="col-6">
+                                <label class="text-muted small d-block">Teléfono</label>
+                                <input id="editTelefono" type="text" class="form-control" value="${usuario.telefono || ''}">
+                            </div>
+                            <div class="col-12">
+                                <label class="text-muted small d-block">Email</label>
+                                <strong>${usuario.email || 'No registrado'}</strong>
+                            </div>
+                            <div class="col-12">
+                                <label class="text-muted small d-block">Nueva contraseña <span class="text-muted">(dejá vacío para no cambiarla)</span></label>
+                                <input id="editPassword" type="password" class="form-control" placeholder="Entre 6 y 12 caracteres">
+                            </div>
+                        </div>
+
+                        <p id="mensajeEdicion" style="display:none; font-size:0.9rem; margin-top:1rem;"></p>
+
+                        <button id="btnActualizarDatos" class="btn btn-info text-white mt-3 w-100">
+                            Actualizar datos
+                        </button>
+                    </div>
+                </div>
+            `;
+
+        document.getElementById("btnCancelarEdicion").addEventListener("click", () => {
+            btonPerfil.click();
+        });
+
+        document.getElementById("btnActualizarDatos").addEventListener("click", async () => {
+            const nombre = document.getElementById("editNombre").value.trim();
+            const apellido = document.getElementById("editApellido").value.trim();
+            const telefono = document.getElementById("editTelefono").value.trim();
+            const password = document.getElementById("editPassword").value.trim();
+            const mensajeEl = document.getElementById("mensajeEdicion");
+            const id = sessionStorage.getItem("idUsuario");
+
+            try {
+                const response = await fetch(`http://localhost:3000/usuarios/editar/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nombre, apellido, telefono, password })
+                });
+                const data = await response.json();
+
+                mensajeEl.style.display = "block";
+                if (data.ok) {
+                    mensajeEl.style.color = "green";
+                    mensajeEl.textContent = data.mensaje;
+                    setTimeout(() => {
+                        btonPerfil.click();
+                    }, 1500);
+                } else {
+                    mensajeEl.style.color = "red";
+                    mensajeEl.textContent = data.mensaje;
+                }
+            } catch (error) {
+                mensajeEl.style.display = "block";
+                mensajeEl.style.color = "red";
+                mensajeEl.textContent = "Error al conectar con el servidor.";
+            }
+        });
         });
 
     } catch (error) {

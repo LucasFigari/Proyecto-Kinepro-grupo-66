@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Conexión de Imágenes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f7f6;
+        }
+        .contenedor-prueba {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #ddd;
+        }
+        h3 { color: #333; margin-bottom: 5px; }
+        p { color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <h2>Test de imagen desde el Backend</h2>
+    
+    <div class="contenedor-prueba">
+        <div id="resultado-imagen">Cargando datos del backend...</div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/area';
+
+        async function probarCarga() {
+            try {
+                // 1. Le pegamos a tu controlador de áreas
+                const respuesta = await fetch(API_URL);
+                const areas = await respuesta.json();
+
+                if (areas.length === 0) {
+                    document.getElementById('resultado-imagen').innerHTML = '<p>No hay áreas cargadas en la Base de Datos.</p>';
+                    return;
+                }
+
+                // 2. Tomamos la primera área que devuelva la base de datos para la prueba
+                const area = areas[0];
+
+                // 3. Normalizamos el nombre como lo hacés en tu app
+                const nombreNormalizado = area.nombre.replace(/\s+/g, '');
+
+                // 4. Armamos la ruta APUNTANDO AL BACKEND sin el /src
+                const rutaImagen = `http://localhost:3000/imagenes/${nombreNormalizado}.png`;
+
+                console.log("=== DATOS DE LA PRUEBA ===");
+                console.log("Nombre original de la BD:", area.nombre);
+                console.log("Nombre normalizado:", nombreNormalizado);
+                console.log("Ruta exacta donde el navegador va a buscar la foto:", rutaImagen);
+
+                // 5. Inyectamos el HTML para ver si muestra la foto o si salta el onerror
+                document.getElementById('resultado-imagen').innerHTML = `
+                    <h3>Área: ${area.nombre}</h3>
+                    <p>Buscando archivo en: <code>${rutaImagen}</code></p>
+                    <img src="${rutaImagen}" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/400x200?text=Error+No+Se+Encontro+La+Imagen'; console.log('❌ Falló la carga, se ejecutó el onerror');" 
+                         alt="${area.nombre}">
+                `;
+
+            } catch (error) {
+                console.error("Error en la petición de prueba:", error);
+                document.getElementById('resultado-imagen').innerHTML = `<p style="color:red;">Error de conexión con el servidor: ${error.message}</p>`;
+            }
+        }
+
+        // Ejecutamos la prueba apenas abre el HTML
+        probarCarga();
+    </script>
+</body>
+</html>

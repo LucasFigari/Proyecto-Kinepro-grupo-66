@@ -2,7 +2,6 @@ const API_URL = 'http://localhost:3000/area';
 const btonPerfil = document.getElementById("Perfil"); 
 const contenido = document.getElementById("divContenedor");
 const turnos = document.getElementById("botonDeTurnos"); 
-const btonHistorial = document.getElementById("botonHistorial");
 
 const rol = sessionStorage.getItem('rol');
 if (!rol || rol !== 'usuario') window.location.href = '/';
@@ -26,8 +25,8 @@ const cargarAreas = async () => {
         }
 
         areas.forEach(area => {
-            const nombreNormalizado = area.nombre.replace(/\s+/g, '');
-            const rutaImagen = `./src/imagenes/${nombreNormalizado}.png`;
+            const nombreNormalizado = area.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '').toLowerCase();
+            const rutaImagen = `http://localhost:3000/imagenes/${nombreNormalizado}.png`;
 
 const descripcionTratamiento = area.descripcion || 'Descripción detallada del tratamiento y sus metodologías de rehabilitación.';
 
@@ -37,7 +36,7 @@ const tarjetaHTML = `
         
         <div class="position-relative" style="height: 160px; overflow: hidden;">
             <img src="${rutaImagen}" 
-                 onerror="this.onerror=null; this.src='./src/imagenes/default.png';" 
+                 onerror="this.onerror=null; this.src='/default.png';" 
                  class="w-100 h-100" 
                  style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;" 
                  alt="${area.nombre}">
@@ -326,35 +325,6 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
         contenedor.innerHTML = '<p class="text-danger small">Error de conexión al obtener turnos.</p>';
     }
 };
-
-//historial
-btonHistorial.addEventListener("click", async (e) => {
-    e.preventDefault(); 
-
-    const idUsuarioLogueado = sessionStorage.getItem('idUsuario'); 
-    console.log('El usuario logueado tiene el item: ' + idUsuarioLogueado);
-
-    if (!idUsuarioLogueado) {
-        contenido.innerHTML = `
-            <div class="alert alert-warning" role="alert">
-                <h5>Sesión no válida</h5>
-                <p>No se encontraron datos de inicio de sesión. Por favor, vuelva a ingresar al sistema.</p>
-                <a href="/login.html" class="btn btn-warning btn-sm">Ir al Login</a>
-            </div>
-        `;
-        return;
-    }
-
-    contenido.innerHTML = `
-        <div class="text-center mt-5">
-            <div class="spinner-border text-info" role="status"></div>
-            <p class="mt-2 text-muted">Buscando tu historial...</p>
-        </div>
-    `; 
-    
-    
-});
-
 
 window.cargarTurnosPorArea = cargarTurnosPorArea;
 

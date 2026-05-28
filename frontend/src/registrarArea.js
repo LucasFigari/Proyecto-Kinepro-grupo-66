@@ -8,19 +8,19 @@ form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         // Extraemos los datos del formulario
-        const formData = {
-            nombre: document.getElementById('nombre').value,
-            descripcion: document.getElementById('descripcion').value
-        };
+        const formData = new FormData();
+        formData.append('nombre', document.getElementById('nombre').value);
+        formData.append('descripcion', document.getElementById('descripcion').value);
+        
+        const inputImagen = document.getElementById('imagen'); // Asegúrate de tener este ID en tu HTML
+        if (inputImagen.files[0]) {
+            formData.append('imagen', inputImagen.files[0]);
+        }
 
         try {
-            // Llamada a tu API de Node.js
             const response = await fetch('http://localhost:3000/area/registrar-area', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
+                body: formData // No ponemos Headers de Content-Type, el navegador lo hace solo con FormData
             });
 
             const result = await response.json();

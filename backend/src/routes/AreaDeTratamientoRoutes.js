@@ -60,9 +60,18 @@ router.post("/registrar-area", (req, res, next) => {
             // ❌ Si Multer tiró error, respondemos con status 400 y mandamos el mensaje
             return res.status(400).json({ 
                 ok: false, 
-                mensaje: err.message 
+                detalles: err.message 
             });
         }
+
+        // 🛑 VALIDACIÓN: Si no hay archivo, devolvemos error
+        if (!req.file) {
+            return res.status(400).json({ 
+                ok: false, 
+                detalles: 'Debe subir una imagen para crear el área' 
+            });
+        }
+
         // Si no hubo errores, continuamos camino directo al controlador
         next();
     });

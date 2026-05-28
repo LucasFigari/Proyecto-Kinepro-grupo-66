@@ -29,34 +29,60 @@ const cargarAreas = async () => {
             const nombreNormalizado = area.nombre.replace(/\s+/g, '');
             const rutaImagen = `./src/imagenes/${nombreNormalizado}.png`;
 
-            const tarjetaHTML = `
-                <div class="card border-0 position-relative text-white overflow-hidden shadow-sm" 
-                     style="cursor: pointer; height: 220px; border-radius: 14px;">
-                    
-                    <img src="${rutaImagen}" 
-                         onerror="this.onerror=null; this.src='./src/imagenes/default.png';" 
-                         class="w-100 h-100" 
-                         style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;" 
-                         alt="${area.nombre}">
-                    
-                    <div class="d-flex flex-column justify-content-end p-3 w-100 h-100 position-relative" 
-                         style="z-index: 2; ">
-                        
-                        <div class="d-flex align-items-center gap-2">
-                            <p class="card-title mb-0 fw-bold">${area.nombre}</p>
-                        </div>
-                        
-                        <div class="mt-3">
-                            <button 
-                                type="button"
-                                class="btn btn-sm btn-success fw-bold"
-                                onclick="cargarTurnosPorArea(${area.id}, '${area.nombre}')">
-                                Agendar Turno
-                            </button>
-                        </div>
-                    </div>
+const descripcionTratamiento = area.descripcion || 'Descripción detallada del tratamiento y sus metodologías de rehabilitación.';
+
+const tarjetaHTML = `
+    <div class="card border-0 text-white overflow-hidden shadow-sm p-0 flex-column mb-3" 
+         style="height: auto; border-radius: 14px; background: white;">
+        
+        <div class="position-relative" style="height: 160px; overflow: hidden;">
+            <img src="${rutaImagen}" 
+                 onerror="this.onerror=null; this.src='./src/imagenes/default.png';" 
+                 class="w-100 h-100" 
+                 style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;" 
+                 alt="${area.nombre}">
+            
+            <div class="w-100 h-100 position-absolute" 
+                 style="z-index: 2; background: linear-gradient(transparent, rgba(0,0,0,0.7)); top:0; left:0;"></div>
+            
+            <div class="position-absolute bottom-0 start-0 p-3 w-100" style="z-index: 3;">
+                <p class="card-title mb-0 fw-bold fs-5 text-white">${area.nombre}</p>
+            </div>
+        </div>
+        
+        <div class="p-3 bg-white" style="color: #333;">
+            
+            <div class="d-flex gap-2 mb-2">
+                <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-info fw-bold flex-grow-1"
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#collapseArea-${area.id}" 
+                    aria-expanded="false" 
+                    aria-controls="collapseArea-${area.id}">
+                    <i class="ti ti-info-circle"></i> Ver detalles
+                </button>
+
+                <button 
+                    type="button"
+                    class="btn btn-sm btn-success fw-bold flex-grow-1"
+                    onclick="cargarTurnosPorArea(${area.id}, '${area.nombre}')">
+                    <i class="ti ti-calendar-plus"></i> Agendar Turno
+                </button>
+            </div>
+            
+            <div class="collapse" id="collapseArea-${area.id}">
+                <div class="pt-2 border-top mt-2">
+                    <label class="text-muted small d-block fw-bold mb-1">Información del Tratamiento</label>
+                    <p class="card-desc mb-0 text-secondary" style="font-size: 13px; line-height: 1.4;">
+                        ${descripcionTratamiento}
+                    </p>
                 </div>
-            `;
+            </div>
+
+        </div>
+    </div>
+`;
             gridDinamica.insertAdjacentHTML('beforeend', tarjetaHTML);
         });
     } catch (error) {

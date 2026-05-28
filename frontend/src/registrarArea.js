@@ -30,9 +30,9 @@ form.addEventListener('submit', async (e) => {
                 form.reset();
             } else {
                 mostrarMensaje((result.detalles), 'red');
-            }
+            } 
         } catch (error) {
-            mostrarMensaje('Error de conexión con el servidor', 'red');
+            mostrarMensaje('el archivo elegido no es una imagen', 'red');
         }
     });
 

@@ -1,29 +1,20 @@
 import './style.css';
 
-const areasSimuladas = [
-    {
-        id: 1,
-        nombre: 'Tren Superior',
-        descripcion: 'Rehabilitación y fortalecimiento de hombros, brazos y zona cervical.',
-        imagen_url: './src/imagenes/TrenSuperior.png'
-    },
-    {
-        id: 2,
-        nombre: 'Tren Intermedio',
-        descripcion: 'Núcleo de estabilidad del cuerpo, zona lumbar y abdominal.',
-        imagen_url: './src/imagenes/TrenMedio.png'
-    },
-    {
-        id: 3,
-        nombre: 'Tren Inferior',
-        descripcion: 'Recuperación de la marcha y estabilidad de cadera a pies.',
-        imagen_url: './src/imagenes/TrenInferior.png'
-    }
-];
+const mostrarHome = async () => {
+    let areas = [];
 
-function mostrarHome() {
-    const app = document.querySelector('#app');
-    
+    try {
+        // 1. Consumimos las áreas reales desde tu controlador del backend
+        const response = await fetch('http://localhost:3000/area');
+        if (!response.ok) throw new Error("No se pudieron cargar las áreas de tratamiento");
+        areas = await response.json();
+    } catch (error) {
+        console.error("❌ Error al traer áreas de la BD, usando backup vacío:", error);
+        // Si el backend falla, definimos un array vacío para que el .map no rompa la app
+        areas = []; 
+    }
+
+    // 2. Inyectamos el HTML dinámico utilizando el resultado de la base de datos
     app.innerHTML = `
         <header id="barra-superior" class="shadow-sm">
             <div class="container d-flex align-items-center gap-3">
@@ -34,29 +25,40 @@ function mostrarHome() {
         </header>
 
         <main class="container py-5 text-center">
-    <h1 class="fw-light mt-4">Bienvenido a KinePro</h1>
-    <p class="lead text-secondary mb-0">Centro de kinesiología.</p>
-    
-    <hr class="linea-separadora">
-    
-    <div class="row g-4 mt-5"> ${areasSimuladas.map(area => `
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <img src="${area.imagen_url}" class="card-img-top" alt="${area.nombre}" 
-                         style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title" style="color: #107391; font-weight: bold;">${area.nombre}</h5>
-                        <p class="card-text text-muted small">${area.descripcion}</p>
-                        <button id="detalles" class="btn mt-auto" style="background-color: #D1E9F0; color: #107391; font-weight: bold;">
-                            Ver tratamientos
-                        </button>
-                    </div>
-                </div>
+            <h1 class="fw-light mt-4">Bienvenido a KinePro</h1>
+            <p class="lead text-secondary mb-0">Centro de kinesiología.</p>
+            
+            <hr class="linea-separadora">
+            
+            <div class="row g-4 mt-5"> 
+                ${areas.length === 0 
+                    ? '<p class="text-muted">No hay áreas de tratamiento registradas actualmente.</p>' 
+                    : areas.slice(0,3).map(area => {
+                        // 3. Normalizamos el nombre para buscar la foto en el Backend (ej: "Tren Inferior" -> "TrenInferior")
+                        const nombreNormalizado = area.nombre.replace(/\s+/g, '');
+                        const urlImagenReal = `http://localhost:3000/imagenes/${nombreNormalizado}.png`;
+
+                        return `
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <img src="${urlImagenReal}" 
+                                         onerror="this.onerror=null; this.src='./src/imagenes/default.png';" 
+                                         class="card-img-top" 
+                                         alt="${area.nombre}" 
+                                         style="height: 200px; object-fit: cover;">
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title" style="color: #107391; font-weight: bold;">${area.nombre}</h5>
+                                        <p class="card-text text-muted small">${area.descripcion || 'Sin descripción disponible.'}</p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')
+                }
             </div>
-        `).join('')}
-    </div>
-</main>
-        <!-- Modal de login -->
+        </main>
+
         <div id="modalLogin" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
             <div style="background:white; padding:2rem; border-radius:12px; width:100%; max-width:400px;">
                 <h4 style="color:#107391; margin-bottom:1.5rem;">Iniciar Sesión</h4>
@@ -96,7 +98,9 @@ function mostrarHome() {
         </div>
     `;
 
-
+    // ==========================================================
+    // ESCUCHADORES DE EVENTOS (Se quedan igual que antes)
+    // ==========================================================
     const modal = document.getElementById('modalLogin');
 
     document.getElementById('iniciarSesion').addEventListener('click', () => {
@@ -110,7 +114,7 @@ function mostrarHome() {
         document.getElementById('inputPassword').value = '';
     });
 
-    //Confirmar el login
+    // Confirmar el login
     document.getElementById('btnConfirmar').addEventListener('click', async () => {
         const dni = document.getElementById('inputDni').value.trim();
         const password = document.getElementById('inputPassword').value.trim();
@@ -130,37 +134,34 @@ function mostrarHome() {
             });
             const data = await response.json();
 
-        if(data.ok){
-            modal.style.display = 'none';
-            
-            sessionStorage.setItem("idUsuario", data.datos.id); // 
-            sessionStorage.setItem("rol", data.rol);
-            sessionStorage.setItem("nombre", data.datos.nombre);
-            
-            alert(`¡Bienvenido ${data.datos.nombre}!`);
-            
-            if(data.rol === 'Secretaria'){
-                window.location.href = 'index-secretaria.html';
-            } else if(data.rol === 'Kinesiologo'){
-                window.location.href = 'index-kinesiologo.html';
-            } else if(data.rol === 'Admin'){
-                window.location.href = 'index-admin.html';
+            if(data.ok){
+                modal.style.display = 'none';
+                
+                sessionStorage.setItem("idUsuario", data.datos.id); 
+                sessionStorage.setItem("rol", data.rol);
+                sessionStorage.setItem("nombre", data.datos.nombre);
+                
+                alert(`¡Bienvenido ${data.datos.nombre}!`);
+                
+                if(data.rol === 'Secretaria'){
+                    window.location.href = 'index-secretaria.html';
+                } else if(data.rol === 'Kinesiologo'){
+                    window.location.href = 'index-kinesiologo.html';
+                } else if(data.rol === 'Admin'){
+                    window.location.href = 'index-admin.html';
+                } else {
+                    window.location.href = 'index-usuario.html';
+                }
             } else {
-                window.location.href = 'index-usuario.html';
-            }
-        }else {
                 errorEl.textContent = data.mensaje;
                 errorEl.style.display = 'block';
             }
-
         } catch (error) {
             errorEl.textContent = "Error al conectar con el servidor.";
             errorEl.style.display = 'block';
         }
     });
-}
+};
 
-    
-
-
+// Vinculamos la ejecución al DOMContentLoaded
 document.addEventListener('DOMContentLoaded', mostrarHome);

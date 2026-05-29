@@ -1,3 +1,4 @@
+import TurnoSchema from "../schema/TurnosSchema.js"
 export class AreaDeTratamientoController{
 
     constructor(areaDeTratamientoService){
@@ -47,20 +48,29 @@ export class AreaDeTratamientoController{
     }
 
     deleteArea = async (req, res) => {
-        try {
-            const { idParaEliminar } = req.params;
-            await this.areaDeTratamientoService.delete(idParaEliminar);
-            return res.status(200).json({ 
-                detalles: "Se elimino el area." 
+    try {
+        const { idParaEliminar } = req.params;
+
+        // verificás si tiene turnos asociados
+        const turnos = await this.areaDeTratamientoService.getTurnosDeUnArea(parseInt(idParaEliminar));
+
+        if(turnos.length > 0){
+            return res.status(400).json({ 
+                detalles: "No se puede eliminar el área porque tiene turnos asociados." 
             });
-
-        } catch (error) {
-
-            return res.status(500).json({ 
-                detalles: "No se pudo eliminar el area" });
         }
 
+        await this.areaDeTratamientoService.delete(idParaEliminar);
+        return res.status(200).json({ 
+            detalles: "Se eliminó el área." 
+        });
+
+    } catch (error) {
+        return res.status(500).json({ 
+            detalles: "No se pudo eliminar el área" 
+        });
     }
+}
    
 
 getTurnosByArea = async (req, res) => {

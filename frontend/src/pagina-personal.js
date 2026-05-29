@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mensajeEl.style.display = 'block';
             }
         } catch (error) {
-            mensajeEl.textContent = "Error al conectar con el servidor.";
+            mensajeEl.textContent = "El correo ya se encuentra registrado.";
             mensajeEl.style.color = 'red';
             mensajeEl.style.display = 'block';
         }

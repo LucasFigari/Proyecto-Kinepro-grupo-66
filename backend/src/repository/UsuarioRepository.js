@@ -7,7 +7,7 @@ export class UsuarioRepository {
         return await this.repository.findOneBy({ id: id });
     }
 
-    async findByDni(dni) {
+    async buscarPorDni(dni) {
         return await this.repository.findOneBy({ dni: dni });
     }
 

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleccionar Método de Pago</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --bg-principal: #f4f7f6;
+            --blanco: #ffffff;
+            --texto-principal: #2c3e50;
+            --texto-secundario: #7f8c8d;
+            --celeste-clinico: #00a896;
+            --verde-hover: #008f80;
+            --borde: #e2e8f0;
+            --sombra: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radio-esquina: 12px;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+
+        body { 
+            background-color: var(--bg-principal); 
+            color: var(--texto-principal); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+
+        .payment-container { 
+            background: var(--blanco); 
+            width: 100%; 
+            max-width: 450px; 
+            padding: 30px; 
+            border-radius: var(--radio-esquina); 
+            box-shadow: var(--sombra); 
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            color: var(--texto-principal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2 .material-icons-round {
+            color: var(--celeste-clinico);
+        }
+
+        p {
+            font-size: 14px;
+            color: var(--texto-secundario);
+            margin-bottom: 20px;
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--texto-principal);
+        }
+
+        select, input { 
+            padding: 12px; 
+            font-size: 16px; 
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            outline: none;
+            background-color: var(--blanco);
+            transition: border 0.2s;
+            width: 100%;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--celeste-clinico);
+        }
+
+        #contenedor-monto {
+            display: none; 
+            animation: none; 
+        }
+
+        .btn-enviar {
+            background: var(--celeste-clinico);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-enviar:hover {
+            background: var(--verde-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="payment-container">
+        <h2>
+            <span class="material-icons-round">payment</span>
+            Método de Pago
+        </h2>
+        <p>Seleccione cómo desea abonar el servicio para finalizar.</p>
+        
+        <form id="form-pago">
+            <div class="form-group">
+                <label for="nro-turno">Número de Turno:</label>
+                <input type="text" id="nro-turno" placeholder="Ej: 327" required>
+            </div>
+
+            <div class="form-group">
+                <label for="metodo-pago">Seleccione una opción:</label>
+                <select id="metodo-pago" required>
+                    <option value="" disabled selected>-- Elija opción de pago --</option>
+                    <option value="efectivo">Efectivo (En caja)</option>
+                    <option value="online">Pago Online / Transferencia</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="contenedor-monto">
+                <label for="monto-ingresado">Monto Entregado ($):</label>
+                <input type="number" id="monto-ingresado" placeholder="Ej: 2000" min="0" step="0.01">
+            </div>
+
+            <button type="submit" class="btn-enviar">
+                <span class="material-icons-round">check_circle</span>
+                Procesar Pago
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const nroTurnoInput = document.getElementById('nro-turno');
+        const metodoPago = document.getElementById('metodo-pago');
+        const contenedorMonto = document.getElementById('contenedor-monto');
+        const montoIngresado = document.getElementById('monto-ingresado');
+        const formPago = document.getElementById('form-pago');
+
+
+        metodoPago.addEventListener('change', () => {
+            if (metodoPago.value === 'efectivo') {
+                contenedorMonto.style.display = 'flex';
+                montoIngresado.setAttribute('required', 'true');
+                montoIngresado.focus();
+            } else {
+                contenedorMonto.style.display = 'none';
+                montoIngresado.removeAttribute('required');
+                montoIngresado.value = ''; 
+            }
+        });
+
+        formPago.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+
+            const opcionSeleccionada = metodoPago.value;
+            const numeroTurno = nroTurnoInput.value.trim();
+
+            if (!numeroTurno) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: 'Falta información',
+                    text: 'Por favor, ingrese el número de turno.',
+                    confirmButtonColor: '#00a896'
+                });
+                return;
+            }
+
+            if (opcionSeleccionada === 'efectivo') {
+                const monto = parseFloat(montoIngresado.value) || 0;
+                
+                try {
+                    const response = await fetch(`http://localhost:3000/turnos/precio/${numeroTurno}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('No se pudo obtener el precio desde el servidor.');
+                    }
+
+                    const datos = await response.json();
+                    const precioTurno = Number(datos.precio);
+                    const vuelto = monto - precioTurno;
+
+                    if (vuelto < 0) {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Monto insuficiente',
+                            text: `El precio del turno es $${precioTurno} y se ingresaron $${monto}. Faltan $${Math.abs(vuelto).toFixed(2)}`,
+                            confirmButtonColor: '#00a896'
+                        });
+                        return; 
+                    }
+
+                    await Swal.fire({
+                        icon: 'success',
+                        title: '¡Pago Registrado!',
+                        text: `Se registró el pago en efectivo para el Turno ${numeroTurno}. Monto a devolver: $${vuelto.toFixed(2)}`,
+                        confirmButtonColor: '#00a896',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showClass: { popup: 'none' }, 
+                        hideClass: { popup: 'none' }
+                    });
+                    
+                    window.location.href = 'listar-turnos.html';
+
+                } catch (error) {
+                    console.error("Error en la petición:", error);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error de servidor',
+                        text: 'No se pudo comunicar con el sistema o el número de turno no existe.',
+                        confirmButtonColor: '#00a896'
+                    });
+                }
+                
+            } else if (opcionSeleccionada === 'online') {
+                await Swal.fire({
+                    icon: 'info',
+                    title: 'Redirigiendo...',
+                    text: `Te estamos enviando a la plataforma de pago online para el Turno ${numeroTurno}.`,
+                    confirmButtonColor: '#00a896',
+                    showClass: { popup: 'none' }, 
+                    hideClass: { popup: 'none' }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

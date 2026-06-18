@@ -5,6 +5,7 @@ import AreaDeTratamientoSchema from "../schema/AreaDeTratamientoSchema.js";
 import PasswordResetSchema from "../schema/PasswordResetSchema.js"
 import PersonalSchema from "../schema/PersonalSchema.js";
 import TurnoSchema from "../schema/TurnosSchema.js";
+import TurnoAsignadoSchema from "../schema/TurnoAsignadoSchema.js";
 
 const AppDataSource = new DataSource({
     type: "postgres", 
@@ -15,7 +16,7 @@ const AppDataSource = new DataSource({
     database: "db_kinesiologia",
     synchronize: true,
     logging: false,
-    entities: [UserSchema, AreaDeTratamientoSchema, TurnoSchema, PasswordResetSchema, PersonalSchema],
+    entities: [UserSchema, AreaDeTratamientoSchema, TurnoSchema, PasswordResetSchema, PersonalSchema, TurnoAsignadoSchema],
 });
 
 export default AppDataSource;

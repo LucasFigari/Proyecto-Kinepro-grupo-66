@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Turnos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --bg-principal: #f4f7f6; --blanco: #ffffff; --texto-principal: #2c3e50;
+            --texto-secundario: #7f8c8d; --celeste-clinico: #00a896; --rojo-eliminar: #e63946;
+            --borde: #e2e8f0; --sombra: 0 4px 6px -1px rgba(0, 0, 0, 0.1); --radio-esquina: 12px;
+            --verde-hover: #008f80;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-principal); color: var(--texto-principal); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .container { background: var(--blanco); width: 100%; max-width: 650px; padding: 30px; border-radius: var(--radio-esquina); box-shadow: var(--sombra); min-height: 250px; display: flex; flex-direction: column; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--bg-principal); padding-bottom: 15px; gap: 15px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header h1 { font-size: 24px; }
+        
+        .turnos-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        
+        .turno-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background-color: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio-esquina); transition: all 0.25s ease; }
+        .turno-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border-color: #b2dfdb; }
+        
+        .turno-info { display: flex; flex-direction: column; gap: 6px; }
+        .turno-area { font-size: 16px; font-weight: 600; color: var(--texto-principal); }
+        
+        .turno-details { display: flex; gap: 15px; align-items: center; font-size: 13px; color: var(--texto-secundario); }
+        .detail-group { display: flex; align-items: center; gap: 4px; }
+        .detail-group .material-icons-round { font-size: 16px; color: var(--celeste-clinico); }
+
+        .btn-delete { background-color: transparent; border: 1px solid transparent; color: var(--texto-secundario); cursor: pointer; padding: 8px; border-radius: 8px; display: flex; align-items: center; transition: all 0.2s ease; }
+        .btn-delete:hover { background-color: #ffebee; color: var(--rojo-eliminar); border-color: #ffcdd2; }
+        .btn-delete .material-icons-round { font-size: 20px; }
+        
+        .empty-state { 
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center; 
+            padding: 40px 20px; 
+            color: var(--texto-secundario);
+            flex-grow: 1; 
+        }
+        
+        .empty-state.active {
+            display: flex !important;
+        }
+
+        .empty-state .material-icons-round { font-size: 48px; color: #bdc3c7; margin-bottom: 10px; }
+
+        .modal { 
+            padding: 25px; 
+            border: none; 
+            border-radius: var(--radio-esquina); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            max-width: 400px; 
+            width: 100%; 
+            
+            margin: auto; 
+        }
+
+        .modal::backdrop { 
+            background-color: rgba(44, 62, 80, 0.5); 
+            backdrop-filter: blur(2px); 
+        }
+
+        .modal h3 {
+            color: var(--texto-principal);
+            margin-bottom: 8px;
+        }
+
+        .modal p {
+            font-size: 14px;
+            color: var(--texto-secundario);
+            margin-bottom: 15px;
+        }
+
+        .form-group { 
+            margin: 15px 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--texto-principal);
+        }
+
+        .form-group input { 
+            padding: 10px; 
+            font-size: 16px; 
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--celeste-clinico);
+        }
+
+        .modal-actions { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 10px; 
+            margin-top: 20px; 
+        }
+
+        .modal-actions button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secundario {
+            background: transparent;
+            border: 1px solid var(--borde);
+            color: var(--texto-secundario);
+        }
+
+        .btn-secundario:hover {
+            background: var(--bg-principal);
+            color: var(--texto-principal);
+        }
+
+        .btn-primario {
+            background: var(--celeste-clinico);
+            border: none;
+            color: white;
+        }
+
+        .btn-primario:hover {
+            background: var(--verde-hover);
+        }
+    </style>
+</head>
+<body>
+    <dialog id="modal-paciente" class="modal">
+        <div class="modal-content">
+            <h3>Reservar Turno</h3>
+            <p>Por favor, ingrese el DNI del paciente para confirmar la reserva.</p>
+            
+            <form id="form-reserva" method="dialog">
+                <input type="hidden" id="modal-turno-id">
+                
+                <div class="form-group">
+                    <label for="paciente-dni">DNI del Paciente:</label>
+                    <input id="paciente-dni" required placeholder="Ej: 40123456">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" id="btn-cancelar" class="btn-secundario">Cancelar</button>
+                    <button type="submit" class="btn-primario">Confirmar Reserva</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>Turnos</h1>
+            </div>
+        </div>
+
+        <ul class="turnos-list" id="turnos-container">
+
+        </ul>
+
+    </div>
+
+    <script src="./src/listarTurnos.js"></script>
+</body>
+</html>

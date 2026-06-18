@@ -15,13 +15,27 @@ const TurnoSchema = new EntitySchema({
             type: "date"
         },
 
-        horario: {
+        hora_comienzo: {
             type: "time"
         },
 
-        isDisponible: {
-            type: "boolean",
-            default: true
+        hora_fin: {
+            type: "time"
+        },
+        
+        precio: {
+            type: 'decimal',
+            precision: 10,
+            scale: 2,      
+        },
+
+        cupo_maximo:{
+            type: "int",
+        },
+
+        cupos_ocupados:{
+            type: "int",
+            default: 0
         }
     },
 
@@ -32,16 +46,17 @@ const TurnoSchema = new EntitySchema({
             type: "many-to-one",
             joinColumn: { name: "areaId" },
             inverseSide: "turnos",
-            onDelete: "CASCADE"
+            onDelete: "CASCADE",
+            eager: true
         },
 
-        usuario: {
-            target: "Usuario",
-            type: "many-to-one",
-            joinColumn: { name: "usuarioId" },
-            nullable: true,
-            onDelete: "SET NULL"
+        turnoAsignado: {
+            type: "one-to-many",
+            target: "TurnoAsignado",
+            inverseSide: "turno",
+            eager: false
         }
+
     }
 });
 

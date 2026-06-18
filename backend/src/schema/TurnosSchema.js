@@ -3,44 +3,32 @@ import { EntitySchema } from "typeorm";
 const TurnoSchema = new EntitySchema({
     name: "Turno",
     tableName: "turnos",
-
     columns: {
         id: {
             primary: true,
             type: "int",
             generated: true
         },
-
-        fecha: {
+        fecha_turno: {
             type: "date"
         },
-
-        horario: {
+        hora_comienzo: {
             type: "time"
         },
-
-        isDisponible: {
-            type: "boolean",
-            default: true
+        hora_fin:{
+            type: "time"
+        },
+        cupos: {
+            type: "int"
         }
     },
 
     relations: {
-
         area: {
             target: "AreaDeTratamiento",
             type: "many-to-one",
-            joinColumn: { name: "areaId" },
-            inverseSide: "turnos",
+            joinColumn: { name: "id_area_tratamiento" },
             onDelete: "CASCADE"
-        },
-
-        usuario: {
-            target: "Usuario",
-            type: "many-to-one",
-            joinColumn: { name: "usuarioId" },
-            nullable: true,
-            onDelete: "SET NULL"
         }
     }
 });

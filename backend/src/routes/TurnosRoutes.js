@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { obtenerTurnosPorPaciente } from "../controllers/TurnosController.js";
+import { obtenerTurnosPorPaciente, obtenerTurnosDisponiblesPorArea } from "../controllers/TurnosController.js";
 import { TurnosPorSecretariaController} from "../controllers/TurnosPorSecretariaController.js"
 import { TurnoRepository} from "../repository/TurnoRepository.js"
 import { UsuarioRepository } from "../repository/UsuarioRepository.js";
@@ -22,8 +22,9 @@ const turnoPorSecretariaController = new TurnosPorSecretariaController(turnoRepo
 
 
 router.get("/paciente/:id", obtenerTurnosPorPaciente);
+router.get("/area/:idArea", obtenerTurnosDisponiblesPorArea); 
 router.get("", turnoPorSecretariaController.obtenerTurnosDisponibles);
 router.get("/precio/:idTurno", turnoPorSecretariaController.obtnerPrecioDeTurno);
 router.post("/reservar", turnoPorSecretariaController.agregarUsuarioATurno);
-
+  
 export default router;

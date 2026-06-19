@@ -30,6 +30,15 @@ const UserSchema = new EntitySchema({
             type: "varchar"
         }
     },
+    relations: {
+
+        turnoAsignado: {
+            type: "one-to-many",
+            target: "TurnoAsignado",
+            inverseSide: "usuario",
+            eager: true
+        }
+    }
 });
 
 export default UserSchema;

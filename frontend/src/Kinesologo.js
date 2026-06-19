@@ -165,19 +165,153 @@ const cargarAreas = async () => {
     }
 };
 
+//funcion de historial medico
 const historialMedico = () => {
     contenido.innerHTML = `
-        <p class="welcome">Bienvenido, <span id="nombreKinesiologo">Kinesiólogo</span></p>
-        <p class="subtitle">Seleccioná una opción del menú para comenzar.</p>
-        <div class="cards-grid">
-            <a href="#" class="card">
-                <div class="card-icon"><i class="ti ti-clipboard-list"></i></div>
-                <p class="card-title">Historial médico</p>
-                <p class="card-desc">Crear, modificar y eliminar historiales médicos de pacientes.</p>
-            </a>
+        <p class="welcome">Historial Clínico</p>
+        <p class="subtitle">Buscá un paciente por DNI para ver o crear su historial.</p>
+
+        <div style="max-width: 500px; margin-bottom: 1.5rem;">
+            <input type="text" id="buscadorDni" placeholder="Ingresá el DNI del paciente..." 
+                style="width: 100%; padding: 0.8rem 1.2rem; border: 1px solid #ccc; border-radius: 10px; font-size: 16px; outline: none;">
         </div>
-    `;
-};
+
+        <div id="resultadoPaciente"></div>
+    `
+
+    document.getElementById("buscadorDni").addEventListener("input", async function(){
+        const dni = this.value.trim()
+        const contenedor = document.getElementById("resultadoPaciente")
+
+        if(dni === ""){
+            contenedor.innerHTML = ""
+            return
+        }
+
+        const res = await fetch(`http://localhost:3000/usuarios/buscar/${dni}`)
+        const data = await res.json()
+
+        if(data.length === 0){
+            contenedor.innerHTML = `<p style="color: #888;">No se encontraron pacientes con ese DNI.</p>`
+            return
+        }
+
+        contenedor.innerHTML = ""
+
+        data.forEach(paciente => {
+            contenedor.innerHTML += `
+                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.2rem; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <p style="font-weight: 500; margin: 0">${paciente.nombre} ${paciente.apellido}</p>
+                        <p style="font-size: 13px; color: #888; margin: 0">DNI: ${paciente.dni} · ${paciente.email}</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="verHistorial(${paciente.id})" 
+                            style="padding: 0.5rem 1rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Ver historial
+                        </button>
+                        <button onclick="crearHistorial(${paciente.id}, '${paciente.nombre} ${paciente.apellido}')" 
+                            style="padding: 0.5rem 1rem; background: #52b788; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Crear historial
+                        </button>
+                    </div>
+                </div>
+            `
+        })
+    })
+}
+
+window.historialMedico = historialMedico
+
+window.verHistorial = async (idPaciente) => {
+    const res = await fetch(`http://localhost:3000/historial/paciente/${idPaciente}`)
+    const data = await res.json()
+
+    const contenedor = document.getElementById("resultadoPaciente")
+
+    if(data.length === 0){
+        contenedor.innerHTML = `<p style="color: #888;">Este paciente no tiene historiales clínicos.</p>`
+        return
+    }
+
+    contenedor.innerHTML = data.map(historial => `
+        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.2rem; margin-bottom: 10px;">
+            <p style="font-weight: 500; margin: 0">${historial.titulo}</p>
+            <p style="font-size: 13px; color: #888; margin: 0">Fecha: ${historial.fecha}</p>
+            <p style="font-size: 13px; color: #2d6a4f; margin: 0">Área: ${historial.area?.nombre ?? "Sin área"}</p>
+            <p style="margin-top: 0.5rem;">${historial.diagnostico}</p>
+        </div>
+    `).join("")
+}
+
+window.crearHistorial = (idPaciente, nombrePaciente) => {
+    const contenedor = document.getElementById("resultadoPaciente")
+
+    contenedor.innerHTML = `
+        <p style="font-weight: 500; margin-bottom: 1rem;">Nuevo historial para: ${nombrePaciente}</p>
+        <div style="max-width: 500px; display: flex; flex-direction: column; gap: 0.8rem;">
+            <input type="text" id="tituloHistorial" placeholder="Título" 
+                style="padding: 0.7rem; border: 1px solid #ccc; border-radius: 8px;">
+            <input type="date" id="fechaHistorial" 
+                style="padding: 0.7rem; border: 1px solid #ccc; border-radius: 8px;">
+            <select id="areaHistorial" style="padding: 0.7rem; border: 1px solid #ccc; border-radius: 8px;">
+                <option value="">-- Seleccionar área --</option>
+            </select>
+            <textarea id="diagnosticoHistorial" placeholder="Diagnóstico" rows="4"
+                style="padding: 0.7rem; border: 1px solid #ccc; border-radius: 8px; resize: vertical;"></textarea>
+            <button onclick="guardarHistorial(${idPaciente})"
+                style="padding: 0.7rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                Guardar historial
+            </button>
+        </div>
+    `
+
+    // cargás las áreas desde la BD
+    fetch("http://localhost:3000/area")
+    .then(res => res.json())
+    .then(areas => {
+        const select = document.getElementById("areaHistorial")
+        areas.forEach(area => {
+            select.innerHTML += `<option value="${area.id}">${area.nombre}</option>`
+        })
+    })
+}
+
+window.guardarHistorial = async (idPaciente) => {
+    const titulo = document.getElementById("tituloHistorial").value.trim()
+    const fecha = document.getElementById("fechaHistorial").value
+    const diagnostico = document.getElementById("diagnosticoHistorial").value.trim()
+    const idArea = document.getElementById("areaHistorial").value
+
+    if(!titulo || !fecha || !diagnostico || !idArea){
+        alert("Completá todos los campos")
+        return
+    }
+
+    const idKinesiologo = sessionStorage.getItem("idUsuario")
+
+    const historial = {
+        titulo,
+        fecha,
+        diagnostico,
+        idPaciente,
+        idKinesiologo,
+        idArea
+    }
+
+    const res = await fetch("http://localhost:3000/historial/crear", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(historial)
+    })
+
+    const data = await res.json()
+
+    if(data.ok){
+        alert("Historial creado correctamente")
+        historialMedico()
+    }
+}
 
 botonHistorialClinico.addEventListener("click", (e) => {
     e.preventDefault();

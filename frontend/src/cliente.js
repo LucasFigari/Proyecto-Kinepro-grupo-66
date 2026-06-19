@@ -378,40 +378,33 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
         }
 
         const turnosData = await respuesta.json();
-        const hoy = new Date().toLocaleDateString('en-CA'); 
+        const hoy = new Date().toLocaleDateString('en-CA');
 
-        const turnosProximos = turnosData.filter(t => {
-            const fechaLimpia = t.fecha.includes('T') ? t.fecha.split('T')[0] : t.fecha;
-            return fechaLimpia >= hoy;
-        });
+        const turnosProximos = turnosData.filter(t => t.fecha_turno >= hoy);
 
         if (turnosProximos.length === 0) {
             contenedor.innerHTML = '<p class="text-muted small">No tienes turnos programados próximamente.</p>';
             return;
         }
 
-        turnosProximos.sort((a, b) => {
-            const fechaA = a.fecha.includes('T') ? a.fecha.split('T')[0] : a.fecha;
-            const fechaB = b.fecha.includes('T') ? b.fecha.split('T')[0] : b.fecha;
-            return (fechaA + a.horario).localeCompare(fechaB + b.horario);
-        });
+        turnosProximos.sort((a, b) =>
+            (a.fecha_turno + a.hora_comienzo).localeCompare(b.fecha_turno + b.hora_comienzo)
+        );
 
-        contenedor.innerHTML = turnosProximos.map(turno => {
-            const fechaFormateada = turno.fecha.includes('T') ? turno.fecha.split('T')[0] : turno.fecha;
-            const horarioCorto = turno.horario.substring(0, 5); 
-
-            return `
-                <div class="card mb-2 border-0 shadow-sm bg-light" style="border-left: 4px solid #0dcaf0 !important;">
-                    <div class="card-body p-2 d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0 text-dark">${turno.area?.nombre || 'Consulta de Kinesiología'}</h6>
-                            <small class="text-muted"><i class="ti ti-calendar"></i> ${fechaFormateada} | <i class="ti ti-clock"></i> ${horarioCorto} hs</small>
-                        </div>
-                        <span class="badge bg-white text-info border border-info">Confirmado</span>
+        contenedor.innerHTML = turnosProximos.map(turno => `
+            <div class="card mb-2 border-0 shadow-sm bg-light" style="border-left: 4px solid #0dcaf0 !important;">
+                <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0 text-dark">${turno.area?.nombre || 'Consulta de Kinesiología'}</h6>
+                        <small class="text-muted">
+                            <i class="ti ti-calendar"></i> ${turno.fecha_turno} | 
+                            <i class="ti ti-clock"></i> ${turno.hora_comienzo.substring(0, 5)} hs
+                        </small>
                     </div>
+                    <span class="badge bg-white text-info border border-info">Confirmado</span>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `).join('');
 
     } catch (error) {
         console.error("Error al obtener turnos:", error);

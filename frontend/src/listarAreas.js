@@ -13,7 +13,7 @@ async function cargarAreas() {
                 
         const container = document.getElementById('areas-container');
         container.innerHTML = ''; 
-
+ 
         areas.forEach(area => {
             const itemHTML = `
                 <li class="area-item" data-id="${area.id}">

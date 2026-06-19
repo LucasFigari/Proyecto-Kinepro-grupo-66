@@ -60,15 +60,21 @@
        // 🔎 Función para buscar en el Backend
         async function cargarTurnosPorArea(idArea) {
             const contenedor = document.getElementById('contenedor-turnos');
+
             if (!idArea) {
                 contenedor.innerHTML = '<div class="alert alert-danger text-center">Falta el identificador del área.</div>';
                 return;
             }
 
             try {
-                // El fetch limpio sin textos colados
-                const respuesta = await fetch(`http://localhost:3000/turnos/area/${idArea}`)
-                
+                // 🔥 AGREGADO: usuario logueado
+                const idUsuario = sessionStorage.getItem('idUsuario');
+
+                // 🔥 CAMBIO: ahora mandamos idUsuario al backend
+                const respuesta = await fetch(
+                    `http://localhost:3000/turnos/area/${idArea}?idUsuario=${idUsuario}`
+                );
+
                 if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
 
                 const turnos = await respuesta.json();
@@ -81,34 +87,57 @@
                     return;
                 }
 
-                // Dibujamos los turnos dinámicamente uno abajo del otro
+                // Dibujamos los turnos
                 contenedor.innerHTML = turnos.map(turno => {
+
                     const disponibles = turno.cupo_maximo - turno.cupos_ocupados;
                     const sinCupo = disponibles <= 0;
 
                     return `
                         <div class="card-turno p-3 mb-2 d-flex justify-content-between align-items-center bg-light">
                             <div>
-                                <h6 class="mb-1 text-dark fw-bold"><i class="ti ti-calendar"></i> F: ${turno.fecha_turno}</h6>
+                                <h6 class="mb-1 text-dark fw-bold">
+                                    <i class="ti ti-calendar"></i> F: ${turno.fecha_turno}
+                                </h6>
+
                                 <small class="text-secondary d-block">
-                                    <i class="ti ti-clock"></i> ${turno.hora_comienzo.substring(0, 5)} hs a ${turno.hora_fin.substring(0, 5)} hs
+                                    <i class="ti ti-clock"></i>
+                                    ${turno.hora_comienzo.substring(0, 5)} hs a ${turno.hora_fin.substring(0, 5)} hs
                                 </small>
+
                                 <small class="text-muted" style="font-size: 11px;">
                                     Cupos libres: ${disponibles} de ${turno.cupo_maximo}
                                 </small>
                             </div>
-                            <button type="button" 
-                                    class="btn btn-sm ${sinCupo ? 'btn-danger' : 'btn-success text-white fw-bold'}"
-                                    ${sinCupo ? 'disabled' : ''} 
-                                    onclick="reservarTurno(${turno.id})">
-                                ${sinCupo ? 'Agotado' : 'Reservar'}
-                            </button>
+
+                            <div class="d-flex gap-2">
+
+                                <button type="button"
+                                        class="btn btn-sm ${sinCupo ? 'btn-danger' : 'btn-success text-white fw-bold'}"
+                                        ${sinCupo ? 'disabled' : ''}
+                                        onclick="reservarTurno(${turno.id})">
+                                    ${sinCupo ? 'Agotado' : 'Reservar'}
+                                </button>
+
+                                ${sinCupo ? `
+                                    <button type="button"
+                                        class="btn btn-sm ${turno.enListaEspera ? 'btn-danger' : 'btn-warning text-white fw-bold'}"
+                                        onclick="${turno.enListaEspera 
+                                            ? `quitarListaEspera(${turno.id})` 
+                                            : `listaEspera(${turno.id})`}">
+
+                                        ${turno.enListaEspera 
+                                            ? 'Quitarse de lista de espera' 
+                                            : 'Unirse a lista de espera'}
+                                    </button>
+                                ` : ''}
+
+                            </div>
                         </div>
                     `;
                 }).join('');
 
             } catch (error) {
-                // Esto te va a cantar el error real exacto en la consola de F12 si algo falla en la red
                 console.error("🚨 Error capturado en la petición:", error);
                 contenedor.innerHTML = '<div class="alert alert-danger text-center">No se pudo cargar la grilla de horarios.</div>';
             }
@@ -160,6 +189,95 @@
                 Swal.fire({ icon: "error", title: "Error", text: "Fallo en la comunicación con el servidor de KinePro." });
             }
         }
+
+        async function listaEspera(idTurno) {
+            const idUsuario = sessionStorage.getItem('idUsuario');
+
+            if (!idUsuario) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Atención",
+                    text: "Tu sesión expiró"
+                });
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:3000/lista-espera', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idTurno: idTurno,
+                        idUsuario: parseInt(idUsuario)
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "No se pudo agregar",
+                        text: data.error || "Error desconocido"
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Listo",
+                    text: "Te anotaste en lista de espera"
+                }).then(() => {
+                    cargarTurnosPorArea(
+                        new URLSearchParams(window.location.search).get("id")
+                    );
+                });
+
+            } 
+            catch (error) {
+                console.error(error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de red",
+                    text: "No se pudo conectar al servidor"
+                });
+            }
+        }
+
+        async function quitarListaEspera(idTurno) {
+            const idUsuario = sessionStorage.getItem('idUsuario');
+
+            try {
+                const res = await fetch("http://localhost:3000/lista-espera", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        idTurno,
+                        idUsuario: parseInt(idUsuario)
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    Swal.fire("Error", data.error, "error");
+                    return;
+                }
+
+                Swal.fire("Listo", data.message, "success");
+
+                // 🔁 refrescar UI
+                cargarTurnosPorArea(new URLSearchParams(window.location.search).get("id"));
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire("Error", "No se pudo conectar al servidor", "error");
+            }
+        }
+
+
     </script>
 </body>
 </html>

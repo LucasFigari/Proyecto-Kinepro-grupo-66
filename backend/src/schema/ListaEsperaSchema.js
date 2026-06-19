@@ -12,6 +12,9 @@ const ListaEsperaSchema = new EntitySchema({
         fecha_inscripcion: {
             type: "timestamp",
             default: () => "CURRENT_TIMESTAMP"
+        },
+        orden: {
+            type:"int"
         }
     },
     relations: {

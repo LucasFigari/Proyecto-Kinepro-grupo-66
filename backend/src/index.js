@@ -9,6 +9,7 @@ import LoginRoutes from "./routes/LoginRoutes.js"
 import PasswordRoutes from "./routes/PasswordRoutes.js"
 import turnoRutas from "./routes/TurnosRoutes.js"
 import HistorialClinicoRoutes from "./routes/HistorialClinicoRoutes.js"
+import ListaDeEsperaRoutes from "./routes/ListaDeEsperaRoutes.js"
 
 //import "./controllers/Cron.js"
 
@@ -44,6 +45,7 @@ app.use("/login", LoginRoutes)
 app.use("/forgot-password", PasswordRoutes);
 app.use("/turnos", turnoRutas)
 app.use("/historial", HistorialClinicoRoutes)
+app.use("/lista-espera", ListaDeEsperaRoutes)
 app.use(express.static('public'));
 
 app.listen(3000, () => {

@@ -64,8 +64,10 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
 export const obtenerTurnosDisponiblesPorArea = async (req, res) => {
     try {
+        const listaRepo = AppDataSource.getRepository("ListaEspera");
         const { idArea } = req.params;
         const turnoRepository = AppDataSource.getRepository("Turno");
 
@@ -80,7 +82,27 @@ export const obtenerTurnosDisponiblesPorArea = async (req, res) => {
             }
         });
 
-        return res.status(200).json(turnosFiltrados);
+        const idUsuario = req.query.idUsuario;
+
+        const turnosConLista = await Promise.all(
+            turnosFiltrados.map(async (t) => {
+
+                const enLista = await listaRepo.findOne({
+                    where: {
+                        turno: { id: t.id },
+                        usuario: { id: parseInt(idUsuario) }
+                    }
+                });
+
+                return {
+                    ...t,
+                    enListaEspera: !!enLista
+                };
+            })
+        );
+
+        return res.status(200).json(turnosConLista);
+
     } catch (error) {
         console.error("❌ Error al obtener turnos por área:", error);
         return res.status(500).json({ error: 'Error al cargar la agenda.' });

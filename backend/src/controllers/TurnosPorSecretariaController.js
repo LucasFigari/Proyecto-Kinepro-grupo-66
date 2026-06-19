@@ -1,10 +1,11 @@
 export class TurnosPorSecretariaController{
 
-    constructor(turnoRepository, pacienteRepository, turnoAsignadoRepository, sendEmail){
+    constructor(turnoRepository, pacienteRepository, turnoAsignadoRepository, pagoRepository, sendEmail){
         this.turnoRepository = turnoRepository;
         this.pacienteRepository = pacienteRepository;
         this.turnoAsignadoRepository = turnoAsignadoRepository;
         this.sendEmail = sendEmail;
+        this.pagoRepository = pagoRepository;
     }
 
     guardarTurno = async (req, res) => {
@@ -60,8 +61,8 @@ export class TurnosPorSecretariaController{
 
     obtnerPrecioDeTurno = async (req, res) => {
         try {
-            const {idTurno} = req.paramsconst;
-            const precio = await this.turnoRepository.obtenerPrecioDeTurnoPorId(idTurno);
+            const {idTurno} = req.params;
+            const precio = await this.calcularPrecio(idTurno);
             return res.status(200)
                         .json({ precio: Number(precio) });
         } catch (error) {
@@ -79,13 +80,12 @@ export class TurnosPorSecretariaController{
             <p>Hola,</p>
             <p>Tu turno ha sido reservado con éxito.</p>
             <p><strong>Número de Turno:</strong> ${idTurno}</p>
-            <p>Para completar tu reserva, por favor realiza el pago ingresando aquí:</p>
-            <p>
-                <a href="http://localhost:5173/seleccion-de-pago.html" style="color: #00a896; font-weight: bold; text-decoration: underline;">
-                    Ir a la página de pago
-                </a>
-            </p>
-            <p>¡Muchas gracias!</p>
+            <p>Para abonar el servicio, tienes las siguientes opciones:</p>
+            <ul>
+                <li><strong>Pago en Efectivo:</strong> Debes acercarte directamente a nuestro centro.</li>
+                <li><strong>Pago Online:</strong> Si deseas abonar de forma digital por adelantado, <a href="http://localhost:5173/pago-online.html" style="color: #00a896; font-weight: bold; text-decoration: underline;">haz clic aquí para ir a la página de pago</a>.</li>
+            </ul>
+            <p style="margin-top: 15px;">¡Muchas gracias!</p>
         `;
 
         await this.sendEmail.executeConHtml(
@@ -122,7 +122,7 @@ export class TurnosPorSecretariaController{
                 return res.status(400).json({ error: 'EL usuario ya esta registrado en el turno elegido' });
             }
 
-            await this.turnoAsignadoRepository.guardar(turno.id, usuario.id);
+            await this.turnoAsignadoRepository.guardar(turno.id, usuario.id, "reservado");
 
             turno.cupos_ocupados += 1;
             const turnoActualizado = await this.turnoRepository.guardar(turno);
@@ -131,12 +131,73 @@ export class TurnosPorSecretariaController{
             await this.enviarCorreoDeTurnoReservado(turnoActualizado.id, usuario.email);
                 
             return res.status(200).json({ 
-                mensaje: `Usuario asignado con éxito`,
+                mensaje: `Usuario asignado con éxito, Nro de turno: ${turnoActualizado.id}`,
                 turno: turnoActualizado.id 
             });
         } catch (error) {
             return res.status(500)
                     .json({ error: `${error.message}` });
         }
+    }
+
+    registrarPagoDeTurno = async (req, res) => {
+        try {
+            const { idTurno, dni, montoRecibido} = req.body; 
+
+            const turno = await this.turnoRepository.buscarPorId(idTurno);
+            const usuario = await this.pacienteRepository.buscarPorDni(dni);
+
+            const montoAPagar = await this.calcularPrecio(idTurno);
+            const montoDevuelto = montoRecibido - montoAPagar;
+
+            if (!turno) {
+                return res.status(404).json({ error: 'El turno no existe.' });
+            }
+
+
+            if (!usuario) {
+                return res.status(404).json({ error: 'El usuario no existe.' });
+            }
+            
+            const turnoAsignado = await this.turnoAsignadoRepository.obtenerTurnoAsignadoAPaciente(turno.id, usuario.id);
+
+            if (!turnoAsignado) {
+                return res.status(404).json({ error: 'El paciente no tiene este turno asignado' });
+            }
+
+            if (turnoAsignado.estado === "pagado") {
+                return res.status(400).json({ error: 'El pago del turno ya se realizó' });
+            }
+
+            turnoAsignado.estado = "pagado";
+            const turnoActualizado = await this.turnoAsignadoRepository.actualizar(turnoAsignado);
+
+            await this.pagoRepository.guardar({
+                idTurno: turno.id,
+                idUsuario: usuario.id,
+                monto_recibido: montoRecibido,
+                monto_devuelto: montoDevuelto,
+                precio_turno: turno.precio,
+                metodo: "efectivo",
+                fecha_pago: new Date()
+            });
+                
+            return res.status(200).json({ 
+                mensaje: `Se registro el pago con éxito, Nro de turno: ${turnoActualizado.idTurno}, Dni del paciente: ${usuario.dni}`,
+                turno: turnoActualizado.id 
+            });
+        } catch (error) {
+            return res.status(500)
+                    .json({ error: `No se puedo realizar el pago` });
+        }
+    }
+
+    calcularPrecio = async(idTurno) => {
+        let precio = await this.turnoRepository.obtenerPrecioDeTurnoPorId(idTurno);
+        const diaActual = new Date().getDate();
+        if (diaActual >= 14 && diaActual <= 16) {
+            precio = precio - (precio * 0.2);
+        }
+        return precio;
     }
 }

@@ -4,10 +4,11 @@ export class TurnoAsignadoRepository{
         this.repository = repository;
     }
 
-    async guardar(idTurno, idUsuario){
+    async guardar(idTurno, idUsuario, estado){
         return await this.repository.save({
                 idUsuario: idUsuario,
-                idTurno: idTurno
+                idTurno: idTurno,
+                estado: estado
             });
     }
 
@@ -22,5 +23,16 @@ export class TurnoAsignadoRepository{
         return resultado !== null;
     }
 
-    
+    async actualizar(turnoAsignado){
+        return await this.repository.save(turnoAsignado);
+    }
+
+    async obtenerTurnoAsignadoAPaciente(idTurno, idUsuario) {
+    return await this.repository.findOne({
+        where: {
+            idTurno: idTurno,
+            idUsuario: idUsuario 
+        }
+    });
+}
 }

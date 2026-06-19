@@ -12,6 +12,9 @@ const TurnoAsignadoSchema = new EntitySchema({
         idTurno: {
             primary: true,
             type: "int"
+        },
+        estado: {
+            type: "varchar"
         }
     }, 
 
@@ -31,6 +34,13 @@ const TurnoAsignadoSchema = new EntitySchema({
             joinColumn: { name: "idUsuario" },
             inverseSide: "turnoAsignado",
             eager: false
+        },
+
+        pago: {
+            target: "Pago",
+            type: "one-to-one",
+            inverseSide: "turnoAsignado", 
+            eager: false 
         }
     }
 })

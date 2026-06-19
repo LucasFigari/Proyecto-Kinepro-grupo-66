@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seleccionar Método de Pago</title>
+    <title>Registrar Pago en Efectivo</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -77,7 +77,7 @@
             color: var(--texto-principal);
         }
 
-        select, input { 
+        input { 
             padding: 12px; 
             font-size: 16px; 
             border: 1px solid var(--borde);
@@ -88,13 +88,8 @@
             width: 100%;
         }
 
-        select:focus, input:focus {
+        input:focus {
             border-color: var(--celeste-clinico);
-        }
-
-        #contenedor-monto {
-            display: none; 
-            animation: none; 
         }
 
         .btn-enviar {
@@ -123,10 +118,10 @@
 
     <div class="payment-container">
         <h2>
-            <span class="material-icons-round">payment</span>
-            Método de Pago
+            <span class="material-icons-round">payments</span>
+            Pago en Efectivo
         </h2>
-        <p>Seleccione cómo desea abonar el servicio para finalizar.</p>
+        <p>Registre el pago en caja identificando el turno y al paciente.</p>
         
         <form id="form-pago">
             <div class="form-group">
@@ -135,120 +130,98 @@
             </div>
 
             <div class="form-group">
-                <label for="metodo-pago">Seleccione una opción:</label>
-                <select id="metodo-pago" required>
-                    <option value="" disabled selected>-- Elija opción de pago --</option>
-                    <option value="efectivo">Efectivo (En caja)</option>
-                    <option value="online">Pago Online / Transferencia</option>
-                </select>
+                <label for="dni-paciente">DNI del Paciente:</label>
+                <input type="text" id="dni-paciente" placeholder="Ej: 45123456" required>
             </div>
             
             <div class="form-group" id="contenedor-monto">
                 <label for="monto-ingresado">Monto Entregado ($):</label>
-                <input type="number" id="monto-ingresado" placeholder="Ej: 2000" min="0" step="0.01">
+                <input type="number" id="monto-ingresado" placeholder="Ej: 2000" min="0" step="0.01" required>
             </div>
 
             <button type="submit" class="btn-enviar">
                 <span class="material-icons-round">check_circle</span>
-                Procesar Pago
+                Registrar Pago
             </button>
         </form>
     </div>
 
     <script>
+        const rol = sessionStorage.getItem('rol');
+        if (!rol || rol !== 'Secretaria') window.location.href = '/';
+
         const nroTurnoInput = document.getElementById('nro-turno');
-        const metodoPago = document.getElementById('metodo-pago');
-        const contenedorMonto = document.getElementById('contenedor-monto');
+        const dniPacienteInput = document.getElementById('dni-paciente'); 
         const montoIngresado = document.getElementById('monto-ingresado');
         const formPago = document.getElementById('form-pago');
-
-
-        metodoPago.addEventListener('change', () => {
-            if (metodoPago.value === 'efectivo') {
-                contenedorMonto.style.display = 'flex';
-                montoIngresado.setAttribute('required', 'true');
-                montoIngresado.focus();
-            } else {
-                contenedorMonto.style.display = 'none';
-                montoIngresado.removeAttribute('required');
-                montoIngresado.value = ''; 
-            }
-        });
 
         formPago.addEventListener('submit', async (e) => {
             e.preventDefault(); 
 
-            const opcionSeleccionada = metodoPago.value;
             const numeroTurno = nroTurnoInput.value.trim();
+            const dniPaciente = dniPacienteInput.value.trim();
+            const monto = parseFloat(montoIngresado.value) || 0;
 
-            if (!numeroTurno) {
-                await Swal.fire({
-                    icon: 'warning',
-                    title: 'Falta información',
-                    text: 'Por favor, ingrese el número de turno.',
-                    confirmButtonColor: '#00a896'
+            try {
+                const response = await fetch(`http://localhost:3000/turnos/precio/${numeroTurno}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
                 });
-                return;
-            }
 
-            if (opcionSeleccionada === 'efectivo') {
-                const monto = parseFloat(montoIngresado.value) || 0;
-                
-                try {
-                    const response = await fetch(`http://localhost:3000/turnos/precio/${numeroTurno}`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                    });
+                if (!response.ok) {
+                    throw new Error('No se pudo obtener el precio o el turno no existe.');
+                }
 
-                    if (!response.ok) {
-                        throw new Error('No se pudo obtener el precio desde el servidor.');
-                    }
+                const datos = await response.json();
+                const precioTurno = Number(datos.precio);
+                const vuelto = monto - precioTurno;
 
-                    const datos = await response.json();
-                    const precioTurno = Number(datos.precio);
-                    const vuelto = monto - precioTurno;
-
-                    if (vuelto < 0) {
-                        await Swal.fire({
-                            icon: 'error',
-                            title: 'Monto insuficiente',
-                            text: `El precio del turno es $${precioTurno} y se ingresaron $${monto}. Faltan $${Math.abs(vuelto).toFixed(2)}`,
-                            confirmButtonColor: '#00a896'
-                        });
-                        return; 
-                    }
-
-                    await Swal.fire({
-                        icon: 'success',
-                        title: '¡Pago Registrado!',
-                        text: `Se registró el pago en efectivo para el Turno ${numeroTurno}. Monto a devolver: $${vuelto.toFixed(2)}`,
-                        confirmButtonColor: '#00a896',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showClass: { popup: 'none' }, 
-                        hideClass: { popup: 'none' }
-                    });
-                    
-                    window.location.href = 'listar-turnos.html';
-
-                } catch (error) {
-                    console.error("Error en la petición:", error);
+                // Validar que el dinero entregado cubra el costo
+                if (vuelto < 0) {
                     await Swal.fire({
                         icon: 'error',
-                        title: 'Error de servidor',
-                        text: 'No se pudo comunicar con el sistema o el número de turno no existe.',
+                        title: 'Monto insuficiente',
+                        text: `El precio del turno es $${precioTurno} y se ingresaron $${monto}. Faltan $${Math.abs(vuelto).toFixed(2)}`,
                         confirmButtonColor: '#00a896'
                     });
+                    return; 
                 }
-                
-            } else if (opcionSeleccionada === 'online') {
+
+                const responseDeRegistro = await fetch(`http://localhost:3000/turnos/pagos/efectivo`, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idTurno: numeroTurno,
+                        dni: dniPaciente,
+                        montoRecibido: monto
+                    })
+                });
+
+                if (!responseDeRegistro.ok) {
+                    const message = await responseDeRegistro.json();
+                    throw new Error(message.error);
+                }
+
                 await Swal.fire({
-                    icon: 'info',
-                    title: 'Redirigiendo...',
-                    text: `Te estamos enviando a la plataforma de pago online para el Turno ${numeroTurno}.`,
+                    icon: 'success',
+                    title: '¡Pago Registrado!',
+                    text: `Se registró el pago para el DNI ${dniPaciente} en el Turno ${numeroTurno}. Vuelto a entregar: $${vuelto.toFixed(2)}`,
                     confirmButtonColor: '#00a896',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
                     showClass: { popup: 'none' }, 
                     hideClass: { popup: 'none' }
+                });
+                
+                window.location.href = 'listar-turnos.html';
+
+            } catch (error) {
+                console.error("Error en la transacción:", error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error de operación',
+                    text: `${error.message}`,
+                    confirmButtonColor: '#00a896'
                 });
             }
         });

@@ -10,7 +10,23 @@ const PagoSchema = new EntitySchema({
             type: "int",
             generated: true,
         },
-        monto: {
+        idUsuario: {
+            type: "int"
+        },
+        idTurno: {
+            type: "int"
+        },
+        monto_recibido: {
+            type: "decimal", 
+            precision: 10,
+            scale: 2
+        },
+        monto_devuelto: {
+            type: "decimal", 
+            precision: 10,
+            scale: 2
+        },
+        precio_turno: {
             type: "decimal", 
             precision: 10,
             scale: 2
@@ -24,12 +40,16 @@ const PagoSchema = new EntitySchema({
     }, 
 
     relations: {
-        Turno: {
-            target: "Turno",
+        turnoAsignado: {
+            target: "TurnoAsignado",
             type: "one-to-one",
-            joinColumn: { name: "idTurno" }, 
+            joinColumn: [
+                { name: "idUsuario", referencedColumnName: "idUsuario" },
+                { name: "idTurno", referencedColumnName: "idTurno" }
+            ],
             nullable: false,
-            eager: true
+            eager: true,
+            inverseSide: "pago"
         }
     }
 })

@@ -8,6 +8,7 @@ import PersonalRoutes from "./routes/PersonalRoutes.js"
 import LoginRoutes from "./routes/LoginRoutes.js"
 import PasswordRoutes from "./routes/PasswordRoutes.js"
 import turnoRutas from "./routes/TurnosRoutes.js"
+import HistorialClinicoRoutes from "./routes/HistorialClinicoRoutes.js"
 
 //import "./controllers/Cron.js"
 
@@ -42,6 +43,7 @@ app.use("/personal", PersonalRoutes)
 app.use("/login", LoginRoutes)
 app.use("/forgot-password", PasswordRoutes);
 app.use("/turnos", turnoRutas)
+app.use("/historial", HistorialClinicoRoutes)
 app.use(express.static('public'));
 
 app.listen(3000, () => {

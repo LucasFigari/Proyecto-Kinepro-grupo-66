@@ -3,15 +3,13 @@ import { EntitySchema } from "typeorm";
 const TurnoSchema = new EntitySchema({
     name: "Turno",
     tableName: "turnos",
-
     columns: {
         id: {
             primary: true,
             type: "int",
             generated: true
         },
-
-        fecha: {
+        fecha_turno: {
             type: "date"
         },
 
@@ -40,7 +38,6 @@ const TurnoSchema = new EntitySchema({
     },
 
     relations: {
-
         area: {
             target: "AreaDeTratamiento",
             type: "many-to-one",

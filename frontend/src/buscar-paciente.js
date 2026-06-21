@@ -117,8 +117,15 @@ async function verPerfil(id){
     try{
         const res = await fetch(`http://localhost:3000/usuarios/${id}`);
         const usuario = await res.json();
+        mostrarPerfil(usuario);
+    }catch (error){
+        perfilDiv.innerHTML = `<div class="alert alert-danger">Error al cargar el perfil</div>`;
+    }
+}
 
-        perfilDiv.innerHTML = `
+function mostrarPerfil(usuario){
+    const perfilDiv = document.getElementById("perfilCliente");
+    perfilDiv.innerHTML = `
             <div class="card p-4 shadow-sm">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" 
@@ -153,13 +160,100 @@ async function verPerfil(id){
                         <strong>${usuario.email || 'No registrado'}</strong>
                     </div>
                 </div>
-                <button class="btn btn-outline-secondary btn-sm mt-3" onclick="document.getElementById('perfilCliente').style.display='none'">
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-info btn-sm text-white" id="btnEditarCliente">
+                        <i class="ti ti-pencil"></i> Editar perfil
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm mt-3" onclick="document.getElementById('perfilCliente').style.display='none'">
                     <i class="ti ti-x"></i> Cerrar perfil
-                </button>
+                    </button>
+                </div>
             </div>
         `;
 
-    }catch (error){
-        perfilDiv.innerHTML = `<div class="alert alert-danger">Error al cargar el perfil</div>`;
-    }
+        document.getElementById("btnEditarCliente").addEventListener("click", () => {
+            mostrarFormularioEdicion(usuario);
+        })
+}
+
+function mostrarFormularioEdicion(usuario){
+    const perfilDiv = document.getElementById("perfilCliente");
+    perfilDiv.innerHTML = `
+        <div class="card p-4 shadow-sm">
+            <h5 class="mb-3">Editar Perfil de ${usuario.nombre}</h5>
+            <div class="row g-3">
+                <div class="col-6">
+                    <label class="text-muted small d-block">Nombre</label>
+                    <input id="editNombre" type="text" class="form-control" value="${usuario.nombre}">
+                </div>
+                <div class="col-6">
+                    <label class="text-muted small d-block">Apellido</label>
+                    <input id="editApellido" type="text" class="form-control" value="${usuario.apellido || ''}">
+                </div>
+                <div class="col-6">
+                    <label class="text-muted small d-block">DNI</label>
+                    <input id="editDni" type="text" class="form-control" value="${usuario.dni || ''}">
+                </div>
+                <div class="col-6">
+                    <label class="text-muted small d-block">Teléfono</label>
+                    <input id="editTelefono" type="text" class="form-control" value="${usuario.telefono || ''}">
+                </div>
+                <div class="col-12">
+                    <label class="text-muted small d-block">Email</label>
+                    <input id="editEmail" type="email" class="form-control" value="${usuario.email || ''}">
+                </div>
+            </div>
+
+            <p id="mensajeEdicionCliente" style="display:none; font-size:0.9rem; margin-top:1rem;"></p>
+
+            <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-info text-white" id="btnActualizarCliente">
+                    Actualizar
+                </button>
+                <button class="btn btn-outline-secondary" id="btnCancelarEdicionCliente">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("btnCancelarEdicionCliente").addEventListener("click", () => { 
+        mostrarPerfil(usuario);
+    });
+
+    document.getElementById("btnActualizarCliente").addEventListener("click", async () => {
+        const nombre = document.getElementById("editNombre").value.trim();
+        const apellido = document.getElementById("editApellido").value.trim();
+        const dni = document.getElementById("editDni").value.trim();
+        const email = document.getElementById("editEmail").value.trim();
+        const telefono = document.getElementById("editTelefono").value.trim();
+        const mensajeEl = document.getElementById("mensajeEdicionCliente");
+
+        try {
+            const response = await fetch(`http://localhost:3000/usuarios/editar-admin/${usuario.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre, apellido, dni, email, telefono })
+            })
+            const data = await response.json();
+
+            mensajeEl.style.display = "block";
+            if(data.ok){
+                mensajeEl.style.color = "green";
+                mensajeEl.textContent = data.mensaje;
+                setTimeout(async () => {
+                    const res = await fetch(`http://localhost:3000/usuarios/${usuario.id}`);
+                    const usuarioActualizado = await res.json();
+                    mostrarPerfil(usuarioActualizado);
+                }, 1200);
+            } else {
+                mensajeEl.style.color = "red";
+                mensajeEl.textContent = data.mensaje;
+            }
+        }catch (error){
+            mensajeEl.style.display = "block";
+            mensajeEl.style.color = "red";
+            mensajeEl.textContent = "Error al conectar con el servidor.";
+        }
+    })
 }

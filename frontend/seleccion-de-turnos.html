@@ -18,16 +18,13 @@
     <div class="turno-container">
         <h2 id="titulo-area" class="text-success mb-3">Cargando área...</h2>
         <p class="text-muted">Seleccioná un horario disponible para confirmar tu turno.</p>
-        
         <hr>
-
         <div id="contenedor-turnos" class="my-4">
             <div class="text-center py-3">
                 <div class="spinner-border text-success" role="status"></div>
                 <p class="mt-2 text-muted">Buscando horarios disponibles...</p>
             </div>
         </div>
-
         <button style="background-color: #52b788; border-color: white;" class="btn btn-secondary w-100 text-white fw-bold" onclick="window.location.href='/index-usuario.html'">
             Volver al panel
         </button>
@@ -41,8 +38,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            
-            // Extraemos tanto el ID del área como el Nombre de la URL
             const idAreaSeleccionada = urlParams.get('id'); 
             const areaSeleccionada = urlParams.get('area'); 
 
@@ -52,12 +47,9 @@
                 document.getElementById('titulo-area').textContent = "Área de Tratamiento";
             }
 
-            // Llamamos a la función para traer la data real de tu Postgres
             cargarTurnosPorArea(idAreaSeleccionada);
         });
 
-        // 🔎 Función para buscar en el Backend
-       // 🔎 Función para buscar en el Backend
         async function cargarTurnosPorArea(idArea) {
             const contenedor = document.getElementById('contenedor-turnos');
 
@@ -67,10 +59,8 @@
             }
 
             try {
-                // 🔥 AGREGADO: usuario logueado
                 const idUsuario = sessionStorage.getItem('idUsuario');
 
-                // 🔥 CAMBIO: ahora mandamos idUsuario al backend
                 const respuesta = await fetch(
                     `http://localhost:3000/turnos/area/${idArea}?idUsuario=${idUsuario}`
                 );
@@ -87,9 +77,7 @@
                     return;
                 }
 
-                // Dibujamos los turnos
                 contenedor.innerHTML = turnos.map(turno => {
-
                     const disponibles = turno.cupo_maximo - turno.cupos_ocupados;
                     const sinCupo = disponibles <= 0;
 
@@ -99,39 +87,32 @@
                                 <h6 class="mb-1 text-dark fw-bold">
                                     <i class="ti ti-calendar"></i> F: ${turno.fecha_turno}
                                 </h6>
-
                                 <small class="text-secondary d-block">
                                     <i class="ti ti-clock"></i>
                                     ${turno.hora_comienzo.substring(0, 5)} hs a ${turno.hora_fin.substring(0, 5)} hs
                                 </small>
-
                                 <small class="text-muted" style="font-size: 11px;">
                                     Cupos libres: ${disponibles} de ${turno.cupo_maximo}
                                 </small>
                             </div>
-
                             <div class="d-flex gap-2">
-
                                 <button type="button"
                                         class="btn btn-sm ${sinCupo ? 'btn-danger' : 'btn-success text-white fw-bold'}"
                                         ${sinCupo ? 'disabled' : ''}
                                         onclick="reservarTurno(${turno.id})">
                                     ${sinCupo ? 'Agotado' : 'Reservar'}
                                 </button>
-
                                 ${sinCupo ? `
                                     <button type="button"
                                         class="btn btn-sm ${turno.enListaEspera ? 'btn-danger' : 'btn-warning text-white fw-bold'}"
                                         onclick="${turno.enListaEspera 
                                             ? `quitarListaEspera(${turno.id})` 
                                             : `listaEspera(${turno.id})`}">
-
                                         ${turno.enListaEspera 
                                             ? 'Quitarse de lista de espera' 
                                             : 'Unirse a lista de espera'}
                                     </button>
                                 ` : ''}
-
                             </div>
                         </div>
                     `;
@@ -143,7 +124,6 @@
             }
         }
 
-        // 🎯 Función que ejecuta el POST definitivo al backend del paciente
         async function reservarTurno(idTurno) {
             const idUsuarioLogueado = sessionStorage.getItem('idUsuario');
 
@@ -153,8 +133,7 @@
             }
 
             try {
-                // Ejecutamos la reserva usando tu endpoint controlador seguro
-                const respuesta = await fetch('http://localhost:3000/turnos/reservar', {
+                const respuesta = await fetch('http://localhost:3000/turnos/reservar-paciente', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -194,11 +173,7 @@
             const idUsuario = sessionStorage.getItem('idUsuario');
 
             if (!idUsuario) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Atención",
-                    text: "Tu sesión expiró"
-                });
+                Swal.fire({ icon: "warning", title: "Atención", text: "Tu sesión expiró" });
                 return;
             }
 
@@ -215,32 +190,18 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "No se pudo agregar",
-                        text: data.error || "Error desconocido"
-                    });
+                    Swal.fire({ icon: "error", title: "No se pudo agregar", text: data.error || "Error desconocido" });
                     return;
                 }
 
-                Swal.fire({
-                    icon: "success",
-                    title: "Listo",
-                    text: "Te anotaste en lista de espera"
-                }).then(() => {
-                    cargarTurnosPorArea(
-                        new URLSearchParams(window.location.search).get("id")
-                    );
+                Swal.fire({ icon: "success", title: "Listo", text: "Te anotaste en lista de espera" })
+                .then(() => {
+                    cargarTurnosPorArea(new URLSearchParams(window.location.search).get("id"));
                 });
 
-            } 
-            catch (error) {
+            } catch (error) {
                 console.error(error);
-                Swal.fire({
-                    icon: "error",
-                    title: "Error de red",
-                    text: "No se pudo conectar al servidor"
-                });
+                Swal.fire({ icon: "error", title: "Error de red", text: "No se pudo conectar al servidor" });
             }
         }
 
@@ -250,9 +211,7 @@
             try {
                 const res = await fetch("http://localhost:3000/lista-espera", {
                     method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         idTurno,
                         idUsuario: parseInt(idUsuario)
@@ -267,8 +226,6 @@
                 }
 
                 Swal.fire("Listo", data.message, "success");
-
-                // 🔁 refrescar UI
                 cargarTurnosPorArea(new URLSearchParams(window.location.search).get("id"));
 
             } catch (error) {
@@ -276,8 +233,6 @@
                 Swal.fire("Error", "No se pudo conectar al servidor", "error");
             }
         }
-
-
     </script>
 </body>
 </html>

@@ -28,60 +28,60 @@ const cargarAreas = async () => {
             const nombreNormalizado = area.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '').toLowerCase();
             const rutaImagen = `http://localhost:3000/imagenes/${nombreNormalizado}.png`;
 
-const descripcionTratamiento = area.descripcion || 'Descripción detallada del tratamiento y sus metodologías de rehabilitación.';
+            const descripcionTratamiento = area.descripcion || 'Descripción detallada del tratamiento y sus metodologías de rehabilitación.';
 
-const tarjetaHTML = `
-    <div class="card border-0 text-white overflow-hidden shadow-sm p-0 flex-column mb-3" 
-         style="height: auto; border-radius: 14px; background: white;">
-        
-        <div class="position-relative" style="height: 160px; overflow: hidden;">
-            <img src="${rutaImagen}" 
-                 onerror="this.onerror=null; this.src='/default.png';" 
-                 class="w-100 h-100" 
-                 style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;" 
-                 alt="${area.nombre}">
-            
-            <div class="w-100 h-100 position-absolute" 
-                 style="z-index: 2; background: linear-gradient(transparent, rgba(0,0,0,0.7)); top:0; left:0;"></div>
-            
-            <div class="position-absolute bottom-0 start-0 p-3 w-100" style="z-index: 3;">
-                <p class="card-title mb-0 fw-bold fs-5 text-white">${area.nombre}</p>
-            </div>
-        </div>
-        
-        <div class="p-3 bg-white" style="color: #333;">
-            
-            <div class="d-flex gap-2 mb-2">
-                <button 
-                    type="button" 
-                    class="btn btn-sm btn-outline-info fw-bold flex-grow-1"
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#collapseArea-${area.id}" 
-                    aria-expanded="false" 
-                    aria-controls="collapseArea-${area.id}">
-                    <i class="ti ti-info-circle"></i> Ver detalles
-                </button>
+            const tarjetaHTML = `
+                <div class="card border-0 text-white overflow-hidden shadow-sm p-0 flex-column mb-3" 
+                     style="height: auto; border-radius: 14px; background: white;">
+                    
+                    <div class="position-relative" style="height: 160px; overflow: hidden;">
+                        <img src="${rutaImagen}" 
+                             onerror="this.onerror=null; this.src='/default.png';" 
+                             class="w-100 h-100" 
+                             style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;" 
+                             alt="${area.nombre}">
+                        
+                        <div class="w-100 h-100 position-absolute" 
+                             style="z-index: 2; background: linear-gradient(transparent, rgba(0,0,0,0.7)); top:0; left:0;"></div>
+                        
+                        <div class="position-absolute bottom-0 start-0 p-3 w-100" style="z-index: 3;">
+                            <p class="card-title mb-0 fw-bold fs-5 text-white">${area.nombre}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 bg-white" style="color: #333;">
+                        
+                        <div class="d-flex gap-2 mb-2">
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-outline-info fw-bold flex-grow-1"
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#collapseArea-${area.id}" 
+                                aria-expanded="false" 
+                                aria-controls="collapseArea-${area.id}">
+                                <i class="ti ti-info-circle"></i> Ver detalles
+                            </button>
 
-                <button 
-                    type="button"
-                    class="btn btn-sm btn-success fw-bold flex-grow-1"
-                    onclick="cargarTurnosPorArea(${area.id}, '${area.nombre}')">
-                    <i class="ti ti-calendar-plus"></i> Agendar Turno
-                </button>
-            </div>
-            
-            <div class="collapse" id="collapseArea-${area.id}">
-                <div class="pt-2 border-top mt-2">
-                    <label class="text-muted small d-block fw-bold mb-1">Información del Tratamiento</label>
-                    <p class="card-desc mb-0 text-secondary" style="font-size: 13px; line-height: 1.4;">
-                        ${descripcionTratamiento}
-                    </p>
+                            <button 
+                                type="button"
+                                class="btn btn-sm btn-success fw-bold flex-grow-1"
+                                onclick="irASeleccionDeTurnos(${area.id}, '${area.nombre}')">
+                                <i class="ti ti-calendar-plus"></i> Agendar Turno
+                            </button>
+                        </div>
+                        
+                        <div class="collapse" id="collapseArea-${area.id}">
+                            <div class="pt-2 border-top mt-2">
+                                <label class="text-muted small d-block fw-bold mb-1">Información del Tratamiento</label>
+                                <p class="card-desc mb-0 text-secondary" style="font-size: 13px; line-height: 1.4;">
+                                    ${descripcionTratamiento}
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-            </div>
-
-        </div>
-    </div>
-`;
+            `;
             gridDinamica.insertAdjacentHTML('beforeend', tarjetaHTML);
         });
     } catch (error) {
@@ -90,6 +90,12 @@ const tarjetaHTML = `
 };
 
 cargarAreas();
+
+// ✅ CORRECCIÓN: Función limpia que redirige a la pantalla donde se listan los turnos de ese área
+function irASeleccionDeTurnos(idArea, nombreArea) {
+    window.location.href = `/seleccion-de-turnos.html?id=${idArea}&area=${encodeURIComponent(nombreArea)}`;
+}
+window.irASeleccionDeTurnos = irASeleccionDeTurnos;
 
 btonPerfil.addEventListener("click", async (e) => {
     e.preventDefault(); 
@@ -125,7 +131,7 @@ btonPerfil.addEventListener("click", async (e) => {
         }
         
         const usuario = await respuesta.json();
-        sessionStorage.setItem("idUsuario", usuario.id); // ✅ Mantener consistencia en sessionStorage
+        sessionStorage.setItem("idUsuario", usuario.id); 
         
         contenido.innerHTML = `
             <div class="container mt-2" style="max-width: 600px;">
@@ -185,7 +191,6 @@ btonPerfil.addEventListener("click", async (e) => {
             cargarAreas(); 
         });
 
-        //Manejo de la edicion de perfil
         document.getElementById("btnEditarPerfil").addEventListener("click", () => {
             contenido.innerHTML = `
                 <div class="container mt-2" style="max-width: 600px;">
@@ -236,43 +241,43 @@ btonPerfil.addEventListener("click", async (e) => {
                 </div>
             `;
 
-        document.getElementById("btnCancelarEdicion").addEventListener("click", () => {
-            btonPerfil.click();
-        });
+            document.getElementById("btnCancelarEdicion").addEventListener("click", () => {
+                btonPerfil.click();
+            });
 
-        document.getElementById("btnActualizarDatos").addEventListener("click", async () => {
-            const nombre = document.getElementById("editNombre").value.trim();
-            const apellido = document.getElementById("editApellido").value.trim();
-            const telefono = document.getElementById("editTelefono").value.trim();
-            const password = document.getElementById("editPassword").value.trim();
-            const mensajeEl = document.getElementById("mensajeEdicion");
-            const id = sessionStorage.getItem("idUsuario");
+            document.getElementById("btnActualizarDatos").addEventListener("click", async () => {
+                const nombre = document.getElementById("editNombre").value.trim();
+                const apellido = document.getElementById("editApellido").value.trim();
+                const telefono = document.getElementById("editTelefono").value.trim();
+                const password = document.getElementById("editPassword").value.trim();
+                const mensajeEl = document.getElementById("mensajeEdicion");
+                const id = sessionStorage.getItem("idUsuario");
 
-            try {
-                const response = await fetch(`http://localhost:3000/usuarios/editar/${id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nombre, apellido, telefono, password })
-                });
-                const data = await response.json();
+                try {
+                    const response = await fetch(`http://localhost:3000/usuarios/editar/${id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ nombre, apellido, telefono, password })
+                    });
+                    const data = await response.json();
 
-                mensajeEl.style.display = "block";
-                if (data.ok) {
-                    mensajeEl.style.color = "green";
-                    mensajeEl.textContent = data.mensaje;
-                    setTimeout(() => {
-                        btonPerfil.click();
-                    }, 1500);
-                } else {
+                    mensajeEl.style.display = "block";
+                    if (data.ok) {
+                        mensajeEl.style.color = "green";
+                        mensajeEl.textContent = data.mensaje;
+                        setTimeout(() => {
+                            btonPerfil.click();
+                        }, 1500);
+                    } else {
+                        mensajeEl.style.color = "red";
+                        mensajeEl.textContent = data.mensaje;
+                    }
+                } catch (error) {
+                    mensajeEl.style.display = "block";
                     mensajeEl.style.color = "red";
-                    mensajeEl.textContent = data.mensaje;
+                    mensajeEl.textContent = "Error al conectar con el servidor.";
                 }
-            } catch (error) {
-                mensajeEl.style.display = "block";
-                mensajeEl.style.color = "red";
-                mensajeEl.textContent = "Error al conectar con el servidor.";
-            }
-        });
+            });
         });
 
     } catch (error) {
@@ -327,45 +332,6 @@ if (turnos) {
     });
 }
 
-async function cargarTurnosPorArea(idArea, nombreArea) {
-    try {
-        const respuesta = await fetch('http://localhost:3000/area/reservar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombreArea: nombreArea })
-        });
-
-        const resultado = await respuesta.json();
-
-        if (!respuesta.ok) {
-            Swal.fire({
-                icon: "error",
-                title: "Cupos agotados",
-                text: resultado.detalles,
-                confirmButtonColor: "#72B9CB"
-            });
-            return;
-        }
-
-        Swal.fire({
-            icon: "success",
-            title: "¡Cupos disponibles!",
-            text: `Área: ${nombreArea}`,
-            confirmButtonColor: "#72B9CB"
-        }).then(() => {
-            window.location.href = `/seleccion-de-turnos.html?id=${idArea}&area=${encodeURIComponent(nombreArea)}`;
-        });
-
-    } catch (error) {
-        console.error(error);
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se pudo verificar el cupo."
-        });
-    }
-}
-
 const cargarTurnosDelUsuario = async (idUsuario) => {
     const contenedor = document.getElementById("contenedor-turnos-usuario");
 
@@ -411,8 +377,6 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
         contenedor.innerHTML = '<p class="text-danger small">Error de conexión al obtener turnos.</p>';
     }
 };
-
-window.cargarTurnosPorArea = cargarTurnosPorArea;
 
 const modalCerrar = document.getElementById('modalCerrarSesion');
 

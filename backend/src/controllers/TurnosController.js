@@ -38,20 +38,19 @@ export const reservarTurnoComoPaciente = async (req, res) => {
             return res.status(400).json({ error: 'No hay cupos disponibles.' });
         }
 
-        // 🛠️ CORRECCIÓN AQUÍ: Agregamos las relations para que el filtro anidado funcione bien
         const yaAsignado = await turnoAsignadoRepository.findOne({
             where: { 
-                turno: { id: idTurno }, 
-                usuario: { id: idUsuario } 
-            },
-            relations: ["turno", "usuario"] 
+                idTurno: parseInt(idTurno), 
+                idUsuario: parseInt(idUsuario) 
+            }
         });
         
         if (yaAsignado) return res.status(400).json({ error: 'Ya estás registrado en este turno.' });
 
         const nuevaAsignacion = turnoAsignadoRepository.create({
-            turno: { id: idTurno },
-            usuario: { id: idUsuario }
+            idTurno: parseInt(idTurno),
+            idUsuario: parseInt(idUsuario),
+            estado: "reservado"
         });
         await turnoAsignadoRepository.save(nuevaAsignacion);
 
@@ -59,6 +58,7 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         await turnoRepository.save(turno);
 
         return res.status(200).json({ mensaje: '¡Reserva realizada con éxito!' });
+
     } catch (error) {
         console.error("❌ Error en reservarTurnoComoPaciente:", error);
         return res.status(500).json({ error: error.message });

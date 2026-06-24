@@ -22,7 +22,7 @@ async function cargarTurnos() {
                         <div class="turno-details">
                             <div class="detail-group">
                                 <span class="material-icons-round">calendar_today</span>
-                                <span>${turno.fecha}</span>
+                                <span>${turno.fecha_turno}</span>
                             </div>
                             <div class="detail-group">
                                 <span class="material-icons-round">schedule</span>
@@ -31,6 +31,10 @@ async function cargarTurnos() {
                             <div class="detail-group">
                                 <span class="material-icons-round">attach_money</span>
                                 <span>Precio: $${turno.precio}</span>
+                            </div>
+                                <div class="detail-group">
+                                <span class="material-icons-round">people</span>
+                                <span>cupos: $${turno.cupo_maximo - turno.cupos_ocupados}</span>
                             </div>
                         </div>
                     </div>

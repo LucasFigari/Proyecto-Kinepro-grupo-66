@@ -60,6 +60,31 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         await turnoRepository.save(turno);
 
         try {
+            const listaRepo = AppDataSource.getRepository("ListaEspera");
+            const turnoConArea = await turnoRepository.findOne({
+                where: { id: idTurno },
+                relations: ["area"]
+            });
+
+            if (turnoConArea?.area) {
+                const enLista = await listaRepo
+                    .createQueryBuilder("le")
+                    .innerJoin("le.turno", "t")
+                    .innerJoin("t.area", "a")
+                    .where("le.id_usuario = :idUsuario", { idUsuario: parseInt(idUsuario) })
+                    .andWhere("a.id = :areaId", { areaId: turnoConArea.area.id })
+                    .getOne();
+
+                if (enLista) {
+                    await listaRepo.remove(enLista);
+                    console.log("✅ Usuario removido de lista de espera del área");
+                }
+            }
+        } catch (listaError) {
+            console.error("⚠️ No se pudo remover de lista de espera:", listaError);
+        }
+
+        try {
             const usuario = await usuarioRepository.findOneBy({ id: parseInt(idUsuario) });
             if (usuario?.email) {
                 const sendEmail = new SendEmailUseCase();

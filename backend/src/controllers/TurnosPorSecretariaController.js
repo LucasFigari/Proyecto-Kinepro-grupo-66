@@ -200,4 +200,46 @@ export class TurnosPorSecretariaController{
         }
         return precio;
     }
+
+    crearTurno = async (req, res) => {
+        try{
+            const {fecha_turno, hora_comienzo, hora_fin, precio, cupo_maximo, idArea} = req.body;
+
+            if(!fecha_turno || !hora_comienzo || !hora_fin || !precio || !cupo_maximo || !idArea){
+                return res.status(400).json({ ok:false, mensaje: "Debe completar todos los campos"})
+            }
+
+            if(hora_comienzo >= hora_fin){
+                return res.status(400).json({ ok:false, mensaje: "El formato del horario es inválido"});
+            }
+
+            const turnoExistente = await this.turnoRepository.existeTurno(fecha_turno, hora_comienzo, hora_fin, idArea);
+            if(turnoExistente){
+                return res.status(400).json({ ok:false, mensaje: "Ya existe un turno con esa fecha y rango horario en esta área"})
+            }
+
+            const turno = await this.turnoRepository.crearTurno(fecha_turno, hora_comienzo, hora_fin, precio, cupo_maximo, idArea);
+            return res.status(201).json({ ok:true, mensaje: "Turno creado exitosamente", turno })
+
+        }catch(error){
+            console.log("Error al crear un turno: ", error.message)
+            return res.status(500).json({ ok:false, mensaje: "Hubo un error en el servidor" })
+        }
+    }
+
+    eliminarTurno = async(req, res) => {
+
+        try{
+            const {id} = req.params;
+            const resultado = await this.turnoRepository.eliminarTurno(id);
+            if(resultado.ok){
+                return res.status(200).json(resultado)
+            }else{
+                return res.status(400).json(resultado)
+            }
+        }catch(error){
+            return res.status(500).json({ ok:false, mensaje: "Error interno del servidor" })
+        }
+
+    }
 }

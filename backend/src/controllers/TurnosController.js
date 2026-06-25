@@ -87,6 +87,10 @@ export const obtenerTurnosDisponiblesPorArea = async (req, res) => {
         const turnosConLista = await Promise.all(
             turnosFiltrados.map(async (t) => {
 
+                if(!idUsuario || isNaN(parseInt(idUsuario))){
+                    return{ ...t, enListaEspera:false }
+                }
+
                 const enLista = await listaRepo.findOne({
                     where: {
                         turno: { id: t.id },

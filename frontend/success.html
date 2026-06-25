@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Compra Exitosa!</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fa; color: #333333; line-height: 1.6;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+        }
+        .card {
+            background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 40px 32px; text-align: center; max-width: 500px; width: 100%; border-top: 6px solid #00a650;
+        }
+        .icon-circle {
+            width: 72px; height: 72px; border-radius: 50%; background-color: #e5f6ed;
+            display: flex; justify-content: center; align-items: center; margin: 0 auto 24px auto;
+        }
+        .icon-text { font-size: 32px; font-weight: bold; color: #00a650; }
+        h1 { font-size: 24px; margin-bottom: 12px; color: #1a1a1a; }
+        p { font-size: 15px; color: #666666; margin-bottom: 24px; }
+        .details-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; margin-bottom: 24px; text-align: left; }
+        .details-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        .details-label { color: #888888; }
+        .details-value { font-weight: 600; color: #333333; }
+        .btn {
+            display: block; background-color: #3483fa; color: #ffffff; text-decoration: none;
+            padding: 12px 24px; border-radius: 6px; font-size: 15px; font-weight: 600; text-align: center;
+        }
+        .btn:hover { background-color: #2969cb; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon-circle"><span class="icon-text">✓</span></div>
+        <h1>¡Muchas gracias por tu compra!</h1>
+        <p>Tu pago ha sido procesado con éxito. En unos minutos recibirás un correo electrónico con los detalles y tu comprobante.</p>
+        <div class="details-box">
+            <div class="details-row"><span class="details-label">Estado:</span><span class="details-value" style="color: #00a650;">Aprobado</span></div>
+            <div class="details-row"><span class="details-label">Medio de pago:</span><span class="details-value">Tarjeta de Crédito / Débito</span></div>
+        </div>
+        <a href="/" class="btn">Volver al inicio</a>
+    </div>
+</body>
+</html>

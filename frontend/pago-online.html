@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Turno y Pago</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7f6;
+            margin: 0;
+        }
+        .checkout-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .btn-loading {
+            background-color: #ccc;
+            color: #666;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            width: 100%;
+            margin-top: 20px;
+            cursor: not-allowed;
+        }
+        #wallet_container {
+            margin-top: 20px;
+            width: 100%;
+        }
+    </style>
+    
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body>
+
+    <div class="checkout-card">
+        <h2>Resumen de tu Turno</h2>
+        <p><strong>Concepto:</strong> Pago de Turno Médico</p>
+
+        <p><strong>Turno N°:</strong> <span id="info-turno">Cargando...</span></p>
+        
+        <button id="btn-status" class="btn-loading">Preparando plataforma de pago...</button>
+        
+        <div id="wallet_container"></div>
+    </div>
+
+    <script>
+        const ACCES_PUBLIC= "";
+        const mp = new MercadoPago(ACCES_PUBLIC, {
+            locale: 'es-AR'
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const idTurno = urlParams.get('idTurno');
+        const idUsuario = urlParams.get('idUsuario');
+
+        if (idTurno) {
+            document.getElementById('info-turno').innerText = idTurno;
+        } else {
+            document.getElementById('info-turno').innerText = "No especificado";
+        }
+
+
+        async function inicializarCheckout() {
+            try {
+                
+                /*
+                const responseTurno = await fetch(`https://---.com/pago/realizo-pago`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idTurno: idTurno,      
+                        idUsuario: idUsuario    
+                    })
+                });
+
+                const order = await responseTurno.json();
+                if(order.status === "approved"){
+                    throw new Error("Ya se realizo el pago");
+                }*/
+
+                const responsePrecio = await fetch(`https://---..com/turnos/precio/${idTurno}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                const datos = await responsePrecio.json();
+                const precioTurno = Number(datos.precio);
+
+                const response = await fetch("https://---../pago/checkout", { 
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify({
+                        amount: precioTurno,
+                        description: "Pago de Turno Médico",
+                        idTurno: idTurno,       
+                        idUsuario: idUsuario    
+                    })
+                });
+
+                if (!response.ok) throw new Error("Error al crear la preferencia");
+
+                const resJson = await response.json();
+                
+                const preferenceId = resJson.data.preferenceId; 
+
+                if (!preferenceId) {
+                    throw new Error("No se encontró el preferenceId dentro de resJson.data");
+                }
+
+                document.getElementById("btn-status").style.display = "none";
+
+                mp.bricks().create("wallet", "wallet_container", {
+                    initialization: {
+                        preferenceId: preferenceId,
+                    },
+                    customization: {
+                        texts: {
+                            valueProp: 'smart_option', 
+                        },
+                    },
+                });
+
+            } catch (error) {
+                console.error("Error en el checkout:", error);
+                document.getElementById("btn-status").innerText = "Error al cargar el pago. Reintentar.";
+                document.getElementById("btn-status").style.backgroundColor = "#ff4d4d";
+                document.getElementById("btn-status").style.color = "white";
+            }
+        }
+
+        inicializarCheckout();
+    </script>
+</body>
+</html>

@@ -1,3 +1,5 @@
+import { pagoEfectivo } from "../mercado-pago/PaymentController.js";
+
 export class TurnosPorSecretariaController{
 
     constructor(turnoRepository, pacienteRepository, turnoAsignadoRepository, pagoRepository, sendEmail){
@@ -71,10 +73,16 @@ export class TurnosPorSecretariaController{
         }
     }
 
-    enviarCorreoDeTurnoReservado = async (idTurno, email) => {
-        const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
+    enviarCorreoDeTurnoReservado = async (idTurno, email, idUsuario) => {
+        /*const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
 
-        const mensajeTexto = `Hola, tu turno ha sido reservado con éxito. Tu Número de Turno es: ${idTurno}. Puedes realizar el pago en el siguiente enlace: http://localhost:5173/seleccion-de-pago.html`;
+        const urlPago = new URL('http://localhost:5173/pago-online.html');
+        urlPago.searchParams.append('idTurno', idTurno);
+        urlPago.searchParams.append('idUsuario', idUsuario);
+        
+        const urlFinal = urlPago.toString(); 
+
+        const mensajeTexto = `Hola, tu turno ha sido reservado con éxito. Tu Número de Turno es: ${idTurno}. Puedes realizar el pago en el siguiente enlace: ${urlFinal}`;
 
         const plantillaHTML = `
             <p>Hola,</p>
@@ -82,18 +90,35 @@ export class TurnosPorSecretariaController{
             <p><strong>Número de Turno:</strong> ${idTurno}</p>
             <p>Para abonar el servicio, tienes las siguientes opciones:</p>
             <ul>
-                <li><strong>Pago en Efectivo:</strong> Debes acercarte directamente a nuestro centro.</li>
-                <li><strong>Pago Online:</strong> Si deseas abonar de forma digital por adelantado, <a href="http://localhost:5173/pago-online.html" style="color: #00a896; font-weight: bold; text-decoration: underline;">haz clic aquí para ir a la página de pago</a>.</li>
+                <li>Para abonar, haz <a href="${urlFinal}">clic aquí</a>.</li>
             </ul>
             <p style="margin-top: 15px;">¡Muchas gracias!</p>
-        `;
+        `;*/
+        try {
+            const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
 
-        await this.sendEmail.executeConHtml(
-            email, 
-            asunto, 
-            mensajeTexto,  
-            plantillaHTML  
-        );
+            const mensajeTexto = `Hola, tu turno ha sido reservado con éxito. Tu Número de Turno es: ${idTurno}.`;
+
+            const plantillaHTML = `
+                <p>Hola,</p>
+                <p>Tu turno ha sido reservado con éxito.</p>
+                <p><strong>Número de Turno:</strong> ${idTurno}</p>
+                <ul>
+                    <li>Para abonar, acercarse al centro</li>
+                </ul>
+                <p style="margin-top: 15px;">¡Muchas gracias!</p>
+            `;
+
+            await this.sendEmail.executeConHtml(
+                email, 
+                asunto, 
+                mensajeTexto,  
+                plantillaHTML  
+            );
+        } catch (error) {
+            console.error(`[Error Crítico] Falló el envío de email para el turno ${idTurno}:`, error);
+            throw new Error(`No se pudo enviar el correo de confirmación`);
+        }
     }
 
     agregarUsuarioATurno = async (req, res) => {
@@ -124,11 +149,12 @@ export class TurnosPorSecretariaController{
 
             await this.turnoAsignadoRepository.guardar(turno.id, usuario.id, "reservado");
 
+            
             turno.cupos_ocupados += 1;
             const turnoActualizado = await this.turnoRepository.guardar(turno);
 
             
-            await this.enviarCorreoDeTurnoReservado(turnoActualizado.id, usuario.email);
+            await this.enviarCorreoDeTurnoReservado(turnoActualizado.id, usuario.email, usuario.id);
                 
             return res.status(200).json({ 
                 mensaje: `Usuario asignado con éxito, Nro de turno: ${turnoActualizado.id}`,
@@ -142,13 +168,11 @@ export class TurnosPorSecretariaController{
 
     registrarPagoDeTurno = async (req, res) => {
         try {
-            const { idTurno, dni, montoRecibido} = req.body; 
+            const { idTurno, dni} = req.body; 
 
             const turno = await this.turnoRepository.buscarPorId(idTurno);
             const usuario = await this.pacienteRepository.buscarPorDni(dni);
 
-            const montoAPagar = await this.calcularPrecio(idTurno);
-            const montoDevuelto = montoRecibido - montoAPagar;
 
             if (!turno) {
                 return res.status(404).json({ error: 'El turno no existe.' });
@@ -170,17 +194,8 @@ export class TurnosPorSecretariaController{
             }
 
             turnoAsignado.estado = "pagado";
+            //await pagoEfectivo(turno.id, usuario.id);
             const turnoActualizado = await this.turnoAsignadoRepository.actualizar(turnoAsignado);
-
-            await this.pagoRepository.guardar({
-                idTurno: turno.id,
-                idUsuario: usuario.id,
-                monto_recibido: montoRecibido,
-                monto_devuelto: montoDevuelto,
-                precio_turno: turno.precio,
-                metodo: "efectivo",
-                fecha_pago: new Date()
-            });
                 
             return res.status(200).json({ 
                 mensaje: `Se registro el pago con éxito, Nro de turno: ${turnoActualizado.idTurno}, Dni del paciente: ${usuario.dni}`,
@@ -188,7 +203,7 @@ export class TurnosPorSecretariaController{
             });
         } catch (error) {
             return res.status(500)
-                    .json({ error: `No se puedo realizar el pago` });
+                    .json({ error: `No se puedo realizar el pago ${error.message}`});
         }
     }
 
@@ -200,4 +215,13 @@ export class TurnosPorSecretariaController{
         }
         return precio;
     }
-}
+}   
+
+    export const calcularPrecioConMonto = async (monto) => {
+        let precio = monto;
+        const diaActual = new Date().getDate();
+        if (diaActual >= 14 && diaActual <= 16) {
+            precio = precio - (precio * 0.2);
+        }
+        return precio;
+    };

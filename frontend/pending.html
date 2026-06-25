@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Pendiente</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fa; color: #333333; line-height: 1.6;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+        }
+        .card {
+            background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 40px 32px; text-align: center; max-width: 500px; width: 100%; border-top: 6px solid #ffb703;
+        }
+        .icon-circle {
+            width: 72px; height: 72px; border-radius: 50%; background-color: #fff8e5;
+            display: flex; justify-content: center; align-items: center; margin: 0 auto 24px auto;
+        }
+        .icon-text { font-size: 32px; font-weight: bold; color: #ffb703; }
+        h1 { font-size: 24px; margin-bottom: 12px; color: #1a1a1a; }
+        p { font-size: 15px; color: #666666; margin-bottom: 24px; }
+        .details-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; margin-bottom: 24px; text-align: left; }
+        .details-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        .details-label { color: #888888; }
+        .details-value { font-weight: 600; color: #333333; }
+        .notice { font-size: 13px; color: #888; margin-bottom: 24px; text-align: left; }
+        .btn {
+            display: block; background-color: #ffb703; color: #333333; text-decoration: none;
+            padding: 12px 24px; border-radius: 6px; font-size: 15px; font-weight: 600; text-align: center;
+        }
+        .btn:hover { background-color: #e5a402; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon-circle"><span class="icon-text">!</span></div>
+        <h1>Tu pago está pendiente</h1>
+        <p>¡Ya casi está listo! Hemos reservado tu pedido. Si elegiste pagar en efectivo, recuerda que tienes hasta 48 horas para abonar el cupón antes de que expire.</p>
+        <div class="details-box">
+            <div class="details-row"><span class="details-label">Estado:</span><span class="details-value" style="color: #ffb703;">Pendiente de pago</span></div>
+            <div class="details-row"><span class="details-label">Acreditación:</span><span class="details-value">Puede demorar de 1 a 2 días</span></div>
+        </div>
+        <p class="notice">* Nota: Una vez que realices el pago en la sucursal, el sistema se actualizará automáticamente y te enviaremos una notificación.</p>
+        <a href="/" class="btn">Ir a mis pedidos</a>
+    </div>
+</body>
+</html>

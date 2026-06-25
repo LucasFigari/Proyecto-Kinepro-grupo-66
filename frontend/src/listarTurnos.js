@@ -22,7 +22,7 @@ async function cargarTurnos() {
                         <div class="turno-details">
                             <div class="detail-group">
                                 <span class="material-icons-round">calendar_today</span>
-                                <span>${turno.fecha}</span>
+                                <span>${turno.fecha_turno}</span>
                             </div>
                             <div class="detail-group">
                                 <span class="material-icons-round">schedule</span>

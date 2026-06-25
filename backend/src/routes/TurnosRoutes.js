@@ -31,4 +31,6 @@ router.get("/precio/:idTurno", turnoPorSecretariaController.obtnerPrecioDeTurno)
 router.post("/reservar", turnoPorSecretariaController.agregarUsuarioATurno);
 router.post("/pagos/efectivo", turnoPorSecretariaController.registrarPagoDeTurno);
 router.post("/reservar-paciente", reservarTurnoComoPaciente);
+router.post("/crear", turnoPorSecretariaController.crearTurno);
+router.delete("/eliminar/:id", turnoPorSecretariaController.eliminarTurno);
 export default router;

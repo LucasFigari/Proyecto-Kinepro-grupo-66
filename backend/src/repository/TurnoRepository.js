@@ -37,4 +37,41 @@ export class TurnoRepository{
         const turno = await this.turnoRepository.findOneBy({ id: id});
         return turno.precio;
     }
+
+    async crearTurno(fecha_turno, hora_comienzo, hora_fin, precio, cupo_maximo, idArea) {
+        const turno = this.turnoRepository.create({
+            fecha_turno,
+            hora_comienzo,
+            hora_fin,
+            precio,
+            cupo_maximo,
+            cupos_ocupados: 0,
+            area : { id: idArea }
+        });
+        return await this.turnoRepository.save(turno);
+    }
+
+    async existeTurno(fecha_turno, hora_comienzo, hora_fin, idArea){
+        return await this.turnoRepository.findOne({
+            where: {
+                fecha_turno,
+                hora_comienzo,
+                hora_fin,
+                area: { id: idArea }
+            },
+            relations: ["area"]
+        });
+    }
+
+    async eliminarTurno(id){
+        const turno = await this.turnoRepository.findOneBy({ id: parseInt(id) });
+        if(!turno){
+            return { ok:false, mensaje: "El turno no existe" }
+        }
+        if(turno.cupos_ocupados > 0) {
+            return { ok:false, mensaje: "No es posible dar de baja el turno ya que hay clientes anotados" }
+        }
+        await this.turnoRepository.delete(id);
+        return { ok:true, mensaje: "Turno eliminado correctamente" }
+    }
 }

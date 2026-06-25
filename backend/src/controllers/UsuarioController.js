@@ -2,6 +2,7 @@
 import AppDataSource from "../config/DbConfig.js"
 import UserSchema from "../schema/UsuarioSchema.js"
 import TurnoSchema from "../schema/TurnosSchema.js"
+import { validarCamposVacios, validarLongitud, validarTelefono, validarDni, validarPassword } from "../utils/validaciones.js"
 
 export const registrarUsuario = async (req, res) => {
     const { nombre, apellido, dni, email, telefono, password } = req.body
@@ -134,26 +135,25 @@ export const editarUsuario = async (req, res) => {
     const repo = AppDataSource.getRepository(UserSchema)
 
     //Valido campos vacios
-    if( !nombre || !apellido || !telefono){
+    if( !validarCamposVacios({ nombre, apellido, telefono }) ){
         return res.json({ ok: false, mensaje: "Debe completar todos los campos"})
     }
 
     //Valido que nombre y apellido (3-30 caracteres)
-    if( nombre.length < 3 || nombre.length > 30){
+    if( !validarLongitud(nombre, 3, 30) ){
         return res.json({ ok: false, mensaje: "El nombre debe tener entre 3 y 30 caracteres"})
     }
-    if(apellido.length < 3 || apellido.length > 30){
+    if( !validarLongitud(apellido, 3, 30) ){
         return res.json({ ok: false, mensaje: "El apellido debe tener entre 3 y 30 caracteres"})
     }
 
     // Validar teléfono (solo números, 7-8 dígitos)
-    const telefonoRegex = /^\d{7,8}$/
-    if (!telefonoRegex.test(telefono)) {
+    if ( !validarTelefono(telefono) ) {
         return res.json({ ok: false, mensaje: "El teléfono debe tener entre 7 y 8 dígitos numéricos" })
     }
 
     //Valido contraseña si se ingreso nueva
-    if( password && password.length < 6 || password.length > 12){
+    if( password && !validarPassword(password) ){
         return res.json({ ok: false, mensaje: "La contraseña debe tener entre 6 y 12 caracteres"})
     }
 
@@ -162,4 +162,25 @@ export const editarUsuario = async (req, res) => {
 
     await repo.update(id, datosActualizar)
     res.json({ ok: true, mensaje: "Datos actualizados" })
+}
+
+export const editarUsuarioAdmin = async (req, res) => {
+    const {id} = req.params;
+    const { nombre, apellido, dni, email, telefono } = req.body;
+    const repo = AppDataSource.getRepository(UserSchema)
+
+    if (!validarCamposVacios({ nombre, apellido, dni, email, telefono })) {
+        return res.json({ ok: false, mensaje: "No se pueden dejar campos vacíos" })
+    }
+    if (!validarDni(dni)) {
+        return res.json({ ok: false, mensaje: "El DNI debe contener entre 7-8 dígitos numéricos" })
+    }
+
+    const emailExistente = await repo.findOne({ where: { email } })
+    if (emailExistente && emailExistente.id !== parseInt(id)) {
+        return res.json({ ok: false, mensaje: "El correo ya se encuentra registrado" })
+    }
+
+    await repo.update(id, { nombre, apellido, dni, email, telefono })
+    res.json({ ok: true, mensaje: "Modificación de datos exitosa" })
 }

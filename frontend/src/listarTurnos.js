@@ -32,6 +32,10 @@ async function cargarTurnos() {
                                 <span class="material-icons-round">attach_money</span>
                                 <span>Precio: $${turno.precio}</span>
                             </div>
+                                <div class="detail-group">
+                                <span class="material-icons-round">people</span>
+                                <span>cupos: $${turno.cupo_maximo - turno.cupos_ocupados}</span>
+                            </div>
                         </div>
                     </div>
                     <button class="btn btn-reservar" title="Reservar para paciente">

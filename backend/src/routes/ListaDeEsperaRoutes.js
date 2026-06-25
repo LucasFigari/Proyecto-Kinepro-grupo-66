@@ -1,8 +1,8 @@
 import { Router } from "express"
-import { agregarListaEspera, quitarListaDeEspera } from "../controllers/ListaDeEsperaController.js"
+import { agregarListaEspera, quitarListaDeEspera, obtenerListaEsperaPorTurno } from "../controllers/ListaDeEsperaController.js"
 
 const router = Router()
-
+router.get("/:idTurno", obtenerListaEsperaPorTurno);
 router.post("/", agregarListaEspera);
 router.delete("/", quitarListaDeEspera);
 

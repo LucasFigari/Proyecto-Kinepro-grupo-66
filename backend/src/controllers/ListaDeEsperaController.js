@@ -131,3 +131,22 @@ export const quitarListaDeEspera = async (req, res) => {
         return res.status(500).json({ error: "Error interno del servidor" });
     }
 }
+export const obtenerListaEsperaPorTurno = async (req, res) => {
+    try {
+        const { idTurno } = req.params;
+
+        const listaRepo = AppDataSource.getRepository("ListaEspera");
+
+        const lista = await listaRepo.find({
+            where: { turno: { id: parseInt(idTurno) } },
+            relations: ["usuario"],
+            order: { orden: "ASC" }
+        });
+
+        return res.status(200).json(lista);
+
+    } catch (error) {
+        console.error("❌ Error obteniendo lista de espera:", error);
+        return res.status(500).json({ error: "Error interno del servidor" });
+    }
+}

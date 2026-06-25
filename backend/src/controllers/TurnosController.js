@@ -1,4 +1,5 @@
 import AppDataSource from "../config/DbConfig.js";
+import { SendEmailUseCase } from "../password/SendEmailUseCase.js";
 
 export const obtenerTurnosPorPaciente = async (req, res) => {
     try {
@@ -30,6 +31,7 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         
         const turnoRepository = AppDataSource.getRepository("Turno");
         const turnoAsignadoRepository = AppDataSource.getRepository("TurnoAsignado");
+        const usuarioRepository = AppDataSource.getRepository("Usuario");
 
         const turno = await turnoRepository.findOneBy({ id: idTurno });
         if (!turno) return res.status(404).json({ error: 'El turno no existe.' });
@@ -38,27 +40,70 @@ export const reservarTurnoComoPaciente = async (req, res) => {
             return res.status(400).json({ error: 'No hay cupos disponibles.' });
         }
 
-        // 🛠️ CORRECCIÓN AQUÍ: Agregamos las relations para que el filtro anidado funcione bien
         const yaAsignado = await turnoAsignadoRepository.findOne({
             where: { 
-                turno: { id: idTurno }, 
-                usuario: { id: idUsuario } 
-            },
-            relations: ["turno", "usuario"] 
+                idTurno: parseInt(idTurno), 
+                idUsuario: parseInt(idUsuario) 
+            }
         });
         
         if (yaAsignado) return res.status(400).json({ error: 'Ya estás registrado en este turno.' });
 
         const nuevaAsignacion = turnoAsignadoRepository.create({
-            turno: { id: idTurno },
-            usuario: { id: idUsuario }
+            idTurno: parseInt(idTurno),
+            idUsuario: parseInt(idUsuario),
+            estado: "reservado"
         });
         await turnoAsignadoRepository.save(nuevaAsignacion);
 
         turno.cupos_ocupados += 1;
         await turnoRepository.save(turno);
 
+        try {
+            const listaRepo = AppDataSource.getRepository("ListaEspera");
+            const turnoConArea = await turnoRepository.findOne({
+                where: { id: idTurno },
+                relations: ["area"]
+            });
+
+            if (turnoConArea?.area) {
+                const enLista = await listaRepo
+                    .createQueryBuilder("le")
+                    .innerJoin("le.turno", "t")
+                    .innerJoin("t.area", "a")
+                    .where("le.id_usuario = :idUsuario", { idUsuario: parseInt(idUsuario) })
+                    .andWhere("a.id = :areaId", { areaId: turnoConArea.area.id })
+                    .getOne();
+
+                if (enLista) {
+                    await listaRepo.remove(enLista);
+                    console.log("✅ Usuario removido de lista de espera del área");
+                }
+            }
+        } catch (listaError) {
+            console.error("⚠️ No se pudo remover de lista de espera:", listaError);
+        }
+
+        try {
+            const usuario = await usuarioRepository.findOneBy({ id: parseInt(idUsuario) });
+            if (usuario?.email) {
+                const sendEmail = new SendEmailUseCase();
+                const asunto = `Confirmación de Reserva - Turno N° ${turno.id}`;
+                const mensaje = `Hola ${usuario.nombre}, tu turno fue reservado con éxito. Número de turno: ${turno.id}.`;
+                const html = `
+                    <p>Hola <strong>${usuario.nombre}</strong>,</p>
+                    <p>Tu turno fue reservado con éxito.</p>
+                    <p><strong>Número de Turno:</strong> ${turno.id}</p>
+                    <p>¡Muchas gracias!</p>
+                `;
+                await sendEmail.executeConHtml(usuario.email, asunto, mensaje, html);
+            }
+        } catch (emailError) {
+            console.error("⚠️ No se pudo enviar el email:", emailError);
+        }
+
         return res.status(200).json({ mensaje: '¡Reserva realizada con éxito!' });
+
     } catch (error) {
         console.error("❌ Error en reservarTurnoComoPaciente:", error);
         return res.status(500).json({ error: error.message });
@@ -84,23 +129,26 @@ export const obtenerTurnosDisponiblesPorArea = async (req, res) => {
 
         const idUsuario = req.query.idUsuario;
 
-        const turnosConLista = await Promise.all(
-            turnosFiltrados.map(async (t) => {
+ const turnosConLista = await Promise.all(
+    turnosFiltrados.map(async (t) => {
 
-                const enLista = await listaRepo.findOne({
-                    where: {
-                        turno: { id: t.id },
-                        usuario: { id: parseInt(idUsuario) }
-                    }
-                });
+        if(!idUsuario || isNaN(parseInt(idUsuario))){
+            return{ ...t, enListaEspera:false }
+        }
 
-                return {
-                    ...t,
-                    enListaEspera: !!enLista
-                };
-            })
-        );
+        const enLista = await listaRepo.findOne({
+            where: {
+                turno: { id: t.id },
+                usuario: { id: parseInt(idUsuario) }
+            }
+        });g
 
+        return {
+            ...t,
+            enListaEspera: !!enLista
+        };
+    })
+);
         return res.status(200).json(turnosConLista);
 
     } catch (error) {

@@ -141,7 +141,7 @@ export const obtenerTurnosDisponiblesPorArea = async (req, res) => {
                 turno: { id: t.id },
                 usuario: { id: parseInt(idUsuario) }
             }
-        });g
+        });
 
         return {
             ...t,

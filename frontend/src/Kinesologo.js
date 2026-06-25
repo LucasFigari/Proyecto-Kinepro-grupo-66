@@ -235,11 +235,22 @@ window.verHistorial = async (idPaciente) => {
     }
 
     contenedor.innerHTML = data.map(historial => `
-        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.2rem; margin-bottom: 10px;">
+        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.2rem; margin-bottom: 10px; ">
             <p style="font-weight: 500; margin: 0">${historial.titulo}</p>
             <p style="font-size: 13px; color: #888; margin: 0">Fecha: ${historial.fecha}</p>
             <p style="font-size: 13px; color: #2d6a4f; margin: 0">Área: ${historial.area?.nombre ?? "Sin área"}</p>
             <p style="margin-top: 0.5rem;">${historial.diagnostico}</p>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 1rem;">
+            <button class="btn-edit" title="Editar" onclick="editarHistorial(${historial.id}, ${idPaciente}, '${historial.titulo}', '${historial.fecha}', '${historial.diagnostico}', ${historial.area?.id ?? 0})">
+                <span class="material-icons-round">edit</span>
+            </button>
+
+            <button class="btn-delete" title="Eliminar" onclick="eliminarHistorial(${historial.id}, ${idPaciente})">
+                <span class="material-icons-round">delete</span>
+            </button>
+            </div>
+
         </div>
     `).join("")
 }
@@ -312,6 +323,65 @@ window.guardarHistorial = async (idPaciente) => {
         historialMedico()
     }
 }
+
+window.editarHistorial = async (idHistorial, idPaciente, tituloActual, fechaActual, diagnosticoActual) => {
+    const nuevoTitulo = prompt("Modificar Título:", tituloActual);
+    if (nuevoTitulo === null) return;
+
+    const nuevaFecha = prompt("Modificar Fecha (AAAA-MM-DD):", fechaActual);
+    if (nuevaFecha === null) return;
+
+    const nuevoDiagnostico = prompt("Modificar Diagnóstico:", diagnosticoActual);
+    if (nuevoDiagnostico === null) return;
+    
+    const datosActualizados = {
+        titulo: nuevoTitulo.trim() || tituloActual,
+        fecha: nuevaFecha.trim() || fechaActual,
+        diagnostico: nuevoDiagnostico.trim() || diagnosticoActual
+    };
+
+    try {
+        const res = await fetch(`http://localhost:3000/historial/${idHistorial}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datosActualizados)
+        });
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+            alert("Historial clínico modificado correctamente.");
+            window.verHistorial(idPaciente); 
+        } else {
+            alert(data.mensaje || "No se pudo actualizar el historial.");
+        }
+    } catch (error) {
+        console.error("Error al editar historial:", error);
+        alert("Error de conexión con el servidor.");
+    }
+};
+
+window.eliminarHistorial = async (idHistorial, idPaciente) => {
+    if (!confirm("¿Estás seguro de que querés eliminar este registro clínico permanentemente?")) {
+        return; 
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3000/historial/${idHistorial}`, {
+            method: "DELETE"
+        });
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+            alert("El historial fue borrado correctamente.");
+            window.verHistorial(idPaciente);
+        } else {
+            alert(data.mensaje || "No se pudo eliminar el historial.");
+        }
+    } catch (error) {
+        console.error("Error al borrar historial:", error);
+        alert("Error de conexión con el servidor.");
+    }
+};
 
 botonHistorialClinico.addEventListener("click", (e) => {
     e.preventDefault();

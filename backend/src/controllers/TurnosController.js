@@ -49,6 +49,26 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         
         if (yaAsignado) return res.status(400).json({ error: 'Ya estás registrado en este turno.' });
 
+        // ← validar si ya tiene turno en el mismo área
+        const turnoConArea = await turnoRepository.findOne({
+            where: { id: parseInt(idTurno) },
+            relations: ["area"]
+        });
+
+        if (turnoConArea?.area) {
+            const yaEnArea = await turnoAsignadoRepository
+                .createQueryBuilder("ta")
+                .innerJoin("ta.turno", "t")
+                .innerJoin("t.area", "a")
+                .where("ta.idUsuario = :idUsuario", { idUsuario: parseInt(idUsuario) })
+                .andWhere("a.id = :areaId", { areaId: turnoConArea.area.id })
+                .getOne();
+
+            if (yaEnArea) {
+                return res.status(400).json({ error: 'Ya tenés un turno reservado en esta área.' });
+            }
+        }
+
         const nuevaAsignacion = turnoAsignadoRepository.create({
             idTurno: parseInt(idTurno),
             idUsuario: parseInt(idUsuario),
@@ -61,10 +81,6 @@ export const reservarTurnoComoPaciente = async (req, res) => {
 
         try {
             const listaRepo = AppDataSource.getRepository("ListaEspera");
-            const turnoConArea = await turnoRepository.findOne({
-                where: { id: idTurno },
-                relations: ["area"]
-            });
 
             if (turnoConArea?.area) {
                 const enLista = await listaRepo
@@ -109,7 +125,6 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
-
 export const obtenerTurnosDisponiblesPorArea = async (req, res) => {
     try {
         const listaRepo = AppDataSource.getRepository("ListaEspera");

@@ -242,7 +242,7 @@ window.verHistorial = async (idPaciente) => {
             <p style="margin-top: 0.5rem;">${historial.diagnostico}</p>
 
             <div style="display: flex; align-items: center; gap: 10px; margin-top: 1rem;">
-            <button class="btn-edit" title="Editar" onclick="editarHistorial(${historial.id}, ${idPaciente}, '${historial.titulo}', '${historial.fecha}', '${historial.diagnostico}', ${historial.area?.id ?? 0})">
+            <button class="btn-edit" title="Editar" onclick="mostrarFormularioEdicion(${historial.id}, ${idPaciente}, '${historial.titulo}', '${historial.fecha}', '${historial.diagnostico}')">
                 <span class="material-icons-round">edit</span>
             </button>
 
@@ -324,38 +324,53 @@ window.guardarHistorial = async (idPaciente) => {
     }
 }
 
-window.editarHistorial = async (idHistorial, idPaciente, tituloActual, fechaActual, diagnosticoActual) => {
-    const nuevoTitulo = prompt("Modificar Título:", tituloActual);
-    if (nuevoTitulo === null) return;
 
-    const nuevaFecha = prompt("Modificar Fecha (AAAA-MM-DD):", fechaActual);
-    if (nuevaFecha === null) return;
-
-    const nuevoDiagnostico = prompt("Modificar Diagnóstico:", diagnosticoActual);
-    if (nuevoDiagnostico === null) return;
+window.mostrarFormularioEdicion = (idHistorial, idPaciente, tituloAct, fechaAct, diagAct) => {
+    const boton = document.querySelector(`button[onclick*="mostrarFormularioEdicion(${idHistorial},"]`);
+    if (!boton) return alert("Error al encontrar la tarjeta");
     
-    const datosActualizados = {
-        titulo: nuevoTitulo.trim() || tituloActual,
-        fecha: nuevaFecha.trim() || fechaActual,
-        diagnostico: nuevoDiagnostico.trim() || diagnosticoActual
-    };
+    const tarjeta = boton.closest('div'); 
+
+    tarjeta.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left;">
+            <strong style="color: #00a896; font-size: 14px;">Editar Registro Clínico</strong>
+            <input type="text" id="edit-titulo-${idHistorial}" value="${tituloAct}" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 95%;">
+            <input type="date" id="edit-fecha-${idHistorial}" value="${fechaAct}" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 95%;">
+            <textarea id="edit-diag-${idHistorial}" rows="3" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 95%; resize: vertical;">${diagAct}</textarea>
+            
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+                <button onclick="guardarEdicion(${idHistorial}, ${idPaciente})" style="background: #00a896; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500;">Guardar</button>
+                <button onclick="window.verHistorial(${idPaciente})" style="background: #7f8c8d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Cancelar</button>
+            </div>
+        </div>
+    `;
+};
+
+window.guardarEdicion = async (idHistorial, idPaciente) => {
+    const titulo = document.getElementById(`edit-titulo-${idHistorial}`).value.trim();
+    const fecha = document.getElementById(`edit-fecha-${idHistorial}`).value;
+    const diagnostico = document.getElementById(`edit-diag-${idHistorial}`).value.trim();
+
+    if (!titulo || !fecha || !diagnostico) {
+        alert("No podés dejar campos vacíos.");
+        return;
+    }
 
     try {
         const res = await fetch(`http://localhost:3000/historial/${idHistorial}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(datosActualizados)
+            body: JSON.stringify({ titulo, fecha, diagnostico })
         });
         const data = await res.json();
 
         if (res.ok && data.ok) {
-            alert("Historial clínico modificado correctamente.");
             window.verHistorial(idPaciente); 
         } else {
-            alert(data.mensaje || "No se pudo actualizar el historial.");
+            alert(data.mensaje || "Error al guardar los cambios.");
         }
     } catch (error) {
-        console.error("Error al editar historial:", error);
+        console.error(error);
         alert("Error de conexión con el servidor.");
     }
 };

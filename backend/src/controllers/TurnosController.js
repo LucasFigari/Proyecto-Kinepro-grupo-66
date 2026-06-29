@@ -156,3 +156,82 @@ export const obtenerTurnosDisponiblesPorArea = async (req, res) => {
         return res.status(500).json({ error: 'Error al cargar la agenda.' });
     }
 };
+
+export const cancelarTurnoComoCliente = async (req, res) => {
+
+    try{
+        const { idTurno, idUsuario } = req.body;
+
+        const turnoRepo = AppDataSource.getRepository("Turno");
+        const asignadoRepo = AppDataSource.getRepository("TurnoAsignado");
+        const listaRepo = AppDataSource.getRepository("ListaEspera");
+
+        const turno = await turnoRepo.findOneBy({ id: parseInt(idTurno) })
+        if(!turno){
+            return res.status(404).json({ ok: false, mensaje:"El turno no existe" });
+        }
+
+        //Valido que falten más de 4 horas
+        const ahora = new Date();
+        const fechaHoraTurno = new Date(`${turno.fecha_turno}T${turno.hora_comienzo}`)
+        const diferenciaHoras = (fechaHoraTurno - ahora) / (1000 * 60 * 60)
+        if(diferenciaHoras < 4){
+            return res.status(400).json({ ok: false, mensaje: "Solo se pueden cancelar turnos si faltan más de 4 horas" })
+        }
+
+        const inscripcion = await asignadoRepo.findOne({ 
+            where: { idTurno: parseInt(idTurno), idUsuario: parseInt(idUsuario) }
+        });
+        if(!inscripcion){
+            return res.status(404).json({ ok: false, mensaje: "No estas inscripto en este turno" });
+        }
+
+        //Elimino inscripcion y aumento cupos disponibles
+        await asignadoRepo.remove(inscripcion);
+        turno.cupos_ocupados -= 1;
+        await turnoRepo.save(turno);
+
+        //Mover al primero de la lista de espera
+        const primeroEnEspera = await listaRepo.findOne({
+            where: { turno: {id: parseInt(idTurno)} },
+            relations: ["usuario"],
+            order: { orden: "ASC" }
+        });
+
+        if(primeroEnEspera){
+
+            //Anotarlo al turno
+            const nuevaInscripcion = asignadoRepo.create({
+                idTurno: parseInt(idTurno),
+                idUsuario: primeroEnEspera.usuario.id,
+                estado: "reservado"
+            })
+            await asignadoRepo.save(nuevaInscripcion);
+
+            //Incrementar cupos ocupados y eliminar al que se va de la lista de espera
+            turno.cupos_ocupados += 1;
+            await turnoRepo.save(turno);
+            await listaRepo.remove(primeroEnEspera)
+
+            //Notificarle por mail, en caso de que el mail no funcione, no debe romper con el flujo principal
+            try{
+                const { SendEmailUseCase } = await import("../password/SendEmailUseCase.js");
+                const sendEmail = new SendEmailUseCase();
+                await sendEmail.executeConHtml(
+                    primeroEnEspera.usuario.email,
+                    `Confirmación de Reserva - Turno N° ${idTurno}`,
+                    `Tu turno fue confirmado`,
+                    `<p>Hola ${primeroEnEspera.usuario.nombre}, se liberó un cupo y fuiste anotado automáticamente al turno N° ${idTurno}. ¡Te esperamos!</p>`
+                );
+            }catch(error){
+                console.error("Error al enviar mail:", error.message)
+            }
+        }
+
+        return res.status(200).json({ ok:true, mensaje: "Turno cancelado exitosamente" })
+
+    }catch(error){
+        console.error("Error al cancelar turno: ", error.message)
+        return res.status(500).json({ ok: false, mensaje: "Error interno del servidor" })
+    }
+}

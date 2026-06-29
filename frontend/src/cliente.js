@@ -401,7 +401,12 @@ const cargarTurnosDelUsuario = async (idUsuario) => {
                             <i class="ti ti-clock"></i> ${turno.hora_comienzo.substring(0, 5)} hs
                         </small>
                     </div>
-                    <span class="badge bg-white text-info border border-info">Confirmado</span>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="badge bg-white text-info border border-info">Confirmado</span>
+                        <button class="btn btn-sm btn-outline-danger" onclick="cancelarTurno(${turno.id})">
+                            <i class="ti ti-x"></i> Cancelar
+                        </button>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -433,4 +438,52 @@ if (document.getElementById('btnCancelarCerrar')) {
     document.getElementById('btnCancelarCerrar').addEventListener('click', () => {
         modalCerrar.style.display = 'none';
     });
+}
+
+async function cancelarTurno(idTurno){
+
+    const idUsuario = sessionStorage.getItem('idUsuario')
+
+    const confirmacion = await Swal.fire({
+        icon: 'warning',
+        title: '¿Cancelar turno?',
+        text: '¿Estás seguro que querés cancelar este turno?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'No, volver',
+        confirmButtonColor: '#e63946',
+        cancelButtonColor: '#52b788'
+    })
+
+    if(!confirmacion.isConfirmed) return
+
+    try{
+        const response = await fetch('http://localhost:3000/turnos/cancelar-cliente', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idTurno, idUsuario: parseInt(idUsuario) })
+        })
+        const data = await response.json();
+
+        if(data.ok){
+            Swal.fire({
+                icon: 'success',
+                title: 'Turno cancelado',
+                text: data.mensaje,
+                confirmButtonColor: '#52b788'
+            }).then(() => {
+                cargarTurnosDelUsuario(idUsuario)
+            })
+        }else{
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo cancelar',
+                text: data.mensaje,
+                confirmButtonColor: '#52b788'
+            })
+        }
+
+    }catch(error){
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Error al conectar con el servidor.' });
+    }
 }

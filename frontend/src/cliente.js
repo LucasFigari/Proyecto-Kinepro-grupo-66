@@ -2,6 +2,7 @@ const API_URL = 'http://localhost:3000/area';
 const btonPerfil = document.getElementById("Perfil"); 
 const contenido = document.getElementById("divContenedor");
 const turnos = document.getElementById("botonDeTurnos"); 
+const botonCancelados = document.getElementById("botonTurnosCancelados");
 
 const rol = sessionStorage.getItem('rol');
 if (!rol || rol !== 'usuario') window.location.href = '/';
@@ -327,6 +328,39 @@ if (turnos) {
     });
 }
 
+if(botonCancelados){
+    botonCancelados.addEventListener("click", async (e) =>{
+        e.preventDefault();
+        const idUsuarioLogueado = sessionStorage.getItem('idUsuario')
+
+        contenido.innerHTML = `
+            <div class="container mt-2" style="max-width: 600px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <p class="welcome mb-0">Turnos Cancelados</p>
+                        <p class="subtitle mb-0">Registro de tus turnos cancelados.</p>
+                    </div>
+                    <button id="btnVolverAlInicio" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                        <i class="ti ti-arrow-back-up"></i> Volver
+                    </button>
+                </div>
+                <div id="contenedor-cancelados" class="mt-3">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-info" role="status"></div>
+                        <p class="mt-2 text-muted">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+        `
+
+        await cargarTurnosCancelados(idUsuarioLogueado);
+        document.getElementById("btnVolverAlInicio").addEventListener("click", () => {
+            cargarAreas();
+        })
+
+    })
+}
+
 async function cargarTurnosPorArea(idArea, nombreArea) {
     try {
         const respuesta = await fetch('http://localhost:3000/area/reservar', {
@@ -485,5 +519,34 @@ async function cancelarTurno(idTurno){
 
     }catch(error){
         Swal.fire({ icon: 'error', title: 'Error', text: 'Error al conectar con el servidor.' });
+    }
+}
+
+const cargarTurnosCancelados = async (idUsuario) => {
+    const contenedor = document.getElementById("contenedor-cancelados")
+    try{
+        const respuesta = await fetch(`http://localhost:3000/turnos/cancelados/${idUsuario}`)
+        const asignaciones = await respuesta.json();
+        console.log("Turnos cancelados: ", asignaciones)
+        if(asignaciones.length == 0){
+            contenedor.innerHTML = '<p class="text-muted small">No hay Turnos Cancelados.</p>';
+            return;
+        }
+
+        contenedor.innerHTML = asignaciones.map(a => `
+            <div class="card mb-2 border-0 shadow-sm bg-light" style="border-left: 4px solid #e63946 !important;">
+                <div class="card-body p-2">
+                    <h6 class="mb-0 text-dark">${a.turno?.area?.nombre || 'Área no disponible'}</h6>
+                    <small class="text-muted">
+                        <i class="ti ti-calendar"></i> ${a.turno?.fecha_turno} | 
+                        <i class="ti ti-clock"></i> ${a.turno?.hora_comienzo?.substring(0, 5)} hs
+                    </small>
+                </div>
+            </div>
+        `).join('')
+
+    }catch(error){
+        console.error("Error al obtener turnos cancelados:", error);
+        contenedor.innerHTML = '<p class="text-danger small">Error al cargar los turnos cancelados.</p>'
     }
 }

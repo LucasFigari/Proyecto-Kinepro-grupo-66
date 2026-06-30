@@ -11,6 +11,7 @@ import turnoRutas from "./routes/TurnosRoutes.js"
 import HistorialClinicoRoutes from "./routes/HistorialClinicoRoutes.js"
 import ListaDeEsperaRoutes from "./routes/ListaDeEsperaRoutes.js"
 import mercadoRouter from './mercado-pago/MercadoPagoRoutes.js';
+import PagoSimuladoRoutes from "./routes/PagoSimuladoRoutes.js"
 //import "./controllers/Cron.js"
 
 import path from "path";
@@ -23,6 +24,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(cors())
 app.use(express.json());
+app.use("/pago-simulado", PagoSimuladoRoutes)
+
 
 try {
     await AppDataSource.initialize();

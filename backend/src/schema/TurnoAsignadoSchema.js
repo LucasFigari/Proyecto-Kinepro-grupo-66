@@ -36,6 +36,13 @@ const TurnoAsignadoSchema = new EntitySchema({
             eager: false
         },
 
+        pago: {
+            target: "Pago",
+            type: "one-to-one",
+            inverseSide: "turnoAsignado",
+            eager: false
+        },
+
     
     }
 })

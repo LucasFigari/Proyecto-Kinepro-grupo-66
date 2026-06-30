@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Online - KinePro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f0f4f8; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            color: #2d6a4f;
+            margin-bottom: 0.3rem;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .monto {
+            background: #f0f7f4;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .monto p { font-size: 13px; color: #666; }
+        .monto span { font-size: 1.8rem; font-weight: 600; color: #2d6a4f; }
+        .monto .descuento { font-size: 12px; color: #52b788; margin-top: 4px; }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 0.4rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: #2d6a4f; }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn-pagar {
+            width: 100%;
+            padding: 0.9rem;
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+
+        .btn-pagar:hover { background: #1e4d38; }
+
+        .mensaje {
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .mensaje.exito {
+            background: #e0f2f1;
+            color: #2d6a4f;
+            border: 1px solid #b2dfdb;
+            display: block;
+        }
+
+        .mensaje.error {
+            background: #ffebee;
+            color: #e63946;
+            border: 1px solid #ffcdd2;
+            display: block;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">💳</div>
+            <h2>Pago de Turno</h2>
+            <p>Ingresá los datos de tu tarjeta de crédito</p>
+        </div>
+
+        <div class="monto">
+            <p>Monto a abonar</p>
+            <span id="montoMostrar">$ ---</span>
+            <div class="descuento" id="mensajeDescuento" style="display:none">
+                🎉 ¡Descuento del 20% aplicado por pago a mitad de mes!
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Número de tarjeta</label>
+            <input type="text" id="numeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19">
+        </div>
+
+        <div class="form-group">
+            <label>Nombre del titular</label>
+            <input type="text" id="titular" placeholder="Nombre como figura en la tarjeta">
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label>Vencimiento</label>
+                <input type="text" id="vencimiento" placeholder="MM/AA" maxlength="5">
+            </div>
+            <div class="form-group">
+                <label>CVV</label>
+                <input type="text" id="cvv" placeholder="123" maxlength="3">
+            </div>
+        </div>
+
+        <button class="btn-pagar" id="btnPagar">Pagar</button>
+
+        <div class="mensaje" id="mensaje"></div>
+    </div>
+
+    <script src="./src/pago-simulado.js"></script>
+</body>
+</html>

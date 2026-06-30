@@ -97,9 +97,9 @@
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="button"
-                                        class="btn btn-sm ${sinCupo ? 'btn-danger' : 'btn-success text-white fw-bold'}"
-                                        ${sinCupo ? 'disabled' : ''}
-                                        onclick="reservarTurno(${turno.id})">
+                                    class="btn btn-sm ${sinCupo ? 'btn-danger' : 'btn-success text-white fw-bold'}"
+                                    ${sinCupo ? 'disabled' : ''}
+                                    onclick="reservarTurno(${turno.id}, ${turno.precio})">
                                     ${sinCupo ? 'Agotado' : 'Reservar'}
                                 </button>
                                 ${sinCupo ? `
@@ -124,7 +124,7 @@
             }
         }
 
-        async function reservarTurno(idTurno) {
+        async function reservarTurno(idTurno, precioTurno) {
             const idUsuarioLogueado = sessionStorage.getItem('idUsuario');
 
             if (!idUsuarioLogueado) {
@@ -156,11 +156,11 @@
 
                 Swal.fire({
                     icon: "success",
-                    title: "¡Reserva Exitosa!",
-                    text: "El turno fue agendado correctamente. Te enviamos la confirmación por mail.",
+                    title: "Turno reservado",
+                    text: "Ahora tenés que abonar para confirmar tu reserva.",
                     confirmButtonColor: "#52b788"
                 }).then(() => {
-                    window.location.href = '/index-usuario.html';
+                    window.location.href = `/pago-simulado.html?idTurno=${idTurno}&idUsuario=${idUsuarioLogueado}&precio=${precioTurno}`;
                 });
 
             } catch (error) {

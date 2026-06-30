@@ -80,6 +80,28 @@ export const obtenerPerfil = async (req, res) => {
     }
 };
 
+export const obtenerPerfilPorDNI = async (req, res) => {
+    try {
+        const { dni } = req.params; 
+        
+        const repo = AppDataSource.getRepository(UserSchema); 
+
+
+        const usuario = await repo.findOneBy({ dni: dni });
+
+        if (!usuario) {
+            return res.status(404).json({ mensaje: "Paciente no encontrado" });
+        }
+
+        res.status(200).json(usuario);
+        
+    } catch (error) {
+        console.error("Error al obtener el perfil:", error);
+        res.status(500).json({ mensaje: "Error interno del servidor" });
+    }
+};
+
+
 export const eliminarPerfil = async (req,res) =>{
     try {
         const { id } = req.params;

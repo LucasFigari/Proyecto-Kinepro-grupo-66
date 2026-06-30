@@ -61,3 +61,20 @@ export const procesarPagoSimulado = async (req, res) => {
         descuentoAplicado: dia >= 14 && dia <= 16
     })
 }
+
+export const obtenerPagosPorUsuario = async (req, res) => {
+    try {
+        const { idUsuario } = req.params;
+        const repo = AppDataSource.getRepository("Pago"); // Asegurate de que se llame así tu entidad/schema
+
+        const pagos = await repo.find({
+            where: { idUsuario: parseInt(idUsuario) },
+            order: { id: "ASC" }
+        });
+
+        return res.json(pagos);
+    } catch (error) {
+        console.error("Error al obtener historial de pagos:", error);
+        return res.status(500).json({ ok: false, mensaje: "Error interno del servidor" });
+    }
+};

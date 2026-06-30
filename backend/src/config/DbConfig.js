@@ -21,7 +21,7 @@ const AppDataSource = new DataSource({
     synchronize: true,
     logging: false,
     entities: [UserSchema, AreaDeTratamientoSchema, TurnoSchema, PasswordResetSchema, PersonalSchema, ListaEsperaSchema, TurnoAsignadoSchema, 
-        HistorialClinicoSchema, OrderSchema]
+        HistorialClinicoSchema, OrderSchema, PagoSchema]
 });
 
 export default AppDataSource;

@@ -1,4 +1,5 @@
 import { pagoEfectivo } from "../mercado-pago/PaymentController.js";
+import { customAlphabet } from 'nanoid';
 
 export class TurnosPorSecretariaController{
 
@@ -69,7 +70,7 @@ export class TurnosPorSecretariaController{
                         .json({ precio: Number(precio) });
         } catch (error) {
             return res.status(500)
-                    .json({ error: 'Hubo un error interno en el servidor' });
+                    .json({ message: 'Hubo un error interno en el servidor' });
         }
     }
 
@@ -168,42 +169,47 @@ export class TurnosPorSecretariaController{
 
     registrarPagoDeTurno = async (req, res) => {
         try {
-            const { idTurno, dni} = req.body; 
+            const { idTurno, dni, monto_pagado, metodo} = req.body; 
 
             const turno = await this.turnoRepository.buscarPorId(idTurno);
             const usuario = await this.pacienteRepository.buscarPorDni(dni);
 
 
             if (!turno) {
-                return res.status(404).json({ error: 'El turno no existe.' });
+                return res.status(404).json({ message: 'El turno no existe.' });
             }
 
 
             if (!usuario) {
-                return res.status(404).json({ error: 'El usuario no existe.' });
+                return res.status(404).json({ message: 'El usuario no existe.' });
             }
             
             const turnoAsignado = await this.turnoAsignadoRepository.obtenerTurnoAsignadoAPaciente(turno.id, usuario.id);
 
             if (!turnoAsignado) {
-                return res.status(404).json({ error: 'El paciente no tiene este turno asignado' });
+                return res.status(404).json({ message: 'El paciente no tiene este turno asignado' });
             }
 
             if (turnoAsignado.estado === "pagado") {
-                return res.status(400).json({ error: 'El pago del turno ya se realizó' });
+                return res.status(400).json({ message: 'El pago del turno ya se realizó' });
             }
 
             turnoAsignado.estado = "pagado";
-            //await pagoEfectivo(turno.id, usuario.id);
+            const generarCodigo = customAlphabet('0123456789', 20);
+            const codigoPago = generarCodigo();
             const turnoActualizado = await this.turnoAsignadoRepository.actualizar(turnoAsignado);
+            const pago = await this.pagoRepository.guardar({idTurno: turno.id, idUsuario: usuario.id, monto_pagado: monto_pagado, 
+                metodo: metodo, fecha_pago: new Date(), codigo_pago: codigoPago});
                 
             return res.status(200).json({ 
-                mensaje: `Se registro el pago con éxito, Nro de turno: ${turnoActualizado.idTurno}, Dni del paciente: ${usuario.dni}`,
-                turno: turnoActualizado.id 
+                message: `Se registro el pago con éxito, Nro de turno: ${turnoActualizado.idTurno}, Dni del paciente: ${usuario.dni}`,
+                turno: turno.id,
+                dni: usuario.dni,
+                codigo: codigoPago
             });
         } catch (error) {
             return res.status(500)
-                    .json({ error: `No se puedo realizar el pago ${error.message}`});
+                    .json({ message: `No se pudo realizar el pago ${error.message}`});
         }
     }
 

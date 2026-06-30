@@ -16,17 +16,7 @@ const PagoSchema = new EntitySchema({
         idTurno: {
             type: "int"
         },
-        monto_recibido: {
-            type: "decimal", 
-            precision: 10,
-            scale: 2
-        },
-        monto_devuelto: {
-            type: "decimal", 
-            precision: 10,
-            scale: 2
-        },
-        precio_turno: {
+        monto_pagado: {
             type: "decimal", 
             precision: 10,
             scale: 2
@@ -36,6 +26,11 @@ const PagoSchema = new EntitySchema({
         },
         fecha_pago: {
             type: "date"
+        },
+        codigo_pago:{
+            type: "varchar",
+            length: 20,     
+            unique: true
         }
     }, 
 

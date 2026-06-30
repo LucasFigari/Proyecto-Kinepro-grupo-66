@@ -143,58 +143,148 @@
     </div>
 
     <script>
-        const rol = sessionStorage.getItem('rol');
+    const rol = sessionStorage.getItem('rol');
 
-        const nroTurnoInput = document.getElementById('nro-turno');
-        const dniPacienteInput = document.getElementById('dni-paciente'); 
-        const formPago = document.getElementById('form-pago');
+    const nroTurnoInput = document.getElementById('nro-turno');
+    const dniPacienteInput = document.getElementById('dni-paciente'); 
+    const formPago = document.getElementById('form-pago');
 
-        formPago.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
+    formPago.addEventListener('submit', async (e) => {
+        e.preventDefault(); 
 
-            const numeroTurno = nroTurnoInput.value.trim();
-            const dniPaciente = dniPacienteInput.value.trim();
+        const idTurno = nroTurnoInput.value.trim();
+        const dniPaciente = dniPacienteInput.value.trim();
 
-            try {
-                const responseDeRegistro = await fetch(`http://localhost:3000/turnos/pagos/efectivo`, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        idTurno: numeroTurno,
-                        dni: dniPaciente,
-                    })
-                });
-
-                if (!responseDeRegistro.ok) {
-                    const message = await responseDeRegistro.json();
-                    throw new Error(message.error);
-                }
-
-                const data = await responseDeRegistro.json();
-
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Pago Registrado!',
-                    text: `${data.mensaje}`,
-                    confirmButtonColor: '#00a896',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'index-secretaria.html';
-                    }
-                });
-
-            } catch (error) {
-                console.error("Error en la transacción:", error);
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Error de operación',
-                    text: `${error.message}`,
-                    confirmButtonColor: '#00a896'
-                });
+        try {
+            const responseMonto = await fetch(`http://localhost:3000/turnos/precio/${idTurno}`);
+            if (!responseMonto.ok) {
+                throw new Error("No se pudo obtener la información del turno. Verifique el número de turno.");
             }
-        });
-    </script>
+            const infoTurno = await responseMonto.json();
+            const montoAPagar = infoTurno.precio || infoTurno.monto || 0; 
+
+            const respuestaUsuario = await fetch(`http://localhost:3000/usuarios/dni/${dniPaciente}`);
+            if (!respuestaUsuario.ok) {
+                throw new Error("No se encontró ningún paciente registrado con ese DNI.");
+            }
+            const paciente = await respuestaUsuario.json();
+
+            if (!paciente || !paciente.id) {
+                throw new Error("El formato de los datos del paciente es incorrecto.");
+            }
+
+            const nombreCompleto = `${paciente.nombre} ${paciente.apellido}`;
+
+            const verifPaciente = await Swal.fire({
+                title: '¿Es el paciente correcto?',
+                icon: 'info',
+                html: `
+                    <div style="text-align: center; font-family: 'Segoe UI', sans-serif;">
+                        <p style="font-size: 15px; color: #7f8c8d; margin-bottom: 10px;">Confirme si los datos en pantalla coinciden:</p>
+                        <div style="background-color: #e8f5e9; padding: 15px; border: 1px solid #c8e6c9; border-radius: 8px; text-align: left;">
+                            <p style="margin: 0 0 8px 0; font-weight: 600; color: #2e7d32; font-size: 15px;">Datos del Paciente:</p>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #1b5e20; display: flex; flex-direction: column; gap: 4px;">
+                                <li><strong>Nombre y APellido:</strong> ${nombreCompleto}</li>
+                                <li><strong>DNI:</strong> ${paciente.dni}</li>
+                                <li><strong>Email:</strong> ${paciente.email || 'No posee'}</li>
+                                <li><strong>Teléfono:</strong> ${paciente.telefono || 'No posee'}</li>
+                            </ul>
+                            <hr style="border: 0; border-top: 1px solid #c8e6c9; margin: 10px 0;">
+                            <p style="margin: 0; font-size: 13px; color: #2c3e50;"><strong>N° Turno a asociar:</strong> #${idTurno}</p>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, es correcto',
+                cancelButtonText: 'No, cancelar',
+                confirmButtonColor: '#00a896',
+                cancelButtonColor: '#7f8c8d',
+                allowOutsideClick: false
+            });
+
+            if (!verifPaciente.isConfirmed) return; 
+
+            const confirmacion = await Swal.fire({
+                title: 'Confirmar Monto',
+                icon: 'question',
+                html: `
+                    <div style="text-align: center; font-family: 'Segoe UI', sans-serif;">
+                        <p style="font-size: 15px; color: #7f8c8d; margin-bottom: 10px;">El total a cobrar en efectivo es:</p>
+                        <h3 style="font-size: 28px; color: #00a896; margin-bottom: 20px;">$${montoAPagar}</h3>
+                        <div style="background-color: #f4f7f6; padding: 12px; border-radius: 8px; text-align: left;">
+                            <p style="margin: 4px 0; font-size: 14px; color: #2c3e50;"><strong>Paciente:</strong> ${nombreCompleto}</p>
+                            <p style="margin: 4px 0; font-size: 14px; color: #2c3e50;"><strong>DNI:</strong> ${paciente.dni}</p>
+                            <p style="margin: 4px 0; font-size: 14px; color: #2c3e50;"><strong>Turno:</strong> #${idTurno}</p>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar Pago',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#00a896',
+                cancelButtonColor: '#7f8c8d',
+                allowOutsideClick: false
+            });
+
+            if (!confirmacion.isConfirmed) return; 
+
+            const responseDeRegistro = await fetch(`http://localhost:3000/turnos/pagos/efectivo`, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    idTurno: idTurno,
+                    dni: dniPaciente,
+                    monto_pagado: montoAPagar,
+                    metodo: "efectivo"
+                })
+            });
+
+            const data = await responseDeRegistro.json();
+
+            if (!responseDeRegistro.ok) {
+                throw new Error(data.message || "No se pudo procesar el pago en el servidor.");
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Pago Registrado!',
+                html: `
+                    <div style="text-align: center; font-family: 'Segoe UI', sans-serif;">
+                        <p style="font-size: 16px; color: #2c3e50; margin-bottom: 15px;"><strong>${data.message}</strong></p>
+                        <div style="background-color: #f4f7f6; padding: 15px; border-radius: 8px; text-align: left; display: inline-block; width: 100%; box-sizing: border-box;">
+                            <p style="margin: 5px 0; color: #7f8c8d;"><strong>Paciente:</strong> <span style="color: #2c3e50;">${nombreCompleto}</span></p>
+                            <p style="margin: 5px 0; color: #7f8c8d;"><strong>Turno N°:</strong> <span style="color: #2c3e50;">${idTurno}</span></p>
+                            <p style="margin: 5px 0; color: #7f8c8d;"><strong>Monto Pagado:</strong> <span style="color: #00a896; font-weight: bold;">$${montoAPagar}</span></p>
+                            <p style="margin: 5px 0; color: #7f8c8d;"><strong>Código de Pago:</strong> <span style="color: #00a896; font-weight: bold;">${data.codigo || 'N/A'}</span></p>
+                        </div>
+                    </div>
+                `,
+                confirmButtonColor: '#00a896',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'index-secretaria.html';
+                }
+            });
+
+        } catch (error) {
+            console.error("Error en la transacción:", error);
+    
+            let mensajeAMostrar = error.message || "Ocurrió un error inesperado.";
+
+            if (error.name === "TypeError" || error.message.includes("fetch")) {
+                mensajeAMostrar = "No se pudo conectar con el servidor.";
+            }
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error de operación',
+                text: mensajeAMostrar,
+                confirmButtonColor: '#00a896'
+            });
+        }
+    });
+</script>
 </body>
 </html>

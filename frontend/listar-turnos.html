@@ -157,12 +157,20 @@
                 
                 <div class="form-group">
                     <label for="paciente-dni">DNI del Paciente:</label>
-                    <input id="paciente-dni" required placeholder="Ej: 40123456">
+                    <div style="display: flex; gap: 8px;">
+                        <input id="paciente-dni" required placeholder="Ej: 40123456" style="flex-grow: 1;">
+                        <button type="button" id="btn-buscar-paciente" class="btn-primario" style="padding: 0 12px;">Buscar</button>
+                    </div>
+                </div>
+
+                <div id="info-paciente-container" style="display: none; margin-top: 10px; padding: 10px; border-radius: 8px; background-color: #e8f5e9; border: 1px solid #c8e6c9;">
+                    <p style="margin: 0; font-weight: 600; color: #2e7d32;">Paciente encontrado:</p>
+                    <span id="nombre-paciente-confirmado" style="font-size: 15px; color: #1b5e20; font-weight: bold;"></span>
                 </div>
                 
                 <div class="modal-actions">
                     <button type="button" id="btn-cancelar" class="btn-secundario">Cancelar</button>
-                    <button type="submit" class="btn-primario">Confirmar Reserva</button>
+                    <button type="submit" id="btn-confirmar-reserva" class="btn-primario" disabled style="opacity: 0.5; cursor: not-allowed;">Confirmar Reserva</button>
                 </div>
             </form>
         </div>

@@ -3,6 +3,7 @@ const btonPerfil = document.getElementById("Perfil");
 const contenido = document.getElementById("divContenedor");
 const turnos = document.getElementById("botonDeTurnos"); 
 const botonCancelados = document.getElementById("botonTurnosCancelados");
+const botonHistorial = document.getElementById("botonHistorial")
 
 const rol = sessionStorage.getItem('rol');
 if (!rol || rol !== 'usuario') window.location.href = '/';
@@ -549,4 +550,131 @@ const cargarTurnosCancelados = async (idUsuario) => {
         console.error("Error al obtener turnos cancelados:", error);
         contenedor.innerHTML = '<p class="text-danger small">Error al cargar los turnos cancelados.</p>'
     }
+}
+
+const verHistorialPagosCliente = async (idUsuario) => {
+    const contenedor = document.getElementById("divContenedor");
+
+    try {
+        const res = await fetch(`http://localhost:3000/pago-simulado/usuario/${idUsuario}`);
+        if (!res.ok) throw new Error("Error en la respuesta del servidor");
+        const pagos = await res.json();
+
+        if (pagos.length === 0) {
+            contenedor.innerHTML = `
+                <div class="container mt-2" style="max-width: 600px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="welcome mb-0">Mi Historial de Pagos</p>
+                            <p class="subtitle mb-0">Llevá el control de tus operaciones en la plataforma.</p>
+                        </div>
+                        <button id="btnVolverAlInicioPagos" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                            <i class="ti ti-arrow-back-up"></i> Volver
+                        </button>
+                    </div>
+                    <div class="alert alert-info border-0 shadow-sm" role="alert" style="border-radius: 12px;">
+                        <i class="ti ti-info-circle"></i> No tenés pagos registrados realizados hasta el momento.
+                    </div>
+                </div>
+            `;
+            document.getElementById("btnVolverAlInicioPagos").addEventListener("click", () => cargarAreas());
+            return;
+        }
+
+
+        let tablaHTML = `
+            <div class="container mt-2" style="max-width: 700px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <p class="welcome mb-0">Mi Historial de Pagos</p>
+                        <p class="subtitle mb-0">Registro histórico de tus movimientos y control de gastos.</p>
+                    </div>
+                    <button id="btnVolverAlInicioPagos" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                        <i class="ti ti-arrow-back-up"></i> Volver
+                    </button>
+                </div>
+                
+                <div class="table-responsive shadow-sm" style="background: white; padding: 1.2rem; border-radius: 14px; border: 1px solid #e0e0e0;">
+                    <table class="table table-striped table-hover align-middle mb-0" style="font-size: 14px;">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fecha de Pago</th>
+                                <th>Turno Asoc.</th>
+                                <th>Monto Abonado</th>
+                                <th>Método</th>
+                                <th class="text-end">Nro. Comprobante</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+
+        pagos.forEach(pago => {
+            const montoAbonado = pago.monto_pagado ?? '0.00';
+            
+            
+            const fechaLimpia = pago.fecha_pago && pago.fecha_pago.includes('T') 
+                ? pago.fecha_pago.split('T')[0] 
+                : (pago.fecha_pago || '--');
+
+            tablaHTML += `
+                <tr>
+                    <td><strong>${fechaLimpia}</strong></td>
+                    <td>${pago.idTurno ? `#${pago.idTurno}` : '<span class="text-muted">--</span>'}</td>
+                    <td class="text-success fw-bold">$${montoAbonado}</td>
+                    <td><span class="badge bg-light text-dark border" style="text-transform: uppercase;">${pago.metodo}</span></td>
+                    <td class="text-muted text-end" style="font-size: 12px;">#${pago.id}</td>
+                </tr>
+            `;
+        });
+
+        tablaHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        contenedor.innerHTML = tablaHTML;
+
+        document.getElementById("btnVolverAlInicioPagos").addEventListener("click", () => {
+            cargarAreas();
+        });
+
+    } catch (error) {
+        console.error("Error al cargar el historial de pagos:", error);
+        contenedor.innerHTML = `
+            <div class="container mt-2" style="max-width: 600px;">
+                <div class="alert alert-danger shadow-sm">Error de conexión al obtener tu historial de pagos.</div>
+            </div>
+        `;
+    }
+};
+
+if (botonHistorial) {
+    botonHistorial.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const idUsuarioLogueado = sessionStorage.getItem('idUsuario');
+
+        if (!idUsuarioLogueado) {
+            contenido.innerHTML = `
+                <div class="alert alert-warning" role="alert">
+                    <h5>Sesión requerida</h5>
+                    <p>Debes iniciar sesión para ver tus pagos.</p>
+                    <a href="/login.html" class="btn btn-warning btn-sm">Ir al Login</a>
+                </div>
+            `;
+            return;
+        }
+
+        contenido.innerHTML = `
+            <div class="container mt-2" style="max-width: 600px;">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <p class="mt-2 text-muted">Buscando tus comprobantes financieros...</p>
+                </div>
+            </div>
+        `;
+
+        await verHistorialPagosCliente(idUsuarioLogueado);
+    });
 }

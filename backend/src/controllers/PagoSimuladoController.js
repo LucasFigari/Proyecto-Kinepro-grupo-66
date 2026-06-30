@@ -61,9 +61,21 @@ export const procesarPagoSimulado = async (req, res) => {
         await turnoAsignadoRepo.save(asignacion)
     }
 
-    const repoPago= AppDataSource.getRepository("Pago");
-    await repoPago.save({idTurno: asignacion.idTurno, idUsuario: asignacion.idUsuario, monto_pagado: montoFinal, 
-                metodo: "tarjeta", fecha_pago: new Date()});
+    try {
+        const pagoRepo = AppDataSource.getRepository("Pago");
+        await pagoRepo.save({
+            idUsuario: parseInt(idUsuario),
+            idTurno: parseInt(idTurno),
+            metodo: "tarjeta",
+            fecha_pago: hoy, 
+            monto_pagado: monto, 
+            codigo_pago: "TRJ-" + Date.now().toString().substring(3) // Código corto de 14 caracteres máximo
+        });
+        console.log("✅ Pago con tarjeta registrado legítimamente en la tabla general.");
+    } catch (errorPago) {
+        console.error("❌ Error al registrar el pago en la tabla pagos:", errorPago);
+    }
+
 
     return res.json({
         ok: true,
@@ -72,3 +84,20 @@ export const procesarPagoSimulado = async (req, res) => {
         descuentoAplicado: dia >= 14 && dia <= 16
     })
 }
+
+export const obtenerPagosPorUsuario = async (req, res) => {
+    try {
+        const { idUsuario } = req.params;
+        const repo = AppDataSource.getRepository("Pago"); // Asegurate de que se llame así tu entidad/schema
+
+        const pagos = await repo.find({
+            where: { idUsuario: parseInt(idUsuario) },
+            order: { id: "ASC" }
+        });
+
+        return res.json(pagos);
+    } catch (error) {
+        console.error("Error al obtener historial de pagos:", error);
+        return res.status(500).json({ ok: false, mensaje: "Error interno del servidor" });
+    }
+};

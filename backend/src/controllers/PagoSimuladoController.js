@@ -11,6 +11,16 @@ export const procesarPagoSimulado = async (req, res) => {
         return res.status(503).json({ ok: false, mensaje: "Error de conexión con el servidor externo." })
     }
 
+    const turnoAsignadoRepo = AppDataSource.getRepository("TurnoAsignado")
+    const asignacion = await turnoAsignadoRepo.findOne({
+        where: { idTurno: parseInt(idTurno), idUsuario: parseInt(idUsuario) }
+    })
+    if(asignacion.estado === "pagado"){
+        return res.status(400).json({
+            mensaje: `Ya se realizo el pago del turno nro "${asignacion.idTurno}"` 
+        });
+    }
+
     const tarjeta = await repo.findOne({ where: { numero: numeroTarjeta } })
     if(!tarjeta){
         return res.status(404).json({ ok: false, mensaje: "El número de tarjeta no existe." })
@@ -45,10 +55,7 @@ export const procesarPagoSimulado = async (req, res) => {
     tarjeta.saldo = parseFloat(tarjeta.saldo) - monto
     await repo.save(tarjeta)
 
-    const turnoAsignadoRepo = AppDataSource.getRepository("TurnoAsignado")
-    const asignacion = await turnoAsignadoRepo.findOne({
-        where: { idTurno: parseInt(idTurno), idUsuario: parseInt(idUsuario) }
-    })
+
     if(asignacion){
         asignacion.estado = "pagado"
         await turnoAsignadoRepo.save(asignacion)

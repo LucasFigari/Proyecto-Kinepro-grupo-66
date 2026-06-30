@@ -62,6 +62,9 @@ document.getElementById("btnPagar").addEventListener("click", async () => {
             setTimeout(() => {
                 window.location.href = "./index-usuario.html"
             }, 2000)
+        } else if(res.status === 400){
+            mensaje.textContent = `❌ ${data.mensaje}`
+            mensaje.className = "mensaje error"
         } else {
             mensaje.textContent = `❌ ${data.mensaje}`
             mensaje.className = "mensaje error"

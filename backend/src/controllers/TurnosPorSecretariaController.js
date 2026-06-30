@@ -74,10 +74,11 @@ export class TurnosPorSecretariaController{
         }
     }
 
-    enviarCorreoDeTurnoReservado = async (idTurno, email, idUsuario) => {
-        /*const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
+    enviarCorreoDeTurnoReservado = async (idTurno, email, idUsuario, precio) => {
+        /*
+        const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
 
-        const urlPago = new URL('http://localhost:5173/pago-online.html');
+        const urlPago = new URL('http://localhost:5173/pago-simulado.html');
         urlPago.searchParams.append('idTurno', idTurno);
         urlPago.searchParams.append('idUsuario', idUsuario);
         
@@ -95,6 +96,44 @@ export class TurnosPorSecretariaController{
             </ul>
             <p style="margin-top: 15px;">¡Muchas gracias!</p>
         `;*/
+
+
+        try {
+            const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
+            const urlPago = new URL('http://localhost:5173/pago-simulado.html');
+            urlPago.searchParams.append('idTurno', idTurno);
+            urlPago.searchParams.append('idUsuario', idUsuario);
+            urlPago.searchParams.append('precio', precio);
+
+            const urlFinal = urlPago.toString(); 
+
+            const mensajeTexto = `Hola, tu turno ha sido reservado con éxito. Tu Número de Turno es: ${idTurno}. Puedes realizar el pago en el siguiente enlace: ${urlFinal}`;
+
+            const plantillaHTML = `
+                <p>Hola,</p>
+                <p>Tu turno ha sido reservado con éxito.</p>
+                <p><strong>Número de Turno:</strong> ${idTurno}</p>
+                <p>Para abonar el servicio, tienes las siguientes opciones:</p>
+                <ul>
+                    <li>Para abonar con tarjeta, haz <a href="${urlFinal}" target="_blank">clic aquí para pagar</a>.</li>
+                    <li>Para abonar en efectivo, debe acercarse al centro.</li>
+                </ul>
+                <p style="margin-top: 15px;">¡Muchas gracias!</p>
+            `;
+
+            await this.sendEmail.executeConHtml(
+                email, 
+                asunto, 
+                mensajeTexto,  
+                plantillaHTML  
+            );
+        } catch (error) {
+            console.error(`Falló el envío de email para el turno ${idTurno}:`, error);
+            throw new Error(`No se pudo enviar el correo de confirmación`);
+        }
+
+
+        /*
         try {
             const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
 
@@ -117,9 +156,9 @@ export class TurnosPorSecretariaController{
                 plantillaHTML  
             );
         } catch (error) {
-            console.error(`[Error Crítico] Falló el envío de email para el turno ${idTurno}:`, error);
+            console.error(`Falló el envío de email para el turno ${idTurno}:`, error);
             throw new Error(`No se pudo enviar el correo de confirmación`);
-        }
+        }*/
     }
 
     agregarUsuarioATurno = async (req, res) => {
@@ -155,7 +194,7 @@ export class TurnosPorSecretariaController{
             const turnoActualizado = await this.turnoRepository.guardar(turno);
 
             
-            await this.enviarCorreoDeTurnoReservado(turnoActualizado.id, usuario.email, usuario.id);
+            await this.enviarCorreoDeTurnoReservado(turnoActualizado.id, usuario.email, usuario.id, turno.precio);
                 
             return res.status(200).json({ 
                 mensaje: `Usuario asignado con éxito, Nro de turno: ${turnoActualizado.id}`,

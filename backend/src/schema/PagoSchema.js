@@ -26,11 +26,6 @@ const PagoSchema = new EntitySchema({
         },
         fecha_pago: {
             type: "date"
-        },
-        codigo_pago:{
-            type: "varchar",
-            length: 20,     
-            unique: true
         }
     }, 
 

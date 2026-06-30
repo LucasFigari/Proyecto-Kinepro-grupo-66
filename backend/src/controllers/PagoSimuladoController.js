@@ -2,7 +2,7 @@
 import AppDataSource from "../config/DbConfig.js"
 
 export const procesarPagoSimulado = async (req, res) => {
-    const { numeroTarjeta, titular, vencimiento, cvv, idTurno, idUsuario } = req.body
+    const { numeroTarjeta, titular, vencimiento, cvv, idTurno, idUsuario , montoFinal} = req.body
 
     const repo = AppDataSource.getRepository("Tarjeta")
 
@@ -60,6 +60,10 @@ export const procesarPagoSimulado = async (req, res) => {
         asignacion.estado = "pagado"
         await turnoAsignadoRepo.save(asignacion)
     }
+
+    const repoPago= AppDataSource.getRepository("Pago");
+    await repoPago.save({idTurno: asignacion.idTurno, idUsuario: asignacion.idUsuario, monto_pagado: montoFinal, 
+                metodo: "tarjeta", fecha_pago: new Date()});
 
     return res.json({
         ok: true,

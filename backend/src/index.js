@@ -12,7 +12,7 @@ import HistorialClinicoRoutes from "./routes/HistorialClinicoRoutes.js"
 import ListaDeEsperaRoutes from "./routes/ListaDeEsperaRoutes.js"
 import mercadoRouter from './mercado-pago/MercadoPagoRoutes.js';
 import PagoSimuladoRoutes from "./routes/PagoSimuladoRoutes.js"
-//import "./controllers/Cron.js"
+import ReportesRoutes from "./routes/ReportesRoutes.js"
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -51,6 +51,7 @@ app.use("/historial", HistorialClinicoRoutes)
 app.use("/lista-espera", ListaDeEsperaRoutes)
 app.use(express.static('public'));
 app.use("/pago", mercadoRouter)
+app.use("/reportes", ReportesRoutes);
 
 app.listen(3000, () => {
     console.log("Servidor corriendo en el puerto 3000");

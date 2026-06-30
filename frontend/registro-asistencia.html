@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia de Pacientes</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        :root {
+            --color-primario: #00a896;      
+            --color-primario-hover: #008f80;
+            --color-fondo: #f4f7f6;        
+            --color-texto: #333333;
+            --color-error: #e63946;         
+            --color-success: #2a9d8f;       
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--color-fondo);
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .recovery-container {
+            width: calc(100% - 40px);
+            max-width: 500px; 
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .icon-header {
+            font-size: 48px;
+            color: var(--color-primario);
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            color: var(--color-texto);
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        p.description {
+            color: #666666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #444444;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .material-icons {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999999;
+            font-size: 20px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 12px 12px 42px;
+            border: 1px solid #cccccc;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            color: var(--color-texto);
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background-color: var(--color-primario);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--color-primario-hover);
+        }
+
+        .alert {
+            display: none; 
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: left;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.success {
+            background-color: #e8f5e9;
+            color: var(--color-success);
+            border: 1px solid rgba(42, 157, 143, 0.2);
+        }
+
+        .alert.error {
+            background-color: #ffebee;
+            color: var(--color-error);
+            border: 1px solid rgba(230, 57, 70, 0.2);
+        }
+
+        .clear-screen {
+            margin-top: 15px;
+            display: inline-block;
+            font-size: 14px;
+            color: var(--color-primario);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .clear-screen:hover {
+            text-decoration: underline;
+            color: var(--color-primario-hover);
+        }
+
+        dialog {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: calc(100% - 40px);
+            max-width: 460px;
+            margin: auto;
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-header {
+            color: #2e7d32;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-body {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .modal-body ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 14px;
+            color: #1b5e20;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-modal {
+            padding: 10px 18px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-modal.confirm {
+            background-color: var(--color-primario);
+            color: white;
+        }
+
+        .btn-modal.confirm:hover { background-color: var(--color-primario-hover); }
+
+        .btn-modal.cancel {
+            background-color: #e0e0e0;
+            color: #555;
+        }
+        .btn-modal.cancel:hover { background-color: #d5d5d5; }
+    </style>
+</head>
+<body>
+
+    <div class="recovery-container" id="main-container">
+        <div class="icon-header">
+            <span class="material-icons">how_to_reg</span>
+        </div>
+
+        <h2>Control de Asistencia</h2>
+        <p class="description">Ingrese el DNI del paciente y presione Verificar para procesar el ingreso.</p>
+
+        <div class="alert success" id="alert-success">
+            <span class="material-icons">check_circle</span>
+            <span id="alert-message"></span>
+        </div>
+
+        <div class="alert error" id="alert-error">
+            <span class="material-icons">error</span>
+            <span id="alert-error-message"></span>
+        </div>
+
+        <form id="form-verificar">
+            <div class="form-group">
+                <label for="paciente-dni">DNI del Paciente</label>
+                <div class="input-wrapper">
+                    <span class="material-icons">badge</span>
+                    <input type="text" id="paciente-dni" placeholder="Ej: 45123456" required inputmode="numeric" pattern="[0-9]{7,8}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="nro_turno">Número de Turno</label>
+                <div class="input-wrapper">
+                    <span class="material-icons">confirmation_number</span>
+                    <input type="text" id="nro_turno" placeholder="Ej: 482" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-buscar-paciente">
+                <span class="material-icons">search</span>
+                Verificar Paciente
+            </button>
+        </form>
+
+        <span class="clear-screen" id="btn-limpiar">Limpiar formulario</span>
+    </div>
+
+    <dialog id="modal-paciente">
+        <div class="modal-header">
+            <span class="material-icons">account_box</span>
+            <span>Confirmar Datos del Paciente</span>
+        </div>
+        <div class="modal-body" id="info-paciente-container">
+            </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal cancel" id="btn-cancelar">Cancelar</button>
+            <button type="button" class="btn-modal confirm" id="btn-confirmar-reserva">Confirmar Asistencia</button>
+        </div>
+    </dialog>
+
+    <script>
+        const API_URL_ASISTENCIA = 'http://localhost:3000/usuarios/dni/';
+        const API_URL_PRESENTISMO = 'http://localhost:3000/turnos/asistencia';
+
+        const formVerificar = document.getElementById('form-verificar');
+        const inputDni = document.getElementById('paciente-dni');
+        const nroTurnoInput = document.getElementById('nro_turno');
+        
+        const modal = document.getElementById('modal-paciente');
+        const infoPacienteContainer = document.getElementById('info-paciente-container');
+        const btnConfirmarReserva = document.getElementById('btn-confirmar-reserva');
+        const btnCancelar = document.getElementById('btn-cancelar');
+        
+        const alertSuccess = document.getElementById('alert-success');
+        const alertMessage = document.getElementById('alert-message');
+        const alertError = document.getElementById('alert-error');
+        const alertErrorMessage = document.getElementById('alert-error-message');
+        const btnLimpiar = document.getElementById('btn-limpiar');
+
+        function limpiarAlertas() {
+            alertSuccess.style.display = 'none';
+            alertError.style.display = 'none';
+        }
+
+        formVerificar.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            limpiarAlertas();
+
+            const dni = inputDni.value.trim();
+            const turno = nroTurnoInput.value.trim();
+
+            try {
+                const respuesta = await fetch(`${API_URL_ASISTENCIA}${dni}`); 
+                
+                if (respuesta.ok) {
+                    const paciente = await respuesta.json(); 
+                    
+                    if (paciente && paciente.id) {
+                        infoPacienteContainer.innerHTML = `
+                            <p style="margin: 0 0 8px 0; font-weight: 600;">El paciente se encuentra registrado:</p>
+                            <ul>
+                                <li><strong>Nombre:</strong> ${paciente.nombre} ${paciente.apellido}</li>
+                                <li><strong>DNI:</strong> ${paciente.dni}</li>
+                                <li><strong>Email:</strong> ${paciente.email}</li>
+                                <li><strong>Teléfono:</strong> ${paciente.telefono}</li>
+                                <li style="margin-top: 8px; color: var(--color-primario); font-weight:700;">
+                                    <strong>Asistirá al Turno ID:</strong> ${turno}
+                                </li>
+                            </ul>
+                        `;
+
+                        modal.showModal();
+                    } else {
+                        throw new Error('Paciente no encontrado');
+                    }
+                } else {
+                    const datosError = await respuesta.json().catch(() => ({}));
+                    throw new Error(datosError.mensaje || 'Error en el servidor al buscar el paciente');
+                }
+            } catch (error) {
+                alertErrorMessage.innerHTML = `<strong>Error de verificación:</strong> ${error.message}`;
+                alertError.style.display = 'flex';
+            }
+        });
+
+        btnConfirmarReserva.addEventListener('click', async () => {
+            const dniPaciente = inputDni.value;
+            const idTurno = nroTurnoInput.value;
+
+            try {
+                const response = await fetch(API_URL_PRESENTISMO, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        dni: dniPaciente,
+                        idTurno: idTurno
+                    })
+                });
+
+                modal.close(); 
+
+                if (response.ok) {
+                    const datosExito = await response.json();
+                    
+                    alertMessage.innerHTML = `<strong>¡Éxito!</strong> ${datosExito.message || 'Asistencia confirmada correctamente.'}`;
+                    alertSuccess.style.display = 'flex';
+                    
+                    formVerificar.reset();
+                } else {
+                    const datosError = await response.json().catch(() => ({}));
+                    
+                    alertErrorMessage.innerHTML = `<strong>Error :</strong> ${datosError.message || 'No se pudo procesar la asistencia.'}`;
+                    alertError.style.display = 'flex';
+                }
+            } catch (error) {
+                modal.close();
+                alertErrorMessage.innerHTML = `<strong>Error de conexión:</strong> Hubo un problema de red al intentar guardar la asistencia.`;
+                alertError.style.display = 'flex';
+            }
+        });
+
+        btnCancelar.addEventListener('click', () => {
+            modal.close(); 
+        });
+
+        btnLimpiar.addEventListener('click', () => {
+            formVerificar.reset();
+            limpiarAlertas();
+        });
+    </script>
+</body>
+</html>

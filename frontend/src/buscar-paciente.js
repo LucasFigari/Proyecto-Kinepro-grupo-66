@@ -325,10 +325,68 @@ async function mostrarTurnosCliente(usuario){
                         <i class="ti ti-calendar"></i> ${turno.fecha_turno} | 
                         <i class="ti ti-clock"></i> ${turno.hora_comienzo?.substring(0, 5)} hs
                     </small>
+
+                    <button class="btn btn-sm btn-warning text-dark d-flex align-items-center gap-1" 
+                            onclick="cancelacionConListaEspera(${turno.id}, ${usuario.id})">
+                        <i class="ti ti-trash"></i> Liberar cupo
+                    </button>
+
                 </div>
             </div>
         `).join('')
     }catch(error){
         contenedor.innerHTML = `<p class="text-danger">Error al cargar los turnos.</p>`
+    }
+}
+
+async function cancelacionConListaEspera(idTurno, idUsuario) {
+   
+    const resultadoConfirm = await Swal.fire({
+        title: '¿Estás segura/o?',
+        text: "Se cancelará el turno y se reasignará al próximo paciente en la lista de espera.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2d6a4f', 
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, cancelar turno',
+        cancelButtonText: 'Volver atrás'
+    });
+
+    if (!resultadoConfirm.isConfirmed) return;
+
+    try {
+        const response = await fetch(`http://localhost:3000/turnos/cancelacion-lista-espera`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idTurno, idUsuario })
+        });
+        
+        const data = await response.json();
+
+        if (response.ok) {
+            await Swal.fire({
+                title: 'Turno Cancelado',
+                text: data.mensaje,
+                icon: 'success',
+                confirmButtonColor: '#2d6a4f'
+            });
+            
+            verTurnosDirecto(idUsuario); 
+        } else {
+            Swal.fire({
+                title: 'No se pudo cancelar',
+                text: data.mensaje,
+                icon: 'error',
+                confirmButtonColor: '#2d6a4f'
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            title: 'Error de conexión',
+            text: 'Hubo un problema al comunicarse con el servidor.',
+            icon: 'error',
+            confirmButtonColor: '#2d6a4f'
+        });
     }
 }

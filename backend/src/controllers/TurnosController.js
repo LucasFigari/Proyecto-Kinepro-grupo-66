@@ -270,3 +270,85 @@ export const obtenerTurnosCanceladosPorPaciente = async (req, res) => {
         return res.status(500).json([]);
     }
 }
+
+export const cancelarTurnoConListaEspera = async (req, res) => {
+    try {
+        const { idTurno, idUsuario } = req.body;
+
+        const turnoRepo = AppDataSource.getRepository("Turno");
+        const asignadoRepo = AppDataSource.getRepository("TurnoAsignado");
+        const listaRepo = AppDataSource.getRepository("ListaEspera");
+
+        const turno = await turnoRepo.findOneBy({ id: parseInt(idTurno) });
+        if (!turno) {
+            return res.status(404).json({ ok: false, mensaje: "El turno no existe." });
+        }
+
+        const ahora = new Date();
+        const fechaHoraTurno = new Date(`${turno.fecha_turno}T${turno.hora_comienzo}`);
+        const diferenciaHoras = (fechaHoraTurno - ahora) / (1000 * 60 * 60);
+        if (diferenciaHoras < 4) {
+            return res.status(400).json({ 
+                ok: false, 
+                mensaje: "Cancelación fallida: Solo se pueden cancelar los turnos si faltan más de 4 horas." 
+            });
+        }
+
+        const inscripcion = await asignadoRepo.findOne({ 
+            where: { idTurno: parseInt(idTurno), idUsuario: parseInt(idUsuario) }
+        });
+        if (!inscripcion) {
+            return res.status(404).json({ ok: false, mensaje: "Se cancela la operación: El cliente no posee el turno asignado." });
+        }
+
+        inscripcion.estado = "cancelado";
+        await asignadoRepo.save(inscripcion);
+        
+        turno.cupos_ocupados -= 1;
+        await turnoRepo.save(turno);
+
+        const primeroEnEspera = await listaRepo.findOne({
+            where: { turno: { id: parseInt(idTurno) } },
+            relations: ["usuario"],
+            order: { orden: "ASC" }
+        });
+
+        if (primeroEnEspera) {
+            const nuevaInscripcion = asignadoRepo.create({
+                idTurno: parseInt(idTurno),
+                idUsuario: primeroEnEspera.usuario.id,
+                estado: "reservado"
+            });
+            await asignadoRepo.save(nuevaInscripcion);
+
+            
+            turno.cupos_ocupados += 1;
+            await turnoRepo.save(turno);
+            
+            await listaRepo.remove(primeroEnEspera);
+            try {
+                const { SendEmailUseCase } = await import("../password/SendEmailUseCase.js");
+                const sendEmail = new SendEmailUseCase();
+                await sendEmail.executeConHtml(
+                    primeroEnEspera.usuario.email,
+                    `¡Cupo Disponible! Confirmación de Reserva - Turno N° ${idTurno}`,
+                    `Tu turno fue asignado automaticamente`,
+                    `<p>Hola <strong>${primeroEnEspera.usuario.nombre}</strong>,</p>
+                     <p>Se liberó un cupo para el turno de especialidad N° ${idTurno} y has sido asignado por estar en la cola de prioridad.</p>
+                     <p>¡Te esperamos en KinePro!</p>`
+                );
+            } catch (errorMail) {
+                console.error("Error al enviar mail de prioridad:", errorMail.message);
+            }
+        }
+
+        return res.status(200).json({ 
+            ok: true, 
+            mensaje: "Cancelación exitosa. Cupo liberado y notificación enviada a la cola de prioridad." 
+        });
+
+    } catch (error) {
+        console.error("Error en tu servicio de cancelación:", error.message);
+        return res.status(500).json({ ok: false, mensaje: "Error interno del servidor" });
+    }
+};

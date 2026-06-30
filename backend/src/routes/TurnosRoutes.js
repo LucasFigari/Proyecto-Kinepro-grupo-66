@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { obtenerTurnosPorPaciente, obtenerTurnosDisponiblesPorArea, reservarTurnoComoPaciente, cancelarTurnoComoCliente, obtenerTurnosCanceladosPorPaciente  } from "../controllers/TurnosController.js";
+import { obtenerTurnosPorPaciente, obtenerTurnosDisponiblesPorArea, reservarTurnoComoPaciente, cancelarTurnoComoCliente, obtenerTurnosCanceladosPorPaciente, cancelarTurnoConListaEspera } from "../controllers/TurnosController.js";
 import { TurnosPorSecretariaController} from "../controllers/TurnosPorSecretariaController.js"
 import { TurnoRepository} from "../repository/TurnoRepository.js"
 import { UsuarioRepository } from "../repository/UsuarioRepository.js";
@@ -33,6 +33,7 @@ router.post("/reservar", turnoPorSecretariaController.agregarUsuarioATurno);
 router.post("/pagos/efectivo", turnoPorSecretariaController.registrarPagoDeTurno);
 router.post("/reservar-paciente", reservarTurnoComoPaciente);
 router.post("/crear", turnoPorSecretariaController.crearTurno);
+router.post("/cancelacion-lista-espera", cancelarTurnoConListaEspera);
 router.delete("/eliminar/:id", turnoPorSecretariaController.eliminarTurno);
 router.delete("/cancelar-cliente", cancelarTurnoComoCliente)
 export default router;

@@ -96,9 +96,14 @@ buscador.addEventListener("input", async function(){
         li.className = "resultado-item"
         li.innerHTML = `
             <p>${paciente.nombre} ${paciente.apellido} - DNI: ${paciente.dni}</p>
-            <button class="btn btn-sm btn-info text-white" onclick="verPerfil(${paciente.id})">
-                <i class="ti ti-user"></i> Ver perfil
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-info text-white" onclick="verPerfil(${paciente.id})">
+                    <i class="ti ti-user"></i> Ver perfil
+                </button>
+                <button class="btn btn-sm btn-secondary text-white" onclick="verTurnosDirecto(${paciente.id})">
+                    <i class="ti ti-calendar"></i> Ver turnos
+                </button>
+            </div>
         `
         resultados.appendChild(li)
     })
@@ -164,6 +169,9 @@ function mostrarPerfil(usuario){
                     <button class="btn btn-info btn-sm text-white" id="btnEditarCliente">
                         <i class="ti ti-pencil"></i> Editar perfil
                     </button>
+                    <button class="btn btn-secondary btn-sm text-white" id="btnVerTurnosCliente">
+                        <i class="ti ti-calendar"></i> Ver turnos
+                    </button>
                     <button class="btn btn-outline-secondary btn-sm mt-3" onclick="document.getElementById('perfilCliente').style.display='none'">
                     <i class="ti ti-x"></i> Cerrar perfil
                     </button>
@@ -173,6 +181,9 @@ function mostrarPerfil(usuario){
 
         document.getElementById("btnEditarCliente").addEventListener("click", () => {
             mostrarFormularioEdicion(usuario);
+        })
+        document.getElementById("btnVerTurnosCliente").addEventListener("click", () =>{
+            mostrarTurnosCliente(usuario);
         })
 }
 
@@ -256,4 +267,68 @@ function mostrarFormularioEdicion(usuario){
             mensajeEl.textContent = "Error al conectar con el servidor.";
         }
     })
+}
+
+async function verTurnosDirecto(id){
+    const perfilDiv = document.getElementById("perfilCliente")
+    perfilDiv.style.display = "block"
+    perfilDiv.innerHTML = `
+        <div class="text-center mt-3">
+            <div class="spinner-border text-info" role="status"></div>
+            <p class="mt-2 text-muted">Cargando turnos...</p>
+        </div>
+    `;
+
+    try{
+        const res = await fetch(`http://localhost:3000/usuarios/${id}`)
+        const usuario = await res.json();
+        mostrarTurnosCliente(usuario);
+    }catch(error){
+        perfilDiv.innerHTML = `<div class="alert alert-danger">Error al cargar los turnos.</div>`
+    }
+}
+
+async function mostrarTurnosCliente(usuario){
+    const perfilDiv = document.getElementById("perfilCliente");
+    perfilDiv.innerHTML = `
+        <div class="card p-4 shadow-sm">
+            <h5 class="mb-3">Turnos de ${usuario.nombre} ${usuario.apellido}</h5>
+            <div id="listaTurnosCliente">
+                <p class="text-muted">Cargando turnos...</p>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm mt-3" id="btnVolverPerfilCliente">
+                <i class="ti ti-arrow-back-up"></i> Volver al perfil
+            </button>
+        </div>
+    `;
+
+    document.getElementById("btnVolverPerfilCliente").addEventListener("click", () => {
+        mostrarPerfil(usuario);
+    })
+
+    const contenedor = document.getElementById("listaTurnosCliente")
+
+    try{
+        const res = await fetch(`http://localhost:3000/turnos/paciente/${usuario.id}`);
+        const turnos = await res.json();
+
+        if(turnos.length === 0){
+            contenedor.innerHTML = `<p class="text-muted">El cliente ${usuario.nombre} ${usuario.apellido} no registra ningún turno.</p>`
+            return;
+        }
+
+        contenedor.innerHTML = turnos.map(turno => `
+            <div class="card mb-2 border-0 shadow-sm bg-light">
+                <div class="card-body p-2">
+                    <h6 class="mb-0">${turno.area?.nombre || 'Área no disponible'}</h6>
+                    <small class="text-muted">
+                        <i class="ti ti-calendar"></i> ${turno.fecha_turno} | 
+                        <i class="ti ti-clock"></i> ${turno.hora_comienzo?.substring(0, 5)} hs
+                    </small>
+                </div>
+            </div>
+        `).join('')
+    }catch(error){
+        contenedor.innerHTML = `<p class="text-danger">Error al cargar los turnos.</p>`
+    }
 }

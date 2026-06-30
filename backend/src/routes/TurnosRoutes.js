@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { obtenerTurnosPorPaciente, obtenerTurnosDisponiblesPorArea, reservarTurnoComoPaciente, cancelarTurnoComoCliente  } from "../controllers/TurnosController.js";
+import { obtenerTurnosPorPaciente, obtenerTurnosDisponiblesPorArea, reservarTurnoComoPaciente, cancelarTurnoComoCliente, obtenerTurnosCanceladosPorPaciente  } from "../controllers/TurnosController.js";
 import { TurnosPorSecretariaController} from "../controllers/TurnosPorSecretariaController.js"
 import { TurnoRepository} from "../repository/TurnoRepository.js"
 import { UsuarioRepository } from "../repository/UsuarioRepository.js";
@@ -28,6 +28,7 @@ router.get("/paciente/:id", obtenerTurnosPorPaciente);
 router.get("/area/:idArea", obtenerTurnosDisponiblesPorArea); 
 router.get("", turnoPorSecretariaController.obtenerTurnosDisponibles);
 router.get("/precio/:idTurno", turnoPorSecretariaController.obtnerPrecioDeTurno);
+router.get("/cancelados/:id", obtenerTurnosCanceladosPorPaciente);
 router.post("/reservar", turnoPorSecretariaController.agregarUsuarioATurno);
 router.post("/pagos/efectivo", turnoPorSecretariaController.registrarPagoDeTurno);
 router.post("/reservar-paciente", reservarTurnoComoPaciente);

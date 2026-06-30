@@ -9,7 +9,7 @@ export const obtenerTurnosPorPaciente = async (req, res) => {
         const turnoAsignadoRepository = AppDataSource.getRepository("TurnoAsignado");
 
         const asignaciones = await turnoAsignadoRepository.find({
-            where: { idUsuario: idPaciente },  // ← columna directa, no relación anidada
+            where: { idUsuario: idPaciente, estado: "reservado" },  // ← columna directa, no relación anidada
             relations: ["turno", "turno.area"]  // ← trae el turno y su área
         });
 
@@ -201,8 +201,9 @@ export const cancelarTurnoComoCliente = async (req, res) => {
             return res.status(404).json({ ok: false, mensaje: "No estas inscripto en este turno" });
         }
 
-        //Elimino inscripcion y aumento cupos disponibles
-        await asignadoRepo.remove(inscripcion);
+        //Elimino de forma lógica la inscripcion y aumento cupos disponibles
+        inscripcion.estado = "cancelado";
+        await asignadoRepo.save(inscripcion);
         turno.cupos_ocupados -= 1;
         await turnoRepo.save(turno);
 
@@ -248,5 +249,24 @@ export const cancelarTurnoComoCliente = async (req, res) => {
     }catch(error){
         console.error("Error al cancelar turno: ", error.message)
         return res.status(500).json({ ok: false, mensaje: "Error interno del servidor" })
+    }
+}
+
+export const obtenerTurnosCanceladosPorPaciente = async (req, res) => {
+    try{
+        const idPaciente = parseInt(req.params.id)
+        if(isNaN(idPaciente)) return res.status(400).json([]);
+
+        const turnoAsignadoRepository = AppDataSource.getRepository("TurnoAsignado");
+        const asignaciones = await turnoAsignadoRepository.find({
+            where: { idUsuario: idPaciente, estado: "cancelado" },
+            relations: ["turno", "turno.area"]
+        })
+
+        return res.status(200).json(asignaciones);
+
+    }catch(error){
+        console.error("Error: ", error);
+        return res.status(500).json([]);
     }
 }

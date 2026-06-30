@@ -51,7 +51,7 @@ document.getElementById("btnPagar").addEventListener("click", async () => {
         const res = await fetch("http://localhost:3000/pago-simulado/pagar", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ numeroTarjeta, titular, vencimiento, cvv, idTurno, idUsuario })
+            body: JSON.stringify({ numeroTarjeta, titular, vencimiento, cvv, idTurno, idUsuario, montoFinal})
         })
 
         const data = await res.json()

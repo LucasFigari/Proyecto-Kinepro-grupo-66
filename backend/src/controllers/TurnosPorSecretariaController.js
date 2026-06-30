@@ -1,5 +1,4 @@
 import { pagoEfectivo } from "../mercado-pago/PaymentController.js";
-import { customAlphabet } from 'nanoid';
 
 export class TurnosPorSecretariaController{
 
@@ -75,27 +74,6 @@ export class TurnosPorSecretariaController{
     }
 
     enviarCorreoDeTurnoReservado = async (idTurno, email, idUsuario, precio) => {
-        /*
-        const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
-
-        const urlPago = new URL('http://localhost:5173/pago-simulado.html');
-        urlPago.searchParams.append('idTurno', idTurno);
-        urlPago.searchParams.append('idUsuario', idUsuario);
-        
-        const urlFinal = urlPago.toString(); 
-
-        const mensajeTexto = `Hola, tu turno ha sido reservado con éxito. Tu Número de Turno es: ${idTurno}. Puedes realizar el pago en el siguiente enlace: ${urlFinal}`;
-
-        const plantillaHTML = `
-            <p>Hola,</p>
-            <p>Tu turno ha sido reservado con éxito.</p>
-            <p><strong>Número de Turno:</strong> ${idTurno}</p>
-            <p>Para abonar el servicio, tienes las siguientes opciones:</p>
-            <ul>
-                <li>Para abonar, haz <a href="${urlFinal}">clic aquí</a>.</li>
-            </ul>
-            <p style="margin-top: 15px;">¡Muchas gracias!</p>
-        `;*/
 
 
         try {
@@ -131,34 +109,6 @@ export class TurnosPorSecretariaController{
             console.error(`Falló el envío de email para el turno ${idTurno}:`, error);
             throw new Error(`No se pudo enviar el correo de confirmación`);
         }
-
-
-        /*
-        try {
-            const asunto = `Confirmación de Reserva - Turno N° ${idTurno}`;
-
-            const mensajeTexto = `Hola, tu turno ha sido reservado con éxito. Tu Número de Turno es: ${idTurno}.`;
-
-            const plantillaHTML = `
-                <p>Hola,</p>
-                <p>Tu turno ha sido reservado con éxito.</p>
-                <p><strong>Número de Turno:</strong> ${idTurno}</p>
-                <ul>
-                    <li>Para abonar, acercarse al centro</li>
-                </ul>
-                <p style="margin-top: 15px;">¡Muchas gracias!</p>
-            `;
-
-            await this.sendEmail.executeConHtml(
-                email, 
-                asunto, 
-                mensajeTexto,  
-                plantillaHTML  
-            );
-        } catch (error) {
-            console.error(`Falló el envío de email para el turno ${idTurno}:`, error);
-            throw new Error(`No se pudo enviar el correo de confirmación`);
-        }*/
     }
 
     agregarUsuarioATurno = async (req, res) => {
@@ -234,21 +184,55 @@ export class TurnosPorSecretariaController{
             }
 
             turnoAsignado.estado = "pagado";
-            const generarCodigo = customAlphabet('0123456789', 20);
-            const codigoPago = generarCodigo();
             const turnoActualizado = await this.turnoAsignadoRepository.actualizar(turnoAsignado);
-            const pago = await this.pagoRepository.guardar({idTurno: turno.id, idUsuario: usuario.id, monto_pagado: monto_pagado, 
-                metodo: metodo, fecha_pago: new Date(), codigo_pago: codigoPago});
+            await this.pagoRepository.guardar({idTurno: turno.id, idUsuario: usuario.id, monto_pagado: monto_pagado, 
+                metodo: metodo, fecha_pago: new Date()});
                 
             return res.status(200).json({ 
                 message: `Se registro el pago con éxito, Nro de turno: ${turnoActualizado.idTurno}, Dni del paciente: ${usuario.dni}`,
                 turno: turno.id,
                 dni: usuario.dni,
-                codigo: codigoPago
             });
         } catch (error) {
             return res.status(500)
                     .json({ message: `No se pudo realizar el pago ${error.message}`});
+        }
+    }
+
+    registrarAsistencia = async (req, res) => {
+        try {
+            const { idTurno, dni} = req.body; 
+
+            const turno = await this.turnoRepository.buscarPorId(idTurno);
+            const usuario = await this.pacienteRepository.buscarPorDni(dni);
+
+
+            if (!turno) {
+                return res.status(404).json({ message: 'El turno no existe.' });
+            }
+            if (!usuario) {
+                return res.status(404).json({ message: 'El usuario no existe.' });
+            }
+            const turnoAsignado = await this.turnoAsignadoRepository.obtenerTurnoAsignadoAPaciente(turno.id, usuario.id);
+
+            if (!turnoAsignado) {
+                return res.status(404).json({ message: 'El paciente no tiene este turno asignado' });
+            }
+
+            if (turnoAsignado.asistencia === "asistio") {
+                return res.status(400).json({ message: `Ya se registro la asistencia del paciente con dni: ${usuario.dni}` });
+            }
+
+            turnoAsignado.asistencia = "asistio";
+            turnoAsignado.fecha_asistencia = new Date();
+            const turnoActualizado = await this.turnoAsignadoRepository.actualizar(turnoAsignado);
+            return res.status(200).json({ 
+                message: `Se registro la asistencia del paciente con dni: ${usuario.dni}`
+            });
+
+        } catch (error) {
+            return res.status(500)
+                    .json({ message: `No se pudo registrar la asistencia`});
         }
     }
 

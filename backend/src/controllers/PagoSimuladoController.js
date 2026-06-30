@@ -2,7 +2,7 @@
 import AppDataSource from "../config/DbConfig.js"
 
 export const procesarPagoSimulado = async (req, res) => {
-    const { numeroTarjeta, titular, vencimiento, cvv, idTurno, idUsuario } = req.body
+    const { numeroTarjeta, titular, vencimiento, cvv, idTurno, idUsuario , montoFinal} = req.body
 
     const repo = AppDataSource.getRepository("Tarjeta")
 

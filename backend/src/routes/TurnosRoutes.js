@@ -36,4 +36,6 @@ router.post("/crear", turnoPorSecretariaController.crearTurno);
 router.post("/cancelacion-lista-espera", cancelarTurnoConListaEspera);
 router.delete("/eliminar/:id", turnoPorSecretariaController.eliminarTurno);
 router.delete("/cancelar-cliente", cancelarTurnoComoCliente)
+router.post("/asistencia", turnoPorSecretariaController.registrarAsistencia);
+
 export default router;

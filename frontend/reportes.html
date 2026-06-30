@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Reportes Mensuales</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --color-primario: #00a896;      
+            --color-primario-hover: #008f80;
+            --color-fondo: #f4f7f6;        
+            --color-texto: #333333;
+            --color-error: #e63946;         
+            --color-success: #2a9d8f;       
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--color-fondo);
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .recovery-container {
+            width: calc(100% - 40px);
+            max-width: 500px; 
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .recovery-container.expanded {
+            max-width: 750px;
+        }
+
+        .icon-header {
+            font-size: 48px;
+            color: var(--color-primario);
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            color: var(--color-texto);
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        p.description {
+            color: #666666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #444444;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .material-icons {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999999;
+            font-size: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 12px 12px 42px;
+            border: 1px solid #cccccc;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            color: var(--color-texto);
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+            outline: none;
+            appearance: none;
+        }
+
+        select:focus {
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background-color: var(--color-primario);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--color-primario-hover);
+        }
+
+        .btn-submit:disabled {
+            background-color: #a5d8d2;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            display: none; 
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: left;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.success {
+            display: flex;
+            background-color: #e8f5e9;
+            color: var(--color-success);
+            border: 1px solid rgba(42, 157, 143, 0.2);
+        }
+
+        .clear-screen {
+            margin-top: 15px;
+            display: inline-block;
+            font-size: 14px;
+            color: var(--color-primario);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .clear-screen:hover {
+            text-decoration: underline;
+            color: var(--color-primario-hover);
+        }
+
+        #report-section {
+            display: none;
+            margin-top: 25px;
+            border-top: 2px dashed #e0e0e0;
+            padding-top: 25px;
+            text-align: left;
+        }
+
+        .report-box {
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            color: var(--color-texto);
+        }
+
+        .report-header-print {
+            border-bottom: 2px solid var(--color-primario);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-texto);
+            letter-spacing: 0.5px;
+        }
+
+        .report-meta {
+            font-size: 13px;
+            color: #666666;
+            text-align: right;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .report-card {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eaeaea;
+        }
+
+        .report-card-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #777777;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .report-card-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-texto);
+        }
+
+        .report-card-value.success { color: var(--color-success); }
+        .report-card-value.error { color: var(--color-error); }
+
+        .report-table-wrapper {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: #ffffff;
+        }
+
+        .report-table th, .report-table td {
+            border: 1px solid #eaeaea;
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        .report-table th {
+            background-color: #f1f1f1;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .report-footer-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #555555;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .btn-download {
+            background-color: var(--color-success);
+        }
+        
+        .btn-download:hover {
+            background-color: #21867a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="recovery-container" id="main-container">
+        <span class="material-icons icon-header">description</span>
+        <h2>Reportes Mensuales</h2>
+        <p class="description">Seleccione el tipo de reporte y el período para realizar la consulta GET. Podrá visualizarlo en pantalla y descargarlo localmente.</p>
+
+        <div id="alert-success" class="alert success" style="display: none;">
+            <span class="material-icons">verified</span>
+            <span>Datos recuperados. Reporte generado y listo para guardar.</span>
+        </div>
+
+        <form id="report-form" onsubmit="solicitarReporte(event)">
+            
+            <div class="form-group">
+                <label for="tipoReporte">Tipo de Reporte</label>
+                <div class="input-wrapper">
+                    <span class="material-icons">assignment</span>
+                    <select id="tipoReporte" required>
+                        <option value="pagos">Reporte de Pagos</option>
+                        <option value="asistencias">Reporte de Asistencias e Inasistencias</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mes">Mes</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">calendar_month</span>
+                        <select id="mes" required>
+                            <option value="Enero">Enero</option>
+                            <option value="Febrero">Febrero</option>
+                            <option value="Marzo">Marzo</option>
+                            <option value="Abril">Abril</option>
+                            <option value="Mayo">Mayo</option>
+                            <option value="Junio">Junio</option>
+                            <option value="Julio">Julio</option>
+                            <option value="Agosto">Agosto</option>
+                            <option value="Septiembre">Septiembre</option>
+                            <option value="Octubre">Octubre</option>
+                            <option value="Noviembre">Noviembre</option>
+                            <option value="Diciembre">Diciembre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="anio">Año</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">date_range</span>
+                        <select id="anio" required>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-fetch">
+                <span class="material-icons">search</span>
+                Consultar Reporte
+            </button>
+        </form>
+
+        <div id="report-section">
+            <div class="report-box" id="pdf-content">
+                <div class="report-header-print">
+                    <div>
+                        <div class="report-title" id="rep-titulo">REPORTE MENSUAL</div>
+                        <div id="rep-subtitulo" style="font-size: 13px; color: var(--color-primario); font-weight: 600;">Resumen Operativo</div>
+                    </div>
+                    <div class="report-meta">
+                        <div id="rep-fecha-gen">Generado: --/--/----</div>
+                    </div>
+                </div>
+
+                <div class="report-grid">
+                    <div class="report-card">
+                        <div class="report-card-title" id="lbl-metrica1">Métrica 1</div>
+                        <div class="report-card-value success" id="val-metrica1">0</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-title" id="lbl-metrica2">Métrica 2</div>
+                        <div class="report-card-value error" id="val-metrica2">0</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-title" id="lbl-metrica3">Métrica 3</div>
+                        <div class="report-card-value" id="val-metrica3">0</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-title" id="lbl-metrica4">Métrica 4</div>
+                        <div class="report-card-value" style="color: #444;" id="val-metrica4">0</div>
+                    </div>
+                </div>
+
+                <div class="report-table-wrapper" id="tabla-detalles-wrapper" style="display: none;">
+                    <table class="report-table">
+                        <thead id="tabla-detalles-head">
+                        </thead>
+                        <tbody id="tabla-detalles-body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="report-footer-text">
+                    <strong>Resumen del Período:</strong> <span id="rep-descripcion">Cargando datos...</span>
+                </div>
+            </div>
+
+            <button class="btn-submit btn-download" onclick="descargarPDF()">
+                <span class="material-icons">picture_as_pdf</span>
+                Descargar Documento PDF
+            </button>
+        </div>
+
+        <a class="clear-screen" onclick="resetearFormulario()">Limpiar consulta</a>
+    </div>
+
+    <script>
+        async function solicitarReporte(event) {
+            event.preventDefault();
+            
+            const tipoReporte = document.getElementById('tipoReporte').value;
+            const mesSeleccionado = document.getElementById('mes').value;
+            const anioSeleccionado = document.getElementById('anio').value;
+            const btnFetch = document.getElementById('btn-fetch');
+            const alertSuccess = document.getElementById('alert-success');
+            const reportSection = document.getElementById('report-section');
+            const container = document.getElementById('main-container');
+            const tablaWrapper = document.getElementById('tabla-detalles-wrapper');
+            const tablaHead = document.getElementById('tabla-detalles-head');
+            const tablaBody = document.getElementById('tabla-detalles-body');
+
+            // Estado de carga
+            alertSuccess.style.display = 'none';
+            reportSection.style.display = 'none';
+            tablaWrapper.style.display = 'none';
+            tablaHead.innerHTML = '';
+            tablaBody.innerHTML = '';
+            btnFetch.disabled = true;
+            btnFetch.innerHTML = `<span class="material-icons">sync</span> Consultando Servidor...`;
+
+            try {
+                let url = '';
+                
+                if (tipoReporte === 'pagos') {
+                    url = `http://localhost:3000/reportes/pagos?mes=${mesSeleccionado}&anio=${anioSeleccionado}`;
+                } else if (tipoReporte === 'asistencias') {
+                    url = `http://localhost:3000/reportes/asistencias-inasistencias?mes=${mesSeleccionado}&anio=${anioSeleccionado}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (tipoReporte === 'pagos') {
+                    const pagos = Array.isArray(data) ? data : []; 
+
+                    document.getElementById('rep-titulo').innerText = `REPORTE DE PAGOS`;
+                    document.getElementById('rep-subtitulo').innerText = `Auditoría de Transacciones y Finanzas`;
+                    
+                    tablaHead.innerHTML = `
+                        <tr>
+                            <th>Número de Turno</th>
+                            <th>Monto Pagado</th>
+                            <th>Método</th>
+                            <th>Fecha Pago</th>
+                        </tr>
+                    `;
+
+                    let totalMonto = 0;
+                    let enEfectivo = 0;
+                    let enTarjeta = 0;
+
+                    pagos.forEach(pago => {
+                        totalMonto += parseFloat(pago.monto_pagado || 0);
+                        if(pago.metodo === 'efectivo') enEfectivo++;
+                        if(pago.metodo === 'tarjeta') enTarjeta++;
+
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
+                            <td>${pago.idTurno}</td>
+                            <td>$${parseFloat(pago.monto_pagado).toFixed(2)}</td>
+                            <td>${pago.metodo.toUpperCase()}</td>
+                            <td>${pago.fecha_pago}</td>
+                        `;
+                        tablaBody.appendChild(fila);
+                    });
+
+                    document.getElementById('lbl-metrica1').innerText = "Total Recaudado";
+                    document.getElementById('val-metrica1').innerText = `$${totalMonto.toFixed(2)}`;
+                    document.getElementById('lbl-metrica2').innerText = "Total Transacciones";
+                    document.getElementById('val-metrica2').innerText = pagos.length;
+                    document.getElementById('lbl-metrica3').innerText = "Pagos en Efectivo";
+                    document.getElementById('val-metrica3').innerText = enEfectivo;
+                    document.getElementById('lbl-metrica4').innerText = "Pagos con Tarjeta";
+                    document.getElementById('val-metrica4').innerText = enTarjeta;
+                    
+                    document.getElementById('rep-descripcion').innerText = `El flujo financiero obtenido del sistema para el mes de ${mesSeleccionado} refleja un total procesado de $${totalMonto.toFixed(2)} distribuidos en ${pagos.length} operaciones conciliadas exitosamente.`;
+                    
+                    if(pagos.length > 0) tablaWrapper.style.display = 'block';
+                
+                } else if (tipoReporte === 'asistencias') {
+                    document.getElementById('rep-titulo').innerText = `REPORTE DE ASISTENCIAS E INASISTENCIAS`;
+                    document.getElementById('rep-subtitulo').innerText = `Control de Presentismo y Ausentismo`;
+                    
+                    tablaHead.innerHTML = `
+                        <tr>
+                            <th>Número de Turno</th>
+                            <th>Asistencias</th>
+                            <th>Inasistencias</th>
+                            <th>Fecha</th>
+                        </tr>
+                    `;
+
+                    const asistenciasRaw = data.asistencias || [];
+                    const inasistenciasRaw = data.inasistencias || [];
+                    const totalRegistros = data.total || 0;
+
+                    const turnosMap = {};
+
+                    asistenciasRaw.forEach(item => {
+                        const turno = item.idTurno;
+                        if (!turnosMap[turno]) {
+                            turnosMap[turno] = { asistencias: 0, inasistencias: 0, fecha: item.fecha_asistencia || '--' };
+                        }
+                        turnosMap[turno].asistencias += 1;
+                    });
+
+                    inasistenciasRaw.forEach(item => {
+                        const turno = item.idTurno;
+                        if (!turnosMap[turno]) {
+                            turnosMap[turno] = { asistencias: 0, inasistencias: 0, fecha: item.fecha_asistencia || '--' };
+                        }
+                        turnosMap[turno].inasistencias += 1;
+                    });
+
+                    Object.keys(turnosMap).forEach(idTurno => {
+                        const info = turnosMap[idTurno];
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
+                            <td>${idTurno}</td>
+                            <td>${info.asistencias}</td>
+                            <td>${info.inasistencias}</td>
+                            <td>${info.fecha}</td>
+                        `;
+                        tablaBody.appendChild(fila);
+                    });
+
+                    const ratioAsistencia = totalRegistros > 0 ? ((asistenciasRaw.length / totalRegistros) * 100).toFixed(1) : 0;
+
+                    document.getElementById('lbl-metrica1').innerText = "Total Asistencias";
+                    document.getElementById('val-metrica1').innerText = asistenciasRaw.length;
+                    document.getElementById('lbl-metrica2').innerText = "Total Inasistencias";
+                    document.getElementById('val-metrica2').innerText = inasistenciasRaw.length;
+                    document.getElementById('lbl-metrica3').innerText = "Total Evaluado";
+                    document.getElementById('val-metrica3').innerText = totalRegistros;
+                    document.getElementById('lbl-metrica4').innerText = "% de Asistencia";
+                    document.getElementById('val-metrica4').innerText = `${ratioAsistencia}%`;
+                    
+                    document.getElementById('rep-descripcion').innerText = `El control de asistencia de ${mesSeleccionado} refleja un total de ${totalRegistros} eventos auditados, acumulando un total de ${asistenciasRaw.length} asistencias efectivas y ${inasistenciasRaw.length} inasistencias distribuidas en los turnos indicados.`;
+                    
+                    if(totalRegistros > 0) tablaWrapper.style.display = 'block';
+                }
+
+                document.getElementById('rep-fecha-gen').innerText = `Consultado el: ${new Date().toLocaleDateString()}`;
+
+                alertSuccess.style.display = 'flex';
+                reportSection.style.display = 'block';
+                container.classList.add('expanded');
+
+            } catch (error) {
+                alert('Ocurrió un error en la conexión GET con el servidor local o remoto.');
+                console.error(error);
+            } finally {
+                btnFetch.disabled = false;
+                btnFetch.innerHTML = `<span class="material-icons">search</span> Consultar Reporte (GET)`;
+            }
+        }
+
+        function descargarPDF() {
+            const elemento = document.getElementById('pdf-content');
+            const tipo = document.getElementById('tipoReporte').value;
+            const mes = document.getElementById('mes').value;
+            const anio = document.getElementById('anio').value;
+
+            const configuracion = {
+                margin:       15,
+                filename:     `Reporte_${tipo}_${mes}_${anio}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(configuracion).from(elemento).save();
+        }
+
+        function resetearFormulario() {
+            document.getElementById('report-form').reset();
+            document.getElementById('alert-success').style.display = 'none';
+            document.getElementById('report-section').style.display = 'none';
+            document.getElementById('tabla-detalles-wrapper').style.display = 'none';
+            document.getElementById('tabla-detalles-head').innerHTML = '';
+            document.getElementById('tabla-detalles-body').innerHTML = '';
+            document.getElementById('main-container').classList.remove('expanded');
+        }
+    </script>
+</body>
+</html>

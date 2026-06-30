@@ -15,6 +15,15 @@ const TurnoAsignadoSchema = new EntitySchema({
         },
         estado: {
             type: "varchar"
+        },
+        asistencia:{
+            type: "varchar",
+            nullable: true
+
+        },
+        fecha_asistencia:{
+            type: "date",
+            nullable: true
         }
     }, 
 

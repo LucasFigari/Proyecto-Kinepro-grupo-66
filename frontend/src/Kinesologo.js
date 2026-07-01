@@ -48,12 +48,12 @@ const cargarTurnosPorArea = async (areaId, areaNombre) => {
         // 🧼 2. FILTRADO: Nos quedamos ESTRICTAMENTE con los turnos que coincidan con hoy
         const turnosDeHoy = turnos.filter(turno => {
             // Aseguramos que si la fecha viene completa con hora de la base de datos, solo comparemos el YYYY-MM-DD
-            const fechaLimpia = turno.fecha.includes('T') ? turno.fecha.split('T')[0] : turno.fecha;
+            const fechaLimpia = turno.fecha_turno.includes('T') ? turno.fecha_turno.split('T')[0] : turno.fecha_turno;
             return fechaLimpia === hoy;
         });
 
         // ⏱️ 3. ORDENADO: Ordenamos por horario para que la jornada se lea de corrido
-        turnosDeHoy.sort((a, b) => a.horario.localeCompare(b.horario));
+        turnosDeHoy.sort((a, b) => a.hora_comienzo.localeCompare(b.hora_comienzo));
 
         // 🚨 4. NUEVA VALIDACIÓN: Si después de limpiar no hay nada para hoy, mostramos el aviso
         if (turnosDeHoy.length === 0) {
@@ -80,26 +80,60 @@ const cargarTurnosPorArea = async (areaId, areaNombre) => {
 
         // 📐 5. Recorremos únicamente el array filtrado 'turnosDeHoy'
         turnosDeHoy.forEach(turno => {
-            const estadoBadge = turno.isDisponible 
-                ? '<span class="badge bg-success">Disponible</span>' 
-                : '<span class="badge bg-danger">Ocupado</span>';
+            const sinCupo = turno.cupos_ocupados >= turno.cupo_maximo
+            const estadoBadge = sinCupo
+            ? '<span class="badge bg-danger">Lleno</span>'
+            : '<span class="badge bg-success">Con cupos</span>'
 
-            const pacienteInfo = turno.usuario 
-                ? `<strong>${turno.usuario.nombre} ${turno.usuario.apellido}</strong> <br><small class="text-muted">DNI: ${turno.usuario.dni}</small>`
-                : '<span class="text-success-emphasis fw-medium">-- Cupo Disponible --</span>';
+            const pacientesInfo = turno.usuarios && turno.usuarios.length > 0
+                ? turno.usuarios.map(u => {
+                // Buscar la asistencia del turno actual para este usuario
+                const asignacion = u.turnoAsignado?.find(ta => ta.idTurno === turno.id && ta.estado === "reservado")
+                const asistenciaActual = asignacion?.asistencia
 
-            // Usamos una variable limpia para mostrar la fecha de forma más amigable si querés
-            const fechaAMostrar = turno.fecha.includes('T') ? turno.fecha.split('T')[0] : turno.fecha;
+                let botonesOBadge
+                if (asistenciaActual === 'asistio') {
+                    botonesOBadge = '<span class="badge bg-success fs-6">✓ Presente</span>'
+                } else if (asistenciaActual === 'ausente') {
+                    botonesOBadge = '<span class="badge bg-danger fs-6">✗ Ausente</span>'
+                } else {
+                    botonesOBadge = `
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-success" onclick="marcarAsistencia(${turno.id}, '${u.dni}', 'asistio', this)">
+                                <i class="ti ti-check"></i> Presente
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="marcarAsistencia(${turno.id}, '${u.dni}', 'ausente', this)">
+                                <i class="ti ti-x"></i> Ausente
+                            </button>
+                        </div>
+                    `
+                }
+
+                return `
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <strong>${u.nombre} ${u.apellido}</strong>
+                            <br><small class="text-muted">DNI: ${u.dni}</small>
+                        </div>
+                        ${botonesOBadge}
+                    </div>
+                `
+            }).join('<hr class="my-1">')
+            : '<span class="text-muted">-- Sin clientes anotados --</span>'
+
+            const fechaAMostrar = turno.fecha_turno.includes('T') 
+                ? turno.fecha_turno.split('T')[0] 
+                : turno.fecha_turno
 
             tablaHTML += `
                 <tr>
                     <td><strong>${fechaAMostrar}</strong></td>
-                    <td>${turno.horario} hs</td>
-                    <td>${pacienteInfo}</td> 
+                    <td>${turno.hora_comienzo.substring(0, 5)} hs</td>
+                    <td>${pacientesInfo}</td>
                     <td>${estadoBadge}</td>
                 </tr>
-            `;
-        });
+            `
+})
 
         tablaHTML += `
                 </tbody>
@@ -426,3 +460,44 @@ document.getElementById('btnConfirmarCerrar').addEventListener('click', () => {
 document.getElementById('btnCancelarCerrar').addEventListener('click', () => {
     modalCerrar.style.display = 'none';
 });
+
+async function marcarAsistencia(idTurno, dni, asistencia, boton) {
+    try{
+        const response = await fetch('http://localhost:3000/turnos/asistencia', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idTurno, dni, asistencia })
+        })
+
+        const data = await response.json();
+
+        if(response.ok){
+
+            const contenedorBotones = boton.closest('.d-flex')
+            if (asistencia === 'asistio') {
+                contenedorBotones.outerHTML = '<span class="badge bg-success fs-6">✓ Presente</span>'
+            } else {
+                contenedorBotones.outerHTML = '<span class="badge bg-danger fs-6">✗ Ausente</span>'
+            }
+            
+            Swal.fire({
+                icon: 'success',
+                title: asistencia === 'asistio' ? '¡Presente!' : 'Ausente registrado',
+                text: data.message,
+                confirmButtonColor: '#52b788',
+                timer: 1500,
+                showConfirmButton: false
+            })
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message,
+                confirmButtonColor: '#52b788'
+            })
+        }
+
+    }catch(error){
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Error al conectar con el servidor.' })
+    }
+}

@@ -44,11 +44,25 @@ export class AreaDeTratamientoRepository{
    
 async findTurnosByAreaId(areaId) {
         
-        const areaConTurnos = await this.repository.findOne({
-            where: { id: areaId },
-            relations: ["turnos", "turnos.usuario"] 
-        });
+        const turnoRepo = this.repository.manager.getRepository("Turno");
+        const turnoAsignadoRepo = this.repository.manager.getRepository("TurnoAsignado");
 
-        return areaConTurnos ? areaConTurnos.turnos : [];
+        const turnos = await turnoRepo.find({
+            where: { area: { id: areaId } },
+            order: { fecha_turno: "ASC", hora_comienzo: "ASC"}
+        })
+
+        const turnosConUsuarios = await Promise.all(turnos.map(async (turno) => {
+            const asignados = await turnoAsignadoRepo.find({
+                where: {idTurno: turno.id, estado: "reservado"},
+                relations: ["usuario"]
+            })
+            return {
+                ...turno,
+                usuarios: asignados.map(a => a.usuario)
+            }
+        }))
+
+        return turnosConUsuarios;
     }
 }

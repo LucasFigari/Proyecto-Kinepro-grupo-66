@@ -201,7 +201,7 @@ export class TurnosPorSecretariaController{
 
     registrarAsistencia = async (req, res) => {
         try {
-            const { idTurno, dni} = req.body; 
+            const { idTurno, dni, asistencia } = req.body; 
 
             const turno = await this.turnoRepository.buscarPorId(idTurno);
             const usuario = await this.pacienteRepository.buscarPorDni(dni);
@@ -213,21 +213,23 @@ export class TurnosPorSecretariaController{
             if (!usuario) {
                 return res.status(404).json({ message: 'El usuario no existe.' });
             }
+            
             const turnoAsignado = await this.turnoAsignadoRepository.obtenerTurnoAsignadoAPaciente(turno.id, usuario.id);
 
             if (!turnoAsignado) {
                 return res.status(404).json({ message: 'El paciente no tiene este turno asignado' });
             }
 
-            if (turnoAsignado.asistencia === "asistio") {
-                return res.status(400).json({ message: `Ya se registro la asistencia del paciente con dni: ${usuario.dni}` });
+            if (!['asistio', 'ausente'].includes(asistencia)) {
+                return res.status(400).json({ message: 'El valor de asistencia debe ser "asistio" o "ausente"' });
             }
 
-            turnoAsignado.asistencia = "asistio";
+            turnoAsignado.asistencia = asistencia;
             turnoAsignado.fecha_asistencia = new Date();
-            const turnoActualizado = await this.turnoAsignadoRepository.actualizar(turnoAsignado);
+            await this.turnoAsignadoRepository.actualizar(turnoAsignado);
+
             return res.status(200).json({ 
-                message: `Se registro la asistencia del paciente con dni: ${usuario.dni}`
+                message: `Se registró la asistencia del paciente con DNI: ${usuario.dni} como "${asistencia}"`
             });
 
         } catch (error) {

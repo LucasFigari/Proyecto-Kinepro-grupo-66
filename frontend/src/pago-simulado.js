@@ -56,12 +56,10 @@ document.getElementById("btnPagar").addEventListener("click", async () => {
 
         const data = await res.json()
 
-        if(data.ok){
-            mensaje.textContent = `✅ ${data.mensaje} Monto abonado: $${data.montoAbonado.toFixed(2)}`
-            mensaje.className = "mensaje exito"
-            setTimeout(() => {
-                window.location.href = "./index-usuario.html"
-            }, 2000)
+        if (data.ok) {
+            mensaje.textContent = `✅ ${data.mensaje} Monto abonado: $${data.montoAbonado.toFixed(2)}`;
+            mensaje.className = "mensaje exito";
+            
         } else if(res.status === 400){
             mensaje.textContent = `❌ ${data.mensaje}`
             mensaje.className = "mensaje error"

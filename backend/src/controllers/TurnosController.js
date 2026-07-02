@@ -100,6 +100,7 @@ export const reservarTurnoComoPaciente = async (req, res) => {
             console.error("⚠️ No se pudo remover de lista de espera:", listaError);
         }
 
+        /*
         try {
             const usuario = await usuarioRepository.findOneBy({ id: parseInt(idUsuario) });
             if (usuario?.email) {
@@ -116,6 +117,43 @@ export const reservarTurnoComoPaciente = async (req, res) => {
             }
         } catch (emailError) {
             console.error("⚠️ No se pudo enviar el email:", emailError);
+        }*/
+
+        try {
+            const usuario = await usuarioRepository.findOneBy({ id: parseInt(idUsuario) });
+            const sendEmail = new SendEmailUseCase();
+
+            const asunto = `Confirmación de Reserva - Turno N° ${turno.id}`;
+            const urlPago = new URL('http://localhost:5173/pago-simulado.html');
+            urlPago.searchParams.append('idTurno', turno.id);
+            urlPago.searchParams.append('idUsuario', usuario.id);
+            urlPago.searchParams.append('precio', turno.precio);
+
+            const urlFinal = urlPago.toString(); 
+
+            const mensajeTexto = `Hola, tu turno ha sido reservado con éxito. Tu Número de Turno es: ${turno.id}. Puedes realizar el pago en el siguiente enlace: ${urlFinal}`;
+
+            const plantillaHTML = `
+                <p>Hola,</p>
+                <p>Tu turno ha sido reservado con éxito.</p>
+                <p><strong>Número de Turno:</strong> ${turno.id}</p>
+                <p>Para abonar el servicio, tienes las siguientes opciones:</p>
+                <ul>
+                    <li>Para abonar con tarjeta, haz <a href="${urlFinal}" target="_blank">clic aquí para pagar</a>.</li>
+                    <li>Para abonar en efectivo, debe acercarse al centro.</li>
+                </ul>
+                <p style="margin-top: 15px;">¡Muchas gracias!</p>
+            `;
+
+            await sendEmail.executeConHtml(
+                usuario.email, 
+                asunto, 
+                mensajeTexto,  
+                plantillaHTML  
+            );
+        } catch (error) {
+            console.error(`Falló el envío de email para el turno ${idTurno}:`, error);
+            throw new Error(`No se pudo enviar el correo de confirmación`);
         }
 
         return res.status(200).json({ mensaje: '¡Reserva realizada con éxito!' });

@@ -68,7 +68,7 @@ const tarjetaHTML = `
                     type="button"
                     class="btn btn-sm btn-success fw-bold flex-grow-1"
                     onclick="cargarTurnosPorArea(${area.id}, '${area.nombre}')">
-                    <i class="ti ti-calendar-plus"></i> Agendar Turno
+                    <i class="ti ti-calendar-plus"></i> Ver Turnos Disponibles
                 </button>
             </div>
             

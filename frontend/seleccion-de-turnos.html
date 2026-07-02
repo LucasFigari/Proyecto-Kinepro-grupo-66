@@ -156,11 +156,11 @@
 
                 Swal.fire({
                     icon: "success",
-                    title: "Turno reservado",
-                    text: "Ahora tenés que abonar para confirmar tu reserva.",
+                    title: "¡Reserva Exitosa!",
+                    text: "El turno fue agendado correctamente. Te enviamos la confirmación por email para que elijas el método de pago.",
                     confirmButtonColor: "#52b788"
                 }).then(() => {
-                    window.location.href = `/pago-simulado.html?idTurno=${idTurno}&idUsuario=${idUsuarioLogueado}&precio=${precioTurno}`;
+                    window.location.href = '/index-usuario.html';  // ← vuelve al panel
                 });
 
             } catch (error) {

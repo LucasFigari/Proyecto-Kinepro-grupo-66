@@ -82,10 +82,9 @@
 <body>
 
     <div class="sidebar">
-
-    <a href="./index-admin.html">
-        <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
-    </a>
+        <a href="./index-admin.html">
+            <img src="./src/imagenes/logo.png" alt="Menu principal" class="sidebar-logo">
+        </a>
 
         <div class="sidebar-title">KinePro · Admin</div>
 
@@ -95,14 +94,14 @@
         <a href="./buscar-paciente.html" class="sidebar-btn">
             <i class="ti ti-search"></i> Buscar Paciente
         </a>
-
-
         <a href="listar-areas.html" class="sidebar-btn">
             <i class="ti ti-activity"></i> Tratamientos
         </a>
-
         <a href="./eliminar-usuarios.html" class="sidebar-btn" id="btnSidebarGestion">
             <i class="ti ti-users"></i> Eliminar pacientes
+        </a>
+        <a href="reportes.html" class="sidebar-btn">
+            <i class="ti ti-file-report"></i> Generar reporte
         </a>
 
         <button class="sidebar-logout" id="btnCerrarSesion">
@@ -137,10 +136,15 @@
                 <p class="card-title">Tratamientos</p>
                 <p class="card-desc">Crear y eliminar los tratamientos disponibles en la empresa.</p>
             </a>
+
+            <a href="reportes.html" class="card">
+                <div class="card-icon"><i class="ti ti-file-report"></i></div>
+                <p class="card-title">Generar reporte</p>
+                <p class="card-desc">Visualizar estadísticas y exportar reportes generales de KinePro.</p>
+            </a>
         </div>
     </div>
 
-    <!-- Modal cerrar sesión -->
     <div id="modalCerrarSesion" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
         <div style="background:white; padding:2rem; border-radius:12px; width:100%; max-width:380px; text-align:center;">
             <h4 style="margin-bottom:1rem;">¿Cerrar sesión?</h4>
@@ -157,7 +161,6 @@
     </div>
 
     <script>
-
         const rol = sessionStorage.getItem('rol');
         if (!rol || rol !== 'Admin') window.location.href = '/';
         

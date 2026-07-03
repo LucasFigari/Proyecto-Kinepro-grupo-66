@@ -43,7 +43,8 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         const yaAsignado = await turnoAsignadoRepository.findOne({
             where: { 
                 idTurno: parseInt(idTurno), 
-                idUsuario: parseInt(idUsuario) 
+                idUsuario: parseInt(idUsuario), 
+                estado: 'reservado'
             }
         });
         
@@ -62,6 +63,7 @@ export const reservarTurnoComoPaciente = async (req, res) => {
                 .innerJoin("t.area", "a")
                 .where("ta.idUsuario = :idUsuario", { idUsuario: parseInt(idUsuario) })
                 .andWhere("a.id = :areaId", { areaId: turnoConArea.area.id })
+                .andWhere("ta.estado = :estado", { estado: 'reservado' }) // ✅ FIX: solo bloquear si sigue reservado, no si fue cancelado
                 .getOne();
 
             if (yaEnArea) {
@@ -99,25 +101,6 @@ export const reservarTurnoComoPaciente = async (req, res) => {
         } catch (listaError) {
             console.error("⚠️ No se pudo remover de lista de espera:", listaError);
         }
-
-        /*
-        try {
-            const usuario = await usuarioRepository.findOneBy({ id: parseInt(idUsuario) });
-            if (usuario?.email) {
-                const sendEmail = new SendEmailUseCase();
-                const asunto = `Confirmación de Reserva - Turno N° ${turno.id}`;
-                const mensaje = `Hola ${usuario.nombre}, tu turno fue reservado con éxito. Número de turno: ${turno.id}.`;
-                const html = `
-                    <p>Hola <strong>${usuario.nombre}</strong>,</p>
-                    <p>Tu turno fue reservado con éxito.</p>
-                    <p><strong>Número de Turno:</strong> ${turno.id}</p>
-                    <p>¡Muchas gracias!</p>
-                `;
-                await sendEmail.executeConHtml(usuario.email, asunto, mensaje, html);
-            }
-        } catch (emailError) {
-            console.error("⚠️ No se pudo enviar el email:", emailError);
-        }*/
 
         try {
             const usuario = await usuarioRepository.findOneBy({ id: parseInt(idUsuario) });
